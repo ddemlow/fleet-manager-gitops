@@ -2,7 +2,7 @@ name: GitOps Deployment to Fleet Manager
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, master ]
     paths:
       - 'manifests/**'
       - 'applications/**'
