@@ -1,0 +1,39 @@
+version: "1"
+type: "Application"
+metadata:
+  name: "example-vm"
+  description: "Example virtual machine deployment"
+  labels:
+    environment: "development"
+    team: "platform"
+spec:
+  assets:
+    - name: "example-disk"
+      type: "virtual_disk"
+      format: "qcow2"
+      size: "20Gi"
+      url: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+    - name: "example-vm"
+      type: "virtual_machine"
+      vcpus: 2
+      memory: "4Gi"
+      disks:
+        - name: "example-disk"
+          size: "20Gi"
+      networks:
+        - name: "default"
+          type: "bridge"
+      userData: |
+        #cloud-config
+        users:
+          - name: ubuntu
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7... # Your SSH key here
+        packages:
+          - docker.io
+          - git
+        runcmd:
+          - systemctl enable docker
+          - systemctl start docker
+          - usermod -aG docker ubuntu

@@ -1,0 +1,43 @@
+version: "1"
+type: "Application"
+metadata:
+  name: "k3s-cluster"
+  description: "K3s Kubernetes cluster deployment"
+  labels:
+    environment: "production"
+    team: "platform"
+    app: "kubernetes"
+spec:
+  assets:
+    - name: "k3s-disk"
+      type: "virtual_disk"
+      format: "qcow2"
+      size: "50Gi"
+      url: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+    - name: "k3s-master"
+      type: "virtual_machine"
+      vcpus: 2
+      memory: "4Gi"
+      disks:
+        - name: "k3s-disk"
+          size: "50Gi"
+      networks:
+        - name: "default"
+          type: "bridge"
+      userData: |
+        #cloud-config
+        users:
+          - name: ubuntu
+            sudo: ALL=(ALL) NOPASSWD:ALL
+            ssh_authorized_keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7... # Your SSH key here
+        packages:
+          - curl
+          - wget
+        runcmd:
+          - curl -sfL https://get.k3s.io | sh -
+          - systemctl enable k3s
+          - systemctl start k3s
+          - mkdir -p /home/ubuntu/.kube
+          - cp /etc/rancher/k3s/k3s.yaml /home/ubuntu/.kube/config
+          - chown ubuntu:ubuntu /home/ubuntu/.kube/config
