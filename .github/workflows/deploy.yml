@@ -1,0 +1,68 @@
+name: GitOps Deployment to Fleet Manager
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'manifests/**'
+      - 'applications/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'manifests/**'
+      - 'applications/**'
+
+env:
+  FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
+
+jobs:
+  validate-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate YAML syntax
+        run: |
+          echo "Validating YAML syntax..."
+          for file in $(find manifests/ applications/ -name "*.yaml" -o -name "*.yml" 2>/dev/null); do
+            echo "Validating $file"
+            python -c "import yaml; yaml.safe_load(open('$file'))" || exit 1
+          done
+
+      - name: Validate manifest structure
+        run: |
+          echo "Validating manifest structure..."
+          python scripts/validate-manifests.py
+
+  deploy:
+    needs: validate-manifests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests pyyaml
+
+      - name: Deploy to Fleet Manager
+        env:
+          SC_FM_APIKEY: ${{ secrets.SC_FM_APIKEY }}
+        run: |
+          python scripts/deploy.py
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment completed successfully"
+          else
+            echo "❌ Deployment failed"
+          fi
