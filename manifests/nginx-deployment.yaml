@@ -5,7 +5,7 @@ metadata:
   description: "Nginx web server deployment 8 (post old vm cleanup)"
   clusterGroups:
     - DDvsns
-  vmname: &vmname "anchor1"
+  vmname: &vmname "gitops-kraken"
   labels:
     - kraken
     - microos
@@ -39,9 +39,8 @@ spec:
         tags:
           - microos
           - "{{clusterName}}"
-          - "{{clusterId}}"
           - kraken
-          - production
+          - gitops
           - *vmname
 
         state: running
