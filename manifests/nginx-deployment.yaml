@@ -23,7 +23,7 @@ spec:
       name: "gitops-kraken-{{clusterName}}"
       spec:
         description: "name {{clusterName}} id {{clusterId}}kraken microos domain"
-        cpu: 2
+        cpu: 4
         memory: "4294967296" 
         machine_type: "uefi"
         storage_devices:
@@ -155,4 +155,4 @@ spec:
 
           meta_data: |
             dsmode: local
-            local-hostname: "nginx-kraken-{{clusterName}}"
+            local-hostname: "gitops-kraken-{{clusterName}}"
