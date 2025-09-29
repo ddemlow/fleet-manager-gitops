@@ -6,8 +6,8 @@ metadata:
   clusterGroups:
     - DDvsns
   labels:
-    environment: "development"
-    team: "platform"
+    - development
+    - platform
 spec:
   assets:
     - name: "example-disk"
