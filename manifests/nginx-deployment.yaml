@@ -18,141 +18,141 @@ spec:
       format: "raw"
       url: "https://pm-westfield.s3.us-east-2.amazonaws.com/openSUSE-MicroOS.x86_64-ContainerHost-OpenStack-Cloud.raw"  #converted from microos openstack qcow2 file
 
-  resources: []
-    # - type: "virdomain"
-    #   name: "gitops-kraken-{{clusterName}}"
-    #   spec:
-    #     description: "name {{clusterName}} id {{clusterId}}kraken microos domain"
-    #     cpu: 2
-    #     memory: "2147483648" #2GB in bytes
-    #     machine_type: "uefi"
-    #     storage_devices:
-    #       - name: "bootdisk"
-    #         type: "virtio_disk"
-    #         source: "microos"
-    #         boot: 1
-    #         capacity: 42949672960  # 40 GB
-    #     network_devices:
-    #       - name: eth0
-    #         type: virtio
+  resources: 
+    - type: "virdomain"
+      name: "gitops-kraken-{{clusterName}}"
+      spec:
+        description: "name {{clusterName}} id {{clusterId}}kraken microos domain"
+        cpu: 2
+        memory: "2147483648" #2GB in bytes
+        machine_type: "uefi"
+        storage_devices:
+          - name: "bootdisk"
+            type: "virtio_disk"
+            source: "microos"
+            boot: 1
+            capacity: 42949672960  # 40 GB
+        network_devices:
+          - name: eth0
+            type: virtio
 
-    #     tags:
-    #       - microos
-    #       - "{{clusterName}}"
-    #       - "{{clusterId}}"
-    #       - kraken
-    #       - production
-    #       - *vmname
+        tags:
+          - microos
+          - "{{clusterName}}"
+          - "{{clusterId}}"
+          - kraken
+          - production
+          - *vmname
 
-    #     state: running
+        state: running
 
-    #     cloud_init_data:  # note microos does not support write_files: as an immutable os
-    #       user_data: |
-    #         #cloud-config
-    #         password: "password"
-    #         chpasswd: { expire: False }
-    #         ssh_pwauth: True
-    #         ssh_authorized_keys:
-    #           - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
-    #         disable_root: false
-    #         ssh_pwauth: True
-    #         ssh_import_id:  gh:ddemlow
-    #         users:
-    #         - name: dave
-    #           groups: [wheel]
-    #           sudo: ALL=(ALL) NOPASSWD:ALL
-    #           shell: /bin/bash
-    #           ssh-authorized-keys:
-    #             - ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
-    #         chpasswd:
-    #           list: |
-    #             dave:password
-    #           expire: false
-    #         runcmd:
-    #           - systemctl enable podman.socket
-    #           - systemctl enable --now podman-auto-update.timer
-    #           - mkdir -p /etc/containers/systemd
+        cloud_init_data:  # note microos does not support write_files: as an immutable os
+          user_data: |
+            #cloud-config
+            password: "password"
+            chpasswd: { expire: False }
+            ssh_pwauth: True
+            ssh_authorized_keys:
+              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+            disable_root: false
+            ssh_pwauth: True
+            ssh_import_id:  gh:ddemlow
+            users:
+            - name: dave
+              groups: [wheel]
+              sudo: ALL=(ALL) NOPASSWD:ALL
+              shell: /bin/bash
+              ssh-authorized-keys:
+                - ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+            chpasswd:
+              list: |
+                dave:password
+              expire: false
+            runcmd:
+              - systemctl enable podman.socket
+              - systemctl enable --now podman-auto-update.timer
+              - mkdir -p /etc/containers/systemd
 
-    #           # Create a persistent host directory for the nginx document root
-    #           - mkdir -p /var/edge/www
+              # Create a persistent host directory for the nginx document root
+              - mkdir -p /var/edge/www
 
-    #           # Write a custom index.html that includes clusterName / clusterId
-    #           - |
-    #             cat <<'EOF' > /var/edge/www/index.html
-    #             <!doctype html>
-    #             <html>
-    #               <head>
-    #                 <meta charset="utf-8">
-    #                 <title>Welcome - {{clusterName}}</title>
-    #                 <meta name="viewport" content="width=device-width, initial-scale=1" />
-    #                 <style>
-    #                   :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif; }
-    #                   body { margin: 2rem; line-height: 1.5; }
-    #                   .wrap { max-width: 52rem; }
-    #                   h1 { margin-bottom: .25rem; }
-    #                   .meta { color: #555; margin-bottom: 1rem; }
-    #                   code { background: #f4f4f4; padding: .125rem .375rem; border-radius: .25rem; }
-    #                   .card { border: 1px solid #e6e6e6; border-radius: .5rem; padding: 1rem; }
-    #                 </style>
-    #               </head>
-    #               <body>
-    #                 <div class="wrap">
-    #                   <h1>Welcome to nginx on MicroOS</h1>
-    #                   <p class="meta">This node is serving a custom page from a bind-mounted volume.</p>
-    #                   <div class="card">
-    #                     <p><strong>Cluster:</strong> <code>{{clusterName}}</code></p>
-    #                     <p><strong>Cluster ID:</strong> <code>{{clusterId}}</code></p>
-    #                   </div>
-    #                   <p>Content path: <code>/var/edge/www/index.html</code> → mounted into <code>/usr/share/nginx/html</code>.</p>
-    #                 </div>
-    #               </body>
-    #             </html>
-    #             EOF
+              # Write a custom index.html that includes clusterName / clusterId
+              - |
+                cat <<'EOF' > /var/edge/www/index.html
+                <!doctype html>
+                <html>
+                  <head>
+                    <meta charset="utf-8">
+                    <title>Welcome - {{clusterName}}</title>
+                    <meta name="viewport" content="width=device-width, initial-scale=1" />
+                    <style>
+                      :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, sans-serif; }
+                      body { margin: 2rem; line-height: 1.5; }
+                      .wrap { max-width: 52rem; }
+                      h1 { margin-bottom: .25rem; }
+                      .meta { color: #555; margin-bottom: 1rem; }
+                      code { background: #f4f4f4; padding: .125rem .375rem; border-radius: .25rem; }
+                      .card { border: 1px solid #e6e6e6; border-radius: .5rem; padding: 1rem; }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="wrap">
+                      <h1>Welcome to nginx on MicroOS</h1>
+                      <p class="meta">This node is serving a custom page from a bind-mounted volume.</p>
+                      <div class="card">
+                        <p><strong>Cluster:</strong> <code>{{clusterName}}</code></p>
+                        <p><strong>Cluster ID:</strong> <code>{{clusterId}}</code></p>
+                      </div>
+                      <p>Content path: <code>/var/edge/www/index.html</code> → mounted into <code>/usr/share/nginx/html</code>.</p>
+                    </div>
+                  </body>
+                </html>
+                EOF
 
-    #           # Quadlet unit: bind-mount /var/edge/www into the container's docroot with SELinux relabel (:Z)
-    #           - |
-    #             cat <<'EOF' > /etc/containers/systemd/mynginx.container
-    #             [Container]
-    #             Image=docker.io/library/nginx:alpine
-    #             PublishPort=80:80
-    #             Volume=/var/edge/www:/usr/share/nginx/html:Z
-    #             Label=io.containers.autoupdate=registry
+              # Quadlet unit: bind-mount /var/edge/www into the container's docroot with SELinux relabel (:Z)
+              - |
+                cat <<'EOF' > /etc/containers/systemd/mynginx.container
+                [Container]
+                Image=docker.io/library/nginx:alpine
+                PublishPort=80:80
+                Volume=/var/edge/www:/usr/share/nginx/html:Z
+                Label=io.containers.autoupdate=registry
 
-    #             [Install]
-    #             WantedBy=multi-user.target
-    #             EOF
+                [Install]
+                WantedBy=multi-user.target
+                EOF
 
-    #           - systemctl daemon-reload
-    #           - sleep 2
-    #           - systemctl restart mynginx.service
+              - systemctl daemon-reload
+              - sleep 2
+              - systemctl restart mynginx.service
 
-    #           # install qemu-guest-agent transactionally; MicroOS will handle this via reboot/override below
-    #           - transactional-update --non-interactive pkg install qemu-guest-agent
+              # install qemu-guest-agent transactionally; MicroOS will handle this via reboot/override below
+              - transactional-update --non-interactive pkg install qemu-guest-agent
 
-    #           - |
-    #             cat <<'EOF' > /etc/systemd/system/enable-qemu-guest-agent.service
-    #             [Unit]
-    #             Description=Enable qemu-guest-agent post-reboot
-    #             After=multi-user.target
+              - |
+                cat <<'EOF' > /etc/systemd/system/enable-qemu-guest-agent.service
+                [Unit]
+                Description=Enable qemu-guest-agent post-reboot
+                After=multi-user.target
 
-    #             [Service]
-    #             Type=oneshot
-    #             ExecStart=/usr/bin/systemctl enable --now qemu-guest-agent.service
-    #             RemainAfterExit=yes
+                [Service]
+                Type=oneshot
+                ExecStart=/usr/bin/systemctl enable --now qemu-guest-agent.service
+                RemainAfterExit=yes
 
-    #             [Install]
-    #             WantedBy=multi-user.target
-    #             EOF
-    #           - mkdir -p /etc/systemd/system/qemu-guest-agent.service.d
-    #           - |
-    #             cat <<'EOF' > /etc/systemd/system/qemu-guest-agent.service.d/override.conf
-    #             [Unit]
-    #             Requires=
-    #             After=
-    #             EOF
-    #           - systemctl enable enable-qemu-guest-agent.service
-    #           - reboot
+                [Install]
+                WantedBy=multi-user.target
+                EOF
+              - mkdir -p /etc/systemd/system/qemu-guest-agent.service.d
+              - |
+                cat <<'EOF' > /etc/systemd/system/qemu-guest-agent.service.d/override.conf
+                [Unit]
+                Requires=
+                After=
+                EOF
+              - systemctl enable enable-qemu-guest-agent.service
+              - reboot
 
-    #       meta_data: |
-    #         dsmode: local
-    #         local-hostname: "gitops-kraken-{{clusterName}}"
+          meta_data: |
+            dsmode: local
+            local-hostname: "gitops-kraken-{{clusterName}}"
