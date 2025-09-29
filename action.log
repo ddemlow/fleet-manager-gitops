@@ -1,0 +1,526 @@
+deploy	Set up job	﻿2025-09-29T11:02:00.9034906Z ##[debug]Starting: Set up job
+deploy	Set up job	2025-09-29T11:02:00.9036014Z Current runner version: '2.328.0'
+deploy	Set up job	2025-09-29T11:02:00.9057002Z ##[group]Runner Image Provisioner
+deploy	Set up job	2025-09-29T11:02:00.9057876Z Hosted Compute Agent
+deploy	Set up job	2025-09-29T11:02:00.9058439Z Version: 20250912.392
+deploy	Set up job	2025-09-29T11:02:00.9059062Z Commit: d921fda672a98b64f4f82364647e2f10b2267d0b
+deploy	Set up job	2025-09-29T11:02:00.9059838Z Build Date: 2025-09-12T15:23:14Z
+deploy	Set up job	2025-09-29T11:02:00.9060425Z ##[endgroup]
+deploy	Set up job	2025-09-29T11:02:00.9060948Z ##[group]Operating System
+deploy	Set up job	2025-09-29T11:02:00.9061549Z Ubuntu
+deploy	Set up job	2025-09-29T11:02:00.9062006Z 24.04.3
+deploy	Set up job	2025-09-29T11:02:00.9062483Z LTS
+deploy	Set up job	2025-09-29T11:02:00.9062938Z ##[endgroup]
+deploy	Set up job	2025-09-29T11:02:00.9063507Z ##[group]Runner Image
+deploy	Set up job	2025-09-29T11:02:00.9064073Z Image: ubuntu-24.04
+deploy	Set up job	2025-09-29T11:02:00.9064549Z Version: 20250922.53.1
+deploy	Set up job	2025-09-29T11:02:00.9065643Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250922.53/images/ubuntu/Ubuntu2404-Readme.md
+deploy	Set up job	2025-09-29T11:02:00.9067595Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250922.53
+deploy	Set up job	2025-09-29T11:02:00.9068659Z ##[endgroup]
+deploy	Set up job	2025-09-29T11:02:00.9069747Z ##[group]GITHUB_TOKEN Permissions
+deploy	Set up job	2025-09-29T11:02:00.9071609Z Contents: read
+deploy	Set up job	2025-09-29T11:02:00.9072162Z Metadata: read
+deploy	Set up job	2025-09-29T11:02:00.9072708Z Packages: read
+deploy	Set up job	2025-09-29T11:02:00.9073298Z ##[endgroup]
+deploy	Set up job	2025-09-29T11:02:00.9075283Z Secret source: Actions
+deploy	Set up job	2025-09-29T11:02:00.9076092Z ##[debug]Primary repository: ddemlow/fleet-manager-gitops
+deploy	Set up job	2025-09-29T11:02:00.9077239Z Prepare workflow directory
+deploy	Set up job	2025-09-29T11:02:00.9147657Z ##[debug]Creating pipeline directory: '/home/runner/work/fleet-manager-gitops'
+deploy	Set up job	2025-09-29T11:02:00.9151238Z ##[debug]Creating workspace directory: '/home/runner/work/fleet-manager-gitops/fleet-manager-gitops'
+deploy	Set up job	2025-09-29T11:02:00.9152940Z ##[debug]Update context data
+deploy	Set up job	2025-09-29T11:02:00.9156159Z ##[debug]Evaluating job-level environment variables
+deploy	Set up job	2025-09-29T11:02:00.9448092Z ##[debug]Evaluating job container
+deploy	Set up job	2025-09-29T11:02:00.9450957Z ##[debug]Evaluating job service containers
+deploy	Set up job	2025-09-29T11:02:00.9453434Z ##[debug]Evaluating job defaults
+deploy	Set up job	2025-09-29T11:02:00.9479018Z Prepare all required actions
+deploy	Set up job	2025-09-29T11:02:00.9516658Z Getting action download info
+deploy	Set up job	2025-09-29T11:02:01.3068305Z Download action repository 'actions/checkout@v4' (SHA:08eba0b27e820071cde6df949e0beb9ba4906955)
+deploy	Set up job	2025-09-29T11:02:01.3100554Z ##[debug]Copied action archive '/opt/actionarchivecache/actions_checkout/08eba0b27e820071cde6df949e0beb9ba4906955.tar.gz' to '/home/runner/work/_actions/_temp_3dfd4b0e-c141-46b9-89d8-518a76211f5a/a68116ce-3a6f-482e-9269-c642bbb1f6d0.tar.gz'
+deploy	Set up job	2025-09-29T11:02:01.4887014Z ##[debug]Unwrap 'actions-checkout-08eba0b' to '/home/runner/work/_actions/actions/checkout/v4'
+deploy	Set up job	2025-09-29T11:02:01.5024071Z ##[debug]Archive '/home/runner/work/_actions/_temp_3dfd4b0e-c141-46b9-89d8-518a76211f5a/a68116ce-3a6f-482e-9269-c642bbb1f6d0.tar.gz' has been unzipped into '/home/runner/work/_actions/actions/checkout/v4'.
+deploy	Set up job	2025-09-29T11:02:01.5121411Z Download action repository 'actions/setup-python@v4' (SHA:7f4fc3e22c37d6ff65e88745f38bd3157c663f7c)
+deploy	Set up job	2025-09-29T11:02:01.5511807Z ##[debug]Copied action archive '/opt/actionarchivecache/actions_setup-python/7f4fc3e22c37d6ff65e88745f38bd3157c663f7c.tar.gz' to '/home/runner/work/_actions/_temp_010a6c1b-45b6-4b12-97ea-4189e4491995/b6eeb4d7-5423-404c-bf12-f00db08834f5.tar.gz'
+deploy	Set up job	2025-09-29T11:02:01.6025445Z ##[debug]Unwrap 'actions-setup-python-7f4fc3e' to '/home/runner/work/_actions/actions/setup-python/v4'
+deploy	Set up job	2025-09-29T11:02:01.6249711Z ##[debug]Archive '/home/runner/work/_actions/_temp_010a6c1b-45b6-4b12-97ea-4189e4491995/b6eeb4d7-5423-404c-bf12-f00db08834f5.tar.gz' has been unzipped into '/home/runner/work/_actions/actions/setup-python/v4'.
+deploy	Set up job	2025-09-29T11:02:01.6317979Z ##[debug]action.yml for action: '/home/runner/work/_actions/actions/checkout/v4/action.yml'.
+deploy	Set up job	2025-09-29T11:02:01.6885440Z ##[debug]action.yml for action: '/home/runner/work/_actions/actions/setup-python/v4/action.yml'.
+deploy	Set up job	2025-09-29T11:02:01.7078646Z ##[debug]Set step '__actions_checkout' display name to: 'Checkout code'
+deploy	Set up job	2025-09-29T11:02:01.7081868Z ##[debug]Set step '__actions_setup-python' display name to: 'Setup Python'
+deploy	Set up job	2025-09-29T11:02:01.7083509Z ##[debug]Set step '__run' display name to: 'Install dependencies'
+deploy	Set up job	2025-09-29T11:02:01.7085034Z ##[debug]Set step '__run_2' display name to: 'Deploy to Fleet Manager'
+deploy	Set up job	2025-09-29T11:02:01.7086858Z ##[debug]Set step '__run_3' display name to: 'Notify deployment status'
+deploy	Set up job	2025-09-29T11:02:01.7087615Z Complete job name: deploy
+deploy	Set up job	2025-09-29T11:02:01.7113405Z ##[debug]Collect running processes for tracking orphan processes.
+deploy	Set up job	2025-09-29T11:02:01.7327175Z ##[debug]Finishing: Set up job
+deploy	Checkout code	﻿2025-09-29T11:02:01.7444396Z ##[debug]Evaluating condition for step: 'Checkout code'
+deploy	Checkout code	2025-09-29T11:02:01.7481853Z ##[debug]Evaluating: success()
+deploy	Checkout code	2025-09-29T11:02:01.7486665Z ##[debug]Evaluating success:
+deploy	Checkout code	2025-09-29T11:02:01.7502780Z ##[debug]=> true
+deploy	Checkout code	2025-09-29T11:02:01.7509074Z ##[debug]Result: true
+deploy	Checkout code	2025-09-29T11:02:01.7531083Z ##[debug]Starting: Checkout code
+deploy	Checkout code	2025-09-29T11:02:01.7599091Z ##[debug]Register post job cleanup for action: actions/checkout@v4
+deploy	Checkout code	2025-09-29T11:02:01.7675481Z ##[debug]Loading inputs
+deploy	Checkout code	2025-09-29T11:02:01.7684719Z ##[debug]Evaluating: github.repository
+deploy	Checkout code	2025-09-29T11:02:01.7685875Z ##[debug]Evaluating Index:
+deploy	Checkout code	2025-09-29T11:02:01.7688109Z ##[debug]..Evaluating github:
+deploy	Checkout code	2025-09-29T11:02:01.7689363Z ##[debug]..=> Object
+deploy	Checkout code	2025-09-29T11:02:01.7695091Z ##[debug]..Evaluating String:
+deploy	Checkout code	2025-09-29T11:02:01.7695997Z ##[debug]..=> 'repository'
+deploy	Checkout code	2025-09-29T11:02:01.7700218Z ##[debug]=> 'ddemlow/fleet-manager-gitops'
+deploy	Checkout code	2025-09-29T11:02:01.7701821Z ##[debug]Result: 'ddemlow/fleet-manager-gitops'
+deploy	Checkout code	2025-09-29T11:02:01.7704936Z ##[debug]Evaluating: github.token
+deploy	Checkout code	2025-09-29T11:02:01.7705514Z ##[debug]Evaluating Index:
+deploy	Checkout code	2025-09-29T11:02:01.7706001Z ##[debug]..Evaluating github:
+deploy	Checkout code	2025-09-29T11:02:01.7706669Z ##[debug]..=> Object
+deploy	Checkout code	2025-09-29T11:02:01.7707130Z ##[debug]..Evaluating String:
+deploy	Checkout code	2025-09-29T11:02:01.7707632Z ##[debug]..=> 'token'
+deploy	Checkout code	2025-09-29T11:02:01.7708417Z ##[debug]=> '***'
+deploy	Checkout code	2025-09-29T11:02:01.7709007Z ##[debug]Result: '***'
+deploy	Checkout code	2025-09-29T11:02:01.7723237Z ##[debug]Loading env
+deploy	Checkout code	2025-09-29T11:02:01.7792740Z ##[group]Run actions/checkout@v4
+deploy	Checkout code	2025-09-29T11:02:01.7793479Z with:
+deploy	Checkout code	2025-09-29T11:02:01.7793933Z   repository: ddemlow/fleet-manager-gitops
+deploy	Checkout code	2025-09-29T11:02:01.7794686Z   token: ***
+deploy	Checkout code	2025-09-29T11:02:01.7795079Z   ssh-strict: true
+deploy	Checkout code	2025-09-29T11:02:01.7795489Z   ssh-user: git
+deploy	Checkout code	2025-09-29T11:02:01.7795903Z   persist-credentials: true
+deploy	Checkout code	2025-09-29T11:02:01.7796595Z   clean: true
+deploy	Checkout code	2025-09-29T11:02:01.7797017Z   sparse-checkout-cone-mode: true
+deploy	Checkout code	2025-09-29T11:02:01.7797514Z   fetch-depth: 1
+deploy	Checkout code	2025-09-29T11:02:01.7797918Z   fetch-tags: false
+deploy	Checkout code	2025-09-29T11:02:01.7798352Z   show-progress: true
+deploy	Checkout code	2025-09-29T11:02:01.7798764Z   lfs: false
+deploy	Checkout code	2025-09-29T11:02:01.7799143Z   submodules: false
+deploy	Checkout code	2025-09-29T11:02:01.7799555Z   set-safe-directory: true
+deploy	Checkout code	2025-09-29T11:02:01.7800389Z env:
+deploy	Checkout code	2025-09-29T11:02:01.7800991Z   FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
+deploy	Checkout code	2025-09-29T11:02:01.7801642Z ##[endgroup]
+deploy	Checkout code	2025-09-29T11:02:01.8820757Z ##[debug]GITHUB_WORKSPACE = '/home/runner/work/fleet-manager-gitops/fleet-manager-gitops'
+deploy	Checkout code	2025-09-29T11:02:01.8823713Z ##[debug]qualified repository = 'ddemlow/fleet-manager-gitops'
+deploy	Checkout code	2025-09-29T11:02:01.8825453Z ##[debug]ref = 'refs/heads/master'
+deploy	Checkout code	2025-09-29T11:02:01.8827323Z ##[debug]commit = '4df00bb2c9e4448383c652d6f7d785329ff3c984'
+deploy	Checkout code	2025-09-29T11:02:01.8828999Z ##[debug]clean = true
+deploy	Checkout code	2025-09-29T11:02:01.8830290Z ##[debug]filter = undefined
+deploy	Checkout code	2025-09-29T11:02:01.8831658Z ##[debug]fetch depth = 1
+deploy	Checkout code	2025-09-29T11:02:01.8832934Z ##[debug]fetch tags = false
+deploy	Checkout code	2025-09-29T11:02:01.8834272Z ##[debug]show progress = true
+deploy	Checkout code	2025-09-29T11:02:01.8835657Z ##[debug]lfs = false
+deploy	Checkout code	2025-09-29T11:02:01.8837142Z ##[debug]submodules = false
+deploy	Checkout code	2025-09-29T11:02:01.8838547Z ##[debug]recursive submodules = false
+deploy	Checkout code	2025-09-29T11:02:01.8839975Z ##[debug]GitHub Host URL = 
+deploy	Checkout code	2025-09-29T11:02:01.8842383Z ::add-matcher::/home/runner/work/_actions/actions/checkout/v4/dist/problem-matcher.json
+deploy	Checkout code	2025-09-29T11:02:01.8941391Z ##[debug]Added matchers: 'checkout-git'. Problem matchers scan action output for known warning or error strings and report these inline.
+deploy	Checkout code	2025-09-29T11:02:01.8948883Z Syncing repository: ddemlow/fleet-manager-gitops
+deploy	Checkout code	2025-09-29T11:02:01.8950182Z ::group::Getting Git version info
+deploy	Checkout code	2025-09-29T11:02:01.8951590Z ##[group]Getting Git version info
+deploy	Checkout code	2025-09-29T11:02:01.8952514Z Working directory is '/home/runner/work/fleet-manager-gitops/fleet-manager-gitops'
+deploy	Checkout code	2025-09-29T11:02:01.8953649Z ##[debug]Getting git version
+deploy	Checkout code	2025-09-29T11:02:01.8954299Z [command]/usr/bin/git version
+deploy	Checkout code	2025-09-29T11:02:01.9011574Z git version 2.51.0
+deploy	Checkout code	2025-09-29T11:02:01.9034778Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:01.9036676Z ##[debug]git version 2.51.0
+deploy	Checkout code	2025-09-29T11:02:01.9037512Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:01.9038969Z ##[debug]Set git useragent to: git/2.51.0 (github-actions-checkout)
+deploy	Checkout code	2025-09-29T11:02:01.9040773Z ::endgroup::
+deploy	Checkout code	2025-09-29T11:02:01.9041544Z ##[endgroup]
+deploy	Checkout code	2025-09-29T11:02:01.9046178Z ::add-mask::***
+deploy	Checkout code	2025-09-29T11:02:01.9054069Z Temporarily overriding HOME='/home/runner/work/_temp/721603ec-c211-467b-8196-2d7d1764d75b' before making global git config changes
+deploy	Checkout code	2025-09-29T11:02:01.9067177Z Adding repository directory to the temporary git global config as a safe directory
+deploy	Checkout code	2025-09-29T11:02:01.9068499Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/fleet-manager-gitops/fleet-manager-gitops
+deploy	Checkout code	2025-09-29T11:02:01.9098256Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:01.9098989Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:01.9103495Z Deleting the contents of '/home/runner/work/fleet-manager-gitops/fleet-manager-gitops'
+deploy	Checkout code	2025-09-29T11:02:01.9107053Z ::group::Initializing the repository
+deploy	Checkout code	2025-09-29T11:02:01.9107673Z ##[group]Initializing the repository
+deploy	Checkout code	2025-09-29T11:02:01.9111291Z [command]/usr/bin/git init /home/runner/work/fleet-manager-gitops/fleet-manager-gitops
+deploy	Checkout code	2025-09-29T11:02:01.9247101Z hint: Using 'master' as the name for the initial branch. This default branch name
+deploy	Checkout code	2025-09-29T11:02:01.9248867Z hint: is subject to change. To configure the initial branch name to use in all
+deploy	Checkout code	2025-09-29T11:02:01.9250416Z hint: of your new repositories, which will suppress this warning, call:
+deploy	Checkout code	2025-09-29T11:02:01.9251594Z hint:
+deploy	Checkout code	2025-09-29T11:02:01.9252354Z hint: 	git config --global init.defaultBranch <name>
+deploy	Checkout code	2025-09-29T11:02:01.9253266Z hint:
+deploy	Checkout code	2025-09-29T11:02:01.9254126Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+deploy	Checkout code	2025-09-29T11:02:01.9255088Z hint: 'development'. The just-created branch can be renamed via this command:
+deploy	Checkout code	2025-09-29T11:02:01.9255853Z hint:
+deploy	Checkout code	2025-09-29T11:02:01.9256495Z hint: 	git branch -m <name>
+deploy	Checkout code	2025-09-29T11:02:01.9257052Z hint:
+deploy	Checkout code	2025-09-29T11:02:01.9257681Z hint: Disable this message with "git config set advice.defaultBranchName false"
+deploy	Checkout code	2025-09-29T11:02:01.9258891Z Initialized empty Git repository in /home/runner/work/fleet-manager-gitops/fleet-manager-gitops/.git/
+deploy	Checkout code	2025-09-29T11:02:01.9262499Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:01.9263608Z ##[debug]Initialized empty Git repository in /home/runner/work/fleet-manager-gitops/fleet-manager-gitops/.git/
+deploy	Checkout code	2025-09-29T11:02:01.9264520Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:01.9270794Z [command]/usr/bin/git remote add origin https://github.com/ddemlow/fleet-manager-gitops
+deploy	Checkout code	2025-09-29T11:02:01.9314579Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:01.9315631Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:01.9316543Z ::endgroup::
+deploy	Checkout code	2025-09-29T11:02:01.9316943Z ##[endgroup]
+deploy	Checkout code	2025-09-29T11:02:01.9317649Z ::group::Disabling automatic garbage collection
+deploy	Checkout code	2025-09-29T11:02:01.9318243Z ##[group]Disabling automatic garbage collection
+deploy	Checkout code	2025-09-29T11:02:01.9321513Z [command]/usr/bin/git config --local gc.auto 0
+deploy	Checkout code	2025-09-29T11:02:01.9354840Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:01.9355795Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:01.9356713Z ::endgroup::
+deploy	Checkout code	2025-09-29T11:02:01.9357126Z ##[endgroup]
+deploy	Checkout code	2025-09-29T11:02:01.9357788Z ::group::Setting up auth
+deploy	Checkout code	2025-09-29T11:02:01.9358238Z ##[group]Setting up auth
+deploy	Checkout code	2025-09-29T11:02:01.9365927Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+deploy	Checkout code	2025-09-29T11:02:01.9394371Z ##[debug]1
+deploy	Checkout code	2025-09-29T11:02:01.9401959Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:01.9403138Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+deploy	Checkout code	2025-09-29T11:02:01.9763857Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:01.9765045Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:01.9771676Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+deploy	Checkout code	2025-09-29T11:02:01.9798924Z ##[debug]1
+deploy	Checkout code	2025-09-29T11:02:01.9800017Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:01.9805480Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+deploy	Checkout code	2025-09-29T11:02:02.0027845Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:02.0028927Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.0037769Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+deploy	Checkout code	2025-09-29T11:02:02.0074963Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:02.0076477Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.0083346Z ::endgroup::
+deploy	Checkout code	2025-09-29T11:02:02.0084039Z ##[endgroup]
+deploy	Checkout code	2025-09-29T11:02:02.0085289Z ::group::Fetching the repository
+deploy	Checkout code	2025-09-29T11:02:02.0086506Z ##[group]Fetching the repository
+deploy	Checkout code	2025-09-29T11:02:02.0093954Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +4df00bb2c9e4448383c652d6f7d785329ff3c984:refs/remotes/origin/master
+deploy	Checkout code	2025-09-29T11:02:02.3074245Z From https://github.com/ddemlow/fleet-manager-gitops
+deploy	Checkout code	2025-09-29T11:02:02.3075346Z  * [new ref]         4df00bb2c9e4448383c652d6f7d785329ff3c984 -> origin/master
+deploy	Checkout code	2025-09-29T11:02:02.3104732Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:02.3105887Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.3108173Z ::endgroup::
+deploy	Checkout code	2025-09-29T11:02:02.3108873Z ##[endgroup]
+deploy	Checkout code	2025-09-29T11:02:02.3110005Z ::group::Determining the checkout info
+deploy	Checkout code	2025-09-29T11:02:02.3110884Z ##[group]Determining the checkout info
+deploy	Checkout code	2025-09-29T11:02:02.3112195Z ::endgroup::
+deploy	Checkout code	2025-09-29T11:02:02.3112808Z ##[endgroup]
+deploy	Checkout code	2025-09-29T11:02:02.3114693Z [command]/usr/bin/git sparse-checkout disable
+deploy	Checkout code	2025-09-29T11:02:02.3151450Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:02.3152585Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.3156866Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+deploy	Checkout code	2025-09-29T11:02:02.3184154Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:02.3185291Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.3186553Z ::group::Checking out the ref
+deploy	Checkout code	2025-09-29T11:02:02.3187413Z ##[group]Checking out the ref
+deploy	Checkout code	2025-09-29T11:02:02.3189508Z [command]/usr/bin/git checkout --progress --force -B master refs/remotes/origin/master
+deploy	Checkout code	2025-09-29T11:02:02.3244644Z Reset branch 'master'
+deploy	Checkout code	2025-09-29T11:02:02.3247358Z branch 'master' set up to track 'origin/master'.
+deploy	Checkout code	2025-09-29T11:02:02.3252461Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:02.3253793Z ##[debug]branch 'master' set up to track 'origin/master'.
+deploy	Checkout code	2025-09-29T11:02:02.3254778Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.3255832Z ::endgroup::
+deploy	Checkout code	2025-09-29T11:02:02.3256700Z ##[endgroup]
+deploy	Checkout code	2025-09-29T11:02:02.3284976Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:02.3286483Z ##[debug]commit 4df00bb2c9e4448383c652d6f7d785329ff3c984
+deploy	Checkout code	2025-09-29T11:02:02.3287692Z ##[debug]Author: Dave Demlow <ddemlow@scalecomputing.com>
+deploy	Checkout code	2025-09-29T11:02:02.3288874Z ##[debug]Date:   Sun Sep 28 15:59:02 2025 -0400
+deploy	Checkout code	2025-09-29T11:02:02.3289812Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.3290493Z ##[debug]    Test workflow trigger
+deploy	Checkout code	2025-09-29T11:02:02.3291280Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.3292004Z [command]/usr/bin/git log -1 --format=%H
+deploy	Checkout code	2025-09-29T11:02:02.3312218Z 4df00bb2c9e4448383c652d6f7d785329ff3c984
+deploy	Checkout code	2025-09-29T11:02:02.3317592Z ##[debug]0
+deploy	Checkout code	2025-09-29T11:02:02.3318711Z ##[debug]4df00bb2c9e4448383c652d6f7d785329ff3c984
+deploy	Checkout code	2025-09-29T11:02:02.3319569Z ##[debug]
+deploy	Checkout code	2025-09-29T11:02:02.3322771Z ##[debug]Unsetting HOME override
+deploy	Checkout code	2025-09-29T11:02:02.3330875Z ::remove-matcher owner=checkout-git::
+deploy	Checkout code	2025-09-29T11:02:02.3342549Z ##[debug]Removed matchers: 'checkout-git'
+deploy	Checkout code	2025-09-29T11:02:02.3396634Z ##[debug]Node Action run completed with exit code 0
+deploy	Checkout code	2025-09-29T11:02:02.3431635Z ##[debug]Save intra-action state isPost = true
+deploy	Checkout code	2025-09-29T11:02:02.3432443Z ##[debug]Save intra-action state setSafeDirectory = true
+deploy	Checkout code	2025-09-29T11:02:02.3433458Z ##[debug]Save intra-action state repositoryPath = /home/runner/work/fleet-manager-gitops/fleet-manager-gitops
+deploy	Checkout code	2025-09-29T11:02:02.3437932Z ##[debug]Set output commit = 4df00bb2c9e4448383c652d6f7d785329ff3c984
+deploy	Checkout code	2025-09-29T11:02:02.3438735Z ##[debug]Set output ref = refs/heads/master
+deploy	Checkout code	2025-09-29T11:02:02.3443885Z ##[debug]Finishing: Checkout code
+deploy	Setup Python	﻿2025-09-29T11:02:02.3458388Z ##[debug]Evaluating condition for step: 'Setup Python'
+deploy	Setup Python	2025-09-29T11:02:02.3460823Z ##[debug]Evaluating: success()
+deploy	Setup Python	2025-09-29T11:02:02.3461514Z ##[debug]Evaluating success:
+deploy	Setup Python	2025-09-29T11:02:02.3462205Z ##[debug]=> true
+deploy	Setup Python	2025-09-29T11:02:02.3462829Z ##[debug]Result: true
+deploy	Setup Python	2025-09-29T11:02:02.3463779Z ##[debug]Starting: Setup Python
+deploy	Setup Python	2025-09-29T11:02:02.3492991Z ##[debug]Register post job cleanup for action: actions/setup-python@v4
+deploy	Setup Python	2025-09-29T11:02:02.3509334Z ##[debug]Loading inputs
+deploy	Setup Python	2025-09-29T11:02:02.3523015Z ##[debug]Evaluating: (((github.server_url == 'https://github.com') && github.token) || '')
+deploy	Setup Python	2025-09-29T11:02:02.3523946Z ##[debug]Evaluating Or:
+deploy	Setup Python	2025-09-29T11:02:02.3525935Z ##[debug]..Evaluating And:
+deploy	Setup Python	2025-09-29T11:02:02.3528401Z ##[debug]....Evaluating Equal:
+deploy	Setup Python	2025-09-29T11:02:02.3529800Z ##[debug]......Evaluating Index:
+deploy	Setup Python	2025-09-29T11:02:02.3530337Z ##[debug]........Evaluating github:
+deploy	Setup Python	2025-09-29T11:02:02.3530891Z ##[debug]........=> Object
+deploy	Setup Python	2025-09-29T11:02:02.3531381Z ##[debug]........Evaluating String:
+deploy	Setup Python	2025-09-29T11:02:02.3531944Z ##[debug]........=> 'server_url'
+deploy	Setup Python	2025-09-29T11:02:02.3532516Z ##[debug]......=> 'https://github.com'
+deploy	Setup Python	2025-09-29T11:02:02.3533062Z ##[debug]......Evaluating String:
+deploy	Setup Python	2025-09-29T11:02:02.3533569Z ##[debug]......=> 'https://github.com'
+deploy	Setup Python	2025-09-29T11:02:02.3537434Z ##[debug]....=> true
+deploy	Setup Python	2025-09-29T11:02:02.3538144Z ##[debug]....Evaluating Index:
+deploy	Setup Python	2025-09-29T11:02:02.3538645Z ##[debug]......Evaluating github:
+deploy	Setup Python	2025-09-29T11:02:02.3539157Z ##[debug]......=> Object
+deploy	Setup Python	2025-09-29T11:02:02.3539648Z ##[debug]......Evaluating String:
+deploy	Setup Python	2025-09-29T11:02:02.3540129Z ##[debug]......=> 'token'
+deploy	Setup Python	2025-09-29T11:02:02.3540838Z ##[debug]....=> '***'
+deploy	Setup Python	2025-09-29T11:02:02.3541439Z ##[debug]..=> '***'
+deploy	Setup Python	2025-09-29T11:02:02.3542195Z ##[debug]=> '***'
+deploy	Setup Python	2025-09-29T11:02:02.3547230Z ##[debug]Expanded: ((('https://github.com' == 'https://github.com') && '***') || '')
+deploy	Setup Python	2025-09-29T11:02:02.3548206Z ##[debug]Result: '***'
+deploy	Setup Python	2025-09-29T11:02:02.3552087Z ##[debug]Loading env
+deploy	Setup Python	2025-09-29T11:02:02.3560034Z ##[group]Run actions/setup-python@v4
+deploy	Setup Python	2025-09-29T11:02:02.3560541Z with:
+deploy	Setup Python	2025-09-29T11:02:02.3560912Z   python-version: 3.11
+deploy	Setup Python	2025-09-29T11:02:02.3561332Z   check-latest: false
+deploy	Setup Python	2025-09-29T11:02:02.3561882Z   token: ***
+deploy	Setup Python	2025-09-29T11:02:02.3562283Z   update-environment: true
+deploy	Setup Python	2025-09-29T11:02:02.3562752Z   allow-prereleases: false
+deploy	Setup Python	2025-09-29T11:02:02.3563182Z env:
+deploy	Setup Python	2025-09-29T11:02:02.3563686Z   FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
+deploy	Setup Python	2025-09-29T11:02:02.3564308Z ##[endgroup]
+deploy	Setup Python	2025-09-29T11:02:02.5226044Z ##[debug]Python is expected to be installed into /opt/hostedtoolcache
+deploy	Setup Python	2025-09-29T11:02:02.5228455Z ::group::Installed versions
+deploy	Setup Python	2025-09-29T11:02:02.5229436Z ##[group]Installed versions
+deploy	Setup Python	2025-09-29T11:02:02.5232983Z ##[debug]Semantic version spec of 3.11 is 3.11
+deploy	Setup Python	2025-09-29T11:02:02.5236180Z ##[debug]isExplicit: 
+deploy	Setup Python	2025-09-29T11:02:02.5238060Z ##[debug]explicit? false
+deploy	Setup Python	2025-09-29T11:02:02.5252116Z ##[debug]isExplicit: 3.10.18
+deploy	Setup Python	2025-09-29T11:02:02.5253595Z ##[debug]explicit? true
+deploy	Setup Python	2025-09-29T11:02:02.5260704Z ##[debug]isExplicit: 3.11.13
+deploy	Setup Python	2025-09-29T11:02:02.5262182Z ##[debug]explicit? true
+deploy	Setup Python	2025-09-29T11:02:02.5269281Z ##[debug]isExplicit: 3.12.11
+deploy	Setup Python	2025-09-29T11:02:02.5270751Z ##[debug]explicit? true
+deploy	Setup Python	2025-09-29T11:02:02.5278676Z ##[debug]isExplicit: 3.13.7
+deploy	Setup Python	2025-09-29T11:02:02.5280107Z ##[debug]explicit? true
+deploy	Setup Python	2025-09-29T11:02:02.5291362Z ##[debug]isExplicit: 3.9.23
+deploy	Setup Python	2025-09-29T11:02:02.5292816Z ##[debug]explicit? true
+deploy	Setup Python	2025-09-29T11:02:02.5296120Z ##[debug]evaluating 5 versions
+deploy	Setup Python	2025-09-29T11:02:02.5324312Z ##[debug]matched: 3.11.13
+deploy	Setup Python	2025-09-29T11:02:02.5325843Z ##[debug]checking cache: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Setup Python	2025-09-29T11:02:02.5327725Z ##[debug]Found tool in cache Python 3.11.13 x64
+deploy	Setup Python	2025-09-29T11:02:02.5340958Z Successfully set up CPython (3.11.13)
+deploy	Setup Python	2025-09-29T11:02:02.5342471Z ::endgroup::
+deploy	Setup Python	2025-09-29T11:02:02.5343128Z ##[endgroup]
+deploy	Setup Python	2025-09-29T11:02:02.5350808Z ##[add-matcher]/home/runner/work/_actions/actions/setup-python/v4/.github/python.json
+deploy	Setup Python	2025-09-29T11:02:02.5366832Z ##[debug]Added matchers: 'python'. Problem matchers scan action output for known warning or error strings and report these inline.
+deploy	Setup Python	2025-09-29T11:02:02.5408668Z ##[debug]Node Action run completed with exit code 0
+deploy	Setup Python	2025-09-29T11:02:02.5414183Z ##[debug]pythonLocation='/opt/hostedtoolcache/Python/3.11.13/x64'
+deploy	Setup Python	2025-09-29T11:02:02.5416521Z ##[debug]PKG_CONFIG_PATH='/opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig'
+deploy	Setup Python	2025-09-29T11:02:02.5418609Z ##[debug]pythonLocation='/opt/hostedtoolcache/Python/3.11.13/x64'
+deploy	Setup Python	2025-09-29T11:02:02.5421003Z ##[debug]Python_ROOT_DIR='/opt/hostedtoolcache/Python/3.11.13/x64'
+deploy	Setup Python	2025-09-29T11:02:02.5422763Z ##[debug]Python2_ROOT_DIR='/opt/hostedtoolcache/Python/3.11.13/x64'
+deploy	Setup Python	2025-09-29T11:02:02.5424462Z ##[debug]Python3_ROOT_DIR='/opt/hostedtoolcache/Python/3.11.13/x64'
+deploy	Setup Python	2025-09-29T11:02:02.5426571Z ##[debug]PKG_CONFIG_PATH='/opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig'
+deploy	Setup Python	2025-09-29T11:02:02.5428560Z ##[debug]LD_LIBRARY_PATH='/opt/hostedtoolcache/Python/3.11.13/x64/lib'
+deploy	Setup Python	2025-09-29T11:02:02.5433410Z ##[debug]Set output python-version = 3.11.13
+deploy	Setup Python	2025-09-29T11:02:02.5435164Z ##[debug]Set output python-path = /opt/hostedtoolcache/Python/3.11.13/x64/bin/python
+deploy	Setup Python	2025-09-29T11:02:02.5437745Z ##[debug]Finishing: Setup Python
+deploy	Install dependencies	﻿2025-09-29T11:02:02.5453572Z ##[debug]Evaluating condition for step: 'Install dependencies'
+deploy	Install dependencies	2025-09-29T11:02:02.5455991Z ##[debug]Evaluating: success()
+deploy	Install dependencies	2025-09-29T11:02:02.5457138Z ##[debug]Evaluating success:
+deploy	Install dependencies	2025-09-29T11:02:02.5458004Z ##[debug]=> true
+deploy	Install dependencies	2025-09-29T11:02:02.5459110Z ##[debug]Result: true
+deploy	Install dependencies	2025-09-29T11:02:02.5460356Z ##[debug]Starting: Install dependencies
+deploy	Install dependencies	2025-09-29T11:02:02.5475550Z ##[debug]Loading inputs
+deploy	Install dependencies	2025-09-29T11:02:02.5477663Z ##[debug]Loading env
+deploy	Install dependencies	2025-09-29T11:02:02.5498253Z ##[group]Run pip install requests pyyaml
+deploy	Install dependencies	2025-09-29T11:02:02.5499275Z [36;1mpip install requests pyyaml[0m
+deploy	Install dependencies	2025-09-29T11:02:02.5658675Z shell: /usr/bin/bash -e {0}
+deploy	Install dependencies	2025-09-29T11:02:02.5659411Z env:
+deploy	Install dependencies	2025-09-29T11:02:02.5660207Z   FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
+deploy	Install dependencies	2025-09-29T11:02:02.5661644Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Install dependencies	2025-09-29T11:02:02.5663141Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+deploy	Install dependencies	2025-09-29T11:02:02.5664597Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Install dependencies	2025-09-29T11:02:02.5665925Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Install dependencies	2025-09-29T11:02:02.5667390Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Install dependencies	2025-09-29T11:02:02.5668727Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+deploy	Install dependencies	2025-09-29T11:02:02.5669794Z ##[endgroup]
+deploy	Install dependencies	2025-09-29T11:02:02.5799619Z ##[debug]/usr/bin/bash -e /home/runner/work/_temp/63b52ab4-874c-4d15-a8d6-2709a3d2bb18.sh
+deploy	Install dependencies	2025-09-29T11:02:06.6024083Z Collecting requests
+deploy	Install dependencies	2025-09-29T11:02:06.6589277Z   Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+deploy	Install dependencies	2025-09-29T11:02:06.7156171Z Collecting pyyaml
+deploy	Install dependencies	2025-09-29T11:02:06.7268696Z   Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+deploy	Install dependencies	2025-09-29T11:02:06.8438495Z Collecting charset_normalizer<4,>=2 (from requests)
+deploy	Install dependencies	2025-09-29T11:02:06.8556558Z   Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (36 kB)
+deploy	Install dependencies	2025-09-29T11:02:06.8927219Z Collecting idna<4,>=2.5 (from requests)
+deploy	Install dependencies	2025-09-29T11:02:06.9043933Z   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
+deploy	Install dependencies	2025-09-29T11:02:06.9482938Z Collecting urllib3<3,>=1.21.1 (from requests)
+deploy	Install dependencies	2025-09-29T11:02:06.9592798Z   Downloading urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
+deploy	Install dependencies	2025-09-29T11:02:06.9974263Z Collecting certifi>=2017.4.17 (from requests)
+deploy	Install dependencies	2025-09-29T11:02:07.0082873Z   Downloading certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
+deploy	Install dependencies	2025-09-29T11:02:07.0243938Z Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+deploy	Install dependencies	2025-09-29T11:02:07.0420511Z Downloading charset_normalizer-3.4.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (150 kB)
+deploy	Install dependencies	2025-09-29T11:02:07.0649713Z Downloading idna-3.10-py3-none-any.whl (70 kB)
+deploy	Install dependencies	2025-09-29T11:02:07.0808971Z Downloading urllib3-2.5.0-py3-none-any.whl (129 kB)
+deploy	Install dependencies	2025-09-29T11:02:07.0972692Z Downloading pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (806 kB)
+deploy	Install dependencies	2025-09-29T11:02:07.1155051Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 806.6/806.6 kB 41.4 MB/s  0:00:00
+deploy	Install dependencies	2025-09-29T11:02:07.1262896Z Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
+deploy	Install dependencies	2025-09-29T11:02:07.1756166Z Installing collected packages: urllib3, pyyaml, idna, charset_normalizer, certifi, requests
+deploy	Install dependencies	2025-09-29T11:02:07.4556756Z 
+deploy	Install dependencies	2025-09-29T11:02:07.4568729Z Successfully installed certifi-2025.8.3 charset_normalizer-3.4.3 idna-3.10 pyyaml-6.0.3 requests-2.32.5 urllib3-2.5.0
+deploy	Install dependencies	2025-09-29T11:02:07.6227452Z ##[debug]Finishing: Install dependencies
+deploy	Deploy to Fleet Manager	﻿2025-09-29T11:02:07.6239613Z ##[debug]Evaluating: secrets.SC_FM_APIKEY
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6240024Z ##[debug]Evaluating Index:
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6240286Z ##[debug]..Evaluating secrets:
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6240578Z ##[debug]..=> Object
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6240884Z ##[debug]..Evaluating String:
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6241131Z ##[debug]..=> 'SC_FM_APIKEY'
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6242207Z ##[debug]=> '***'
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6242570Z ##[debug]Result: '***'
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6243720Z ##[debug]Evaluating condition for step: 'Deploy to Fleet Manager'
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6245227Z ##[debug]Evaluating: success()
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6245570Z ##[debug]Evaluating success:
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6246024Z ##[debug]=> true
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6246651Z ##[debug]Result: true
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6247213Z ##[debug]Starting: Deploy to Fleet Manager
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6258360Z ##[debug]Loading inputs
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6259392Z ##[debug]Loading env
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6264129Z ##[group]Run python scripts/deploy.py
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6264452Z [36;1mpython scripts/deploy.py[0m
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6299717Z shell: /usr/bin/bash -e {0}
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6299954Z env:
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6300345Z   FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6300765Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6301188Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6301598Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6301973Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6302344Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6302737Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6303125Z   SC_FM_APIKEY: ***
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6303314Z ##[endgroup]
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.6338577Z ##[debug]/usr/bin/bash -e /home/runner/work/_temp/a5031aca-be28-4f60-ace4-27a1e60b5539.sh
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.9844796Z 🚀 Starting GitOps deployment to Fleet Manager
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.9845795Z 📡 Fleet Manager API: https://api.scalecomputing.com/api/v2
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:07.9846628Z ❌ Fleet Manager API connection failed
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:08.0030326Z ##[error]Process completed with exit code 1.
+deploy	Deploy to Fleet Manager	2025-09-29T11:02:08.0042694Z ##[debug]Finishing: Deploy to Fleet Manager
+deploy	Notify deployment status	﻿2025-09-29T11:02:08.0060752Z ##[debug]Evaluating condition for step: 'Notify deployment status'
+deploy	Notify deployment status	2025-09-29T11:02:08.0063536Z ##[debug]Evaluating: always()
+deploy	Notify deployment status	2025-09-29T11:02:08.0063905Z ##[debug]Evaluating always:
+deploy	Notify deployment status	2025-09-29T11:02:08.0064642Z ##[debug]=> true
+deploy	Notify deployment status	2025-09-29T11:02:08.0064998Z ##[debug]Result: true
+deploy	Notify deployment status	2025-09-29T11:02:08.0065621Z ##[debug]Starting: Notify deployment status
+deploy	Notify deployment status	2025-09-29T11:02:08.0073492Z ##[debug]Loading inputs
+deploy	Notify deployment status	2025-09-29T11:02:08.0075966Z ##[debug]Evaluating: format('if [ "{0}" == "success" ]; then
+deploy	Notify deployment status	2025-09-29T11:02:08.0076540Z ##[debug]  echo "✅ Deployment completed successfully"
+deploy	Notify deployment status	2025-09-29T11:02:08.0076830Z ##[debug]else
+deploy	Notify deployment status	2025-09-29T11:02:08.0077020Z ##[debug]  echo "❌ Deployment failed"
+deploy	Notify deployment status	2025-09-29T11:02:08.0077252Z ##[debug]fi
+deploy	Notify deployment status	2025-09-29T11:02:08.0077429Z ##[debug]', job.status)
+deploy	Notify deployment status	2025-09-29T11:02:08.0077662Z ##[debug]Evaluating format:
+deploy	Notify deployment status	2025-09-29T11:02:08.0081217Z ##[debug]..Evaluating String:
+deploy	Notify deployment status	2025-09-29T11:02:08.0081598Z ##[debug]..=> 'if [ "{0}" == "success" ]; then
+deploy	Notify deployment status	2025-09-29T11:02:08.0081915Z ##[debug]  echo "✅ Deployment completed successfully"
+deploy	Notify deployment status	2025-09-29T11:02:08.0082235Z ##[debug]else
+deploy	Notify deployment status	2025-09-29T11:02:08.0082438Z ##[debug]  echo "❌ Deployment failed"
+deploy	Notify deployment status	2025-09-29T11:02:08.0082684Z ##[debug]fi
+deploy	Notify deployment status	2025-09-29T11:02:08.0082850Z ##[debug]'
+deploy	Notify deployment status	2025-09-29T11:02:08.0095028Z ##[debug]..Evaluating Index:
+deploy	Notify deployment status	2025-09-29T11:02:08.0095313Z ##[debug]....Evaluating job:
+deploy	Notify deployment status	2025-09-29T11:02:08.0095600Z ##[debug]....=> Object
+deploy	Notify deployment status	2025-09-29T11:02:08.0095851Z ##[debug]....Evaluating String:
+deploy	Notify deployment status	2025-09-29T11:02:08.0096103Z ##[debug]....=> 'status'
+deploy	Notify deployment status	2025-09-29T11:02:08.0096683Z ##[debug]..=> 'failure'
+deploy	Notify deployment status	2025-09-29T11:02:08.0097638Z ##[debug]=> 'if [ "failure" == "success" ]; then
+deploy	Notify deployment status	2025-09-29T11:02:08.0097966Z ##[debug]  echo "✅ Deployment completed successfully"
+deploy	Notify deployment status	2025-09-29T11:02:08.0098249Z ##[debug]else
+deploy	Notify deployment status	2025-09-29T11:02:08.0098456Z ##[debug]  echo "❌ Deployment failed"
+deploy	Notify deployment status	2025-09-29T11:02:08.0098694Z ##[debug]fi
+deploy	Notify deployment status	2025-09-29T11:02:08.0098855Z ##[debug]'
+deploy	Notify deployment status	2025-09-29T11:02:08.0099133Z ##[debug]Result: 'if [ "failure" == "success" ]; then
+deploy	Notify deployment status	2025-09-29T11:02:08.0099464Z ##[debug]  echo "✅ Deployment completed successfully"
+deploy	Notify deployment status	2025-09-29T11:02:08.0099719Z ##[debug]else
+deploy	Notify deployment status	2025-09-29T11:02:08.0099916Z ##[debug]  echo "❌ Deployment failed"
+deploy	Notify deployment status	2025-09-29T11:02:08.0100146Z ##[debug]fi
+deploy	Notify deployment status	2025-09-29T11:02:08.0100313Z ##[debug]'
+deploy	Notify deployment status	2025-09-29T11:02:08.0100733Z ##[debug]Loading env
+deploy	Notify deployment status	2025-09-29T11:02:08.0104413Z ##[group]Run if [ "failure" == "success" ]; then
+deploy	Notify deployment status	2025-09-29T11:02:08.0104741Z [36;1mif [ "failure" == "success" ]; then[0m
+deploy	Notify deployment status	2025-09-29T11:02:08.0105049Z [36;1m  echo "✅ Deployment completed successfully"[0m
+deploy	Notify deployment status	2025-09-29T11:02:08.0105319Z [36;1melse[0m
+deploy	Notify deployment status	2025-09-29T11:02:08.0105514Z [36;1m  echo "❌ Deployment failed"[0m
+deploy	Notify deployment status	2025-09-29T11:02:08.0105755Z [36;1mfi[0m
+deploy	Notify deployment status	2025-09-29T11:02:08.0138763Z shell: /usr/bin/bash -e {0}
+deploy	Notify deployment status	2025-09-29T11:02:08.0138992Z env:
+deploy	Notify deployment status	2025-09-29T11:02:08.0139290Z   FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
+deploy	Notify deployment status	2025-09-29T11:02:08.0139710Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Notify deployment status	2025-09-29T11:02:08.0140130Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib/pkgconfig
+deploy	Notify deployment status	2025-09-29T11:02:08.0140539Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Notify deployment status	2025-09-29T11:02:08.0140893Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Notify deployment status	2025-09-29T11:02:08.0141236Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.13/x64
+deploy	Notify deployment status	2025-09-29T11:02:08.0141598Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.13/x64/lib
+deploy	Notify deployment status	2025-09-29T11:02:08.0141890Z ##[endgroup]
+deploy	Notify deployment status	2025-09-29T11:02:08.0174789Z ##[debug]/usr/bin/bash -e /home/runner/work/_temp/f1333232-578e-4932-b6c2-8c6b37553182.sh
+deploy	Notify deployment status	2025-09-29T11:02:08.0195881Z ❌ Deployment failed
+deploy	Notify deployment status	2025-09-29T11:02:08.0200548Z ##[debug]Finishing: Notify deployment status
+deploy	Post Setup Python	﻿2025-09-29T11:02:08.0207484Z ##[debug]Evaluating condition for step: 'Post Setup Python'
+deploy	Post Setup Python	2025-09-29T11:02:08.0208641Z ##[debug]Evaluating: success()
+deploy	Post Setup Python	2025-09-29T11:02:08.0208984Z ##[debug]Evaluating success:
+deploy	Post Setup Python	2025-09-29T11:02:08.0209339Z ##[debug]=> false
+deploy	Post Setup Python	2025-09-29T11:02:08.0209658Z ##[debug]Result: false
+deploy	Post Checkout code	﻿2025-09-29T11:02:08.0214500Z ##[debug]Evaluating condition for step: 'Post Checkout code'
+deploy	Post Checkout code	2025-09-29T11:02:08.0215547Z ##[debug]Evaluating: always()
+deploy	Post Checkout code	2025-09-29T11:02:08.0215876Z ##[debug]Evaluating always:
+deploy	Post Checkout code	2025-09-29T11:02:08.0216179Z ##[debug]=> true
+deploy	Post Checkout code	2025-09-29T11:02:08.0216760Z ##[debug]Result: true
+deploy	Post Checkout code	2025-09-29T11:02:08.0217260Z ##[debug]Starting: Post Checkout code
+deploy	Post Checkout code	2025-09-29T11:02:08.0257509Z ##[debug]Loading inputs
+deploy	Post Checkout code	2025-09-29T11:02:08.0258483Z ##[debug]Evaluating: github.repository
+deploy	Post Checkout code	2025-09-29T11:02:08.0258768Z ##[debug]Evaluating Index:
+deploy	Post Checkout code	2025-09-29T11:02:08.0259021Z ##[debug]..Evaluating github:
+deploy	Post Checkout code	2025-09-29T11:02:08.0259272Z ##[debug]..=> Object
+deploy	Post Checkout code	2025-09-29T11:02:08.0259511Z ##[debug]..Evaluating String:
+deploy	Post Checkout code	2025-09-29T11:02:08.0259745Z ##[debug]..=> 'repository'
+deploy	Post Checkout code	2025-09-29T11:02:08.0260025Z ##[debug]=> 'ddemlow/fleet-manager-gitops'
+deploy	Post Checkout code	2025-09-29T11:02:08.0260331Z ##[debug]Result: 'ddemlow/fleet-manager-gitops'
+deploy	Post Checkout code	2025-09-29T11:02:08.0262021Z ##[debug]Evaluating: github.token
+deploy	Post Checkout code	2025-09-29T11:02:08.0262291Z ##[debug]Evaluating Index:
+deploy	Post Checkout code	2025-09-29T11:02:08.0262547Z ##[debug]..Evaluating github:
+deploy	Post Checkout code	2025-09-29T11:02:08.0262797Z ##[debug]..=> Object
+deploy	Post Checkout code	2025-09-29T11:02:08.0263011Z ##[debug]..Evaluating String:
+deploy	Post Checkout code	2025-09-29T11:02:08.0263239Z ##[debug]..=> 'token'
+deploy	Post Checkout code	2025-09-29T11:02:08.0263692Z ##[debug]=> '***'
+deploy	Post Checkout code	2025-09-29T11:02:08.0264001Z ##[debug]Result: '***'
+deploy	Post Checkout code	2025-09-29T11:02:08.0273305Z ##[debug]Loading env
+deploy	Post Checkout code	2025-09-29T11:02:08.0277294Z Post job cleanup.
+deploy	Post Checkout code	2025-09-29T11:02:08.1193703Z ##[debug]Getting git version
+deploy	Post Checkout code	2025-09-29T11:02:08.1208218Z [command]/usr/bin/git version
+deploy	Post Checkout code	2025-09-29T11:02:08.1243620Z git version 2.51.0
+deploy	Post Checkout code	2025-09-29T11:02:08.1265864Z ##[debug]0
+deploy	Post Checkout code	2025-09-29T11:02:08.1268568Z ##[debug]git version 2.51.0
+deploy	Post Checkout code	2025-09-29T11:02:08.1268922Z ##[debug]
+deploy	Post Checkout code	2025-09-29T11:02:08.1269636Z ##[debug]Set git useragent to: git/2.51.0 (github-actions-checkout)
+deploy	Post Checkout code	2025-09-29T11:02:08.1270779Z ::add-mask::***
+deploy	Post Checkout code	2025-09-29T11:02:08.1285536Z Temporarily overriding HOME='/home/runner/work/_temp/5e7bb84d-8d02-4dd4-bd4f-de7a4a7e28f4' before making global git config changes
+deploy	Post Checkout code	2025-09-29T11:02:08.1287936Z Adding repository directory to the temporary git global config as a safe directory
+deploy	Post Checkout code	2025-09-29T11:02:08.1293166Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/fleet-manager-gitops/fleet-manager-gitops
+deploy	Post Checkout code	2025-09-29T11:02:08.1323043Z ##[debug]0
+deploy	Post Checkout code	2025-09-29T11:02:08.1323717Z ##[debug]
+deploy	Post Checkout code	2025-09-29T11:02:08.1331381Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+deploy	Post Checkout code	2025-09-29T11:02:08.1358474Z ##[debug]1
+deploy	Post Checkout code	2025-09-29T11:02:08.1359128Z ##[debug]
+deploy	Post Checkout code	2025-09-29T11:02:08.1365179Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+deploy	Post Checkout code	2025-09-29T11:02:08.1585560Z ##[debug]0
+deploy	Post Checkout code	2025-09-29T11:02:08.1586105Z ##[debug]
+deploy	Post Checkout code	2025-09-29T11:02:08.1592623Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+deploy	Post Checkout code	2025-09-29T11:02:08.1613280Z http.https://github.com/.extraheader
+deploy	Post Checkout code	2025-09-29T11:02:08.1621276Z ##[debug]0
+deploy	Post Checkout code	2025-09-29T11:02:08.1622116Z ##[debug]http.https://github.com/.extraheader
+deploy	Post Checkout code	2025-09-29T11:02:08.1622602Z ##[debug]
+deploy	Post Checkout code	2025-09-29T11:02:08.1627959Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+deploy	Post Checkout code	2025-09-29T11:02:08.1653934Z ##[debug]0
+deploy	Post Checkout code	2025-09-29T11:02:08.1654460Z ##[debug]
+deploy	Post Checkout code	2025-09-29T11:02:08.1659410Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+deploy	Post Checkout code	2025-09-29T11:02:08.1872035Z ##[debug]0
+deploy	Post Checkout code	2025-09-29T11:02:08.1872701Z ##[debug]
+deploy	Post Checkout code	2025-09-29T11:02:08.1873307Z ##[debug]Unsetting HOME override
+deploy	Post Checkout code	2025-09-29T11:02:08.1938673Z ##[debug]Node Action run completed with exit code 0
+deploy	Post Checkout code	2025-09-29T11:02:08.1941104Z ##[debug]Finishing: Post Checkout code
+deploy	Complete job	﻿2025-09-29T11:02:08.1981219Z ##[debug]Starting: Complete job
+deploy	Complete job	2025-09-29T11:02:08.1983017Z Uploading runner diagnostic logs
+deploy	Complete job	2025-09-29T11:02:08.1994230Z ##[debug]Starting diagnostic file upload.
+deploy	Complete job	2025-09-29T11:02:08.1994567Z ##[debug]Setting up diagnostic log folders.
+deploy	Complete job	2025-09-29T11:02:08.1996377Z ##[debug]Creating diagnostic log files folder.
+deploy	Complete job	2025-09-29T11:02:08.2004293Z ##[debug]Copying 1 worker diagnostic logs.
+deploy	Complete job	2025-09-29T11:02:08.2012218Z ##[debug]Copying 1 runner diagnostic logs.
+deploy	Complete job	2025-09-29T11:02:08.2013464Z ##[debug]Zipping diagnostic files.
+deploy	Complete job	2025-09-29T11:02:08.2083721Z ##[debug]Uploading diagnostic metadata file.
+deploy	Complete job	2025-09-29T11:02:08.2111908Z ##[debug]Diagnostic file upload complete.
+deploy	Complete job	2025-09-29T11:02:08.2112446Z Completed runner diagnostic log upload
+deploy	Complete job	2025-09-29T11:02:08.2112716Z Cleaning up orphan processes
+deploy	Complete job	2025-09-29T11:02:08.2390309Z ##[debug]Finishing: Complete job
