@@ -52,6 +52,28 @@ class FleetManagerGitOps:
         changed_files = []
         process_all = os.getenv('PROCESS_ALL_MANIFESTS', '').lower() in ('1', 'true', 'yes')
         
+        # 0) Prefer GitHub Actions event payload when available (push events contain changed files)
+        try:
+            event_path = os.getenv('GITHUB_EVENT_PATH')
+            if event_path and os.path.exists(event_path):
+                with open(event_path, 'r') as f:
+                    event = json.load(f)
+                # Push event: aggregate added/modified files across commits
+                if event.get('commits'):
+                    gh_candidates: List[str] = []
+                    for c in event.get('commits') or []:
+                        gh_candidates.extend(c.get('added') or [])
+                        gh_candidates.extend(c.get('modified') or [])
+                    changed_files = [
+                        f for f in gh_candidates if f and 
+                        f.startswith(('manifests/', 'applications/')) and 
+                        f.endswith(('.yaml', '.yml'))
+                    ]
+                    if changed_files:
+                        return sorted(set(changed_files))
+        except Exception:
+            pass
+
         # Prefer using git to detect changes
         try:
             import subprocess
