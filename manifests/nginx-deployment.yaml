@@ -5,7 +5,6 @@ metadata:
   description: "Nginx web server deployment 5 (GH Actions test)"
   clusterGroups:
     - DDvsns
-  name: "nginx-test-2"
   vmname: &vmname "anchor1"
   labels:
     - kraken
