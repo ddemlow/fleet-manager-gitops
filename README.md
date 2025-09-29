@@ -178,7 +178,6 @@ git push origin main
 #### **Deployment Fails:**
 - Check GitHub Actions logs
 - Verify API keys are correct
-- Ensure MCP server is running
 
 #### **Manifest Validation Fails:**
 - Check YAML syntax
@@ -235,7 +234,6 @@ Add custom validation rules in `scripts/validate-manifests.py`
 
 - **GitHub Issues**: Report bugs and feature requests
 - **Fleet Manager Docs**: [Scale Computing Documentation](https://docs.scalecomputing.com)
-- **MCP Server**: Check the MCP server logs for API issues
 
 ---
 
