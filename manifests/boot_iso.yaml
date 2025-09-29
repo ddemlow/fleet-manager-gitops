@@ -15,7 +15,7 @@ spec:
       format: iso
       url: http://tinycorelinux.net/16.x/x86/release/Core-current.iso
   resources:
-    - name: gitops-example-vm2
+    - name: gitops-isoboot-example
       type: virdomain
       spec:
         description: A simple VM for testing
