@@ -21,20 +21,13 @@ class FleetManagerGitOps:
         if not self.fm_api_key:
             raise ValueError("SC_FM_APIKEY environment variable is required")
             
-        # Fleet Manager API headers (based on actual API usage)
+        # Fleet Manager API headers
+        # Use API key header appropriate for server-to-server requests
         self.headers = {
-            'authority': 'api.scalecomputing.com',
-            'accept': 'application/json, text/plain, */*',
-            'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+            'accept': 'application/json',
+            'content-type': 'application/json',
             'api-key': self.fm_api_key,
-            'origin': 'https://fleet.scalecomputing.com',
-            'referer': 'https://fleet.scalecomputing.com/',
-            'sec-fetch-dest': 'empty',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-site': 'same-site',
-            'Content-Type': 'application/json',
-            # Realistic UA helps in some edge cases
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
+            'user-agent': 'fleet-manager-gitops/1.0 (+github-actions)'
         }
 
     def _debug_fail(self, resp: requests.Response, context: str) -> None:
