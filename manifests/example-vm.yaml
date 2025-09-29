@@ -21,7 +21,7 @@ spec:
         description: A simple VM for testing
         cpu: 1
         memory: "2147483648"
-        machine_type: uefi
+        machine_type: bios
         storage_devices:
           - name: cdrom1
             type: ide_cdrom
