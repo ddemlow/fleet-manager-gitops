@@ -13,8 +13,6 @@ gitops/
 ├── manifests/                     # Application manifests
 │   ├── example-vm.yaml           # Simple VM example
 │   └── nginx-deployment.yaml     # Nginx web server
-├── applications/                  # Complex applications
-│   └── k3s-cluster.yaml          # K3s Kubernetes cluster
 ├── scripts/
 │   ├── deploy.py                 # Main deployment script
 │   └── validate-manifests.py     # Manifest validation
@@ -110,7 +108,7 @@ spec:
 
 ### **Complex Application**
 ```yaml
-# applications/k3s-cluster.yaml
+# manifests/k3s-cluster.yaml
 version: "1"
 type: "Application"
 metadata:
@@ -200,7 +198,7 @@ python scripts/deploy.py
 - **[README.md](README.md)**: Complete documentation
 - **[SETUP.md](SETUP.md)**: Detailed setup guide
 - **[QUICKSTART.md](QUICKSTART.md)**: 5-minute quick start
-- **Example manifests**: In `manifests/` and `applications/`
+- **Example manifests**: In `manifests/`
 
 ## 🎯 **Next Steps**
 

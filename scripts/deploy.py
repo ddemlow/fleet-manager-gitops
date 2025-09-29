@@ -81,7 +81,7 @@ class FleetManagerGitOps:
                         gh_candidates.extend(c.get('modified') or [])
                     changed_files = [
                         f for f in gh_candidates if f and 
-                        f.startswith(('manifests/', 'applications/')) and 
+                        f.startswith('manifests/') and 
                         f.endswith(('.yaml', '.yml'))
                     ]
                     if changed_files:
@@ -92,7 +92,7 @@ class FleetManagerGitOps:
                     gh_candidates = (head.get('added') or []) + (head.get('modified') or [])
                     changed_files = [
                         f for f in gh_candidates if f and 
-                        f.startswith(('manifests/', 'applications/')) and 
+                        f.startswith('manifests/') and 
                         f.endswith(('.yaml', '.yml'))
                     ]
                     if changed_files:
@@ -142,7 +142,7 @@ class FleetManagerGitOps:
 
             changed_files = [
                 f for f in candidates if f and 
-                f.startswith(('manifests/', 'applications/')) and 
+                f.startswith('manifests/') and 
                 f.endswith(('.yaml', '.yml'))
             ]
         except Exception:
@@ -153,9 +153,7 @@ class FleetManagerGitOps:
         if not changed_files and process_all:
             changed_files = (
                 glob.glob('manifests/**/*.yaml', recursive=True) +
-                glob.glob('manifests/**/*.yml', recursive=True) +
-                glob.glob('applications/**/*.yaml', recursive=True) +
-                glob.glob('applications/**/*.yml', recursive=True)
+                glob.glob('manifests/**/*.yml', recursive=True)
             )
         
         return sorted(set(changed_files))

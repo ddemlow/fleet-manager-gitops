@@ -5,12 +5,10 @@ on:
     branches: [ main, develop, master ]
     paths:
       - 'manifests/**'
-      - 'applications/**'
   pull_request:
     branches: [ main ]
     paths:
       - 'manifests/**'
-      - 'applications/**'
 
 env:
   FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2

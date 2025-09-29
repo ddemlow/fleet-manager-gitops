@@ -47,7 +47,7 @@ your-repo/
 ├── manifests/                      # Your application manifests
 │   ├── example-vm.yaml
 │   └── nginx-deployment.yaml
-├── applications/                   # Complex applications
+├── manifests/                      # Application definitions (YAML)
 │   └── k3s-cluster.yaml
 ├── scripts/                        # Deployment scripts
 │   ├── deploy.py
@@ -119,7 +119,7 @@ python scripts/deploy.py
 ### **Need Help?**
 - Check the full [SETUP.md](SETUP.md) guide
 - Read the [README.md](README.md) for detailed documentation
-- Look at example manifests in `manifests/` and `applications/`
+- Look at example manifests in `manifests/`
 
 ---
 

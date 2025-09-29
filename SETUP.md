@@ -110,7 +110,7 @@ on:
     branches: [ main, develop ]  # Deploy on these branches
     paths:
       - 'manifests/**'           # Only when manifests change
-      - 'applications/**'       # Or applications change
+      # paths under manifests trigger the workflow
 ```
 
 ### **Environment-Specific Deployments**

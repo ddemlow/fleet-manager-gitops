@@ -20,7 +20,7 @@ gitops/
 ├── manifests/                     # Application manifests
 │   ├── example-vm.yaml
 │   └── nginx-deployment.yaml
-├── applications/                   # Complex application definitions
+├── manifests/                      # Application definitions (YAML)
 │   └── k3s-cluster.yaml
 ├── scripts/
 │   ├── deploy.py                  # Main deployment script
@@ -107,7 +107,7 @@ spec:
 ## 🔄 **GitOps Workflow**
 
 ### **Automatic Deployment:**
-1. **Edit manifest** files in `manifests/` or `applications/`
+1. **Edit manifest** files in `manifests/`
 2. **Commit and push** changes
 3. **GitHub Actions** automatically:
    - Validates YAML syntax
