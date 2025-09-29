@@ -84,17 +84,16 @@ class FleetManagerGitOps:
             return None
 
     def create_deployment_application(self, app_name: str, manifest: str) -> str:
-        """Create a new deployment application"""
+        """Create a new deployment application using PUT"""
         try:
             payload = {
                 "name": app_name,
-                "version": "1.0.0",
-                "description": f"GitOps managed application: {app_name}",
-                "sourceType": "api",
+                "sourceType": "editor",  # Use "editor" like in your example
                 "sourceConfig": manifest
             }
             
-            response = requests.post(
+            # Use PUT for deployment-applications (always PUT according to API)
+            response = requests.put(
                 f"{self.fm_api_url}/deployment-applications",
                 headers=self.headers,
                 json=payload,
@@ -116,7 +115,7 @@ class FleetManagerGitOps:
         try:
             payload = {
                 "name": app_name,
-                "sourceType": "api",
+                "sourceType": "editor",  # Use "editor" like in your example
                 "sourceConfig": manifest
             }
             
