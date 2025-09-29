@@ -17,6 +17,7 @@ class FleetManagerGitOps:
     def __init__(self):
         self.fm_api_key = os.getenv('SC_FM_APIKEY')
         self.fm_api_url = os.getenv('FLEET_MANAGER_API_URL', 'https://api.scalecomputing.com/api/v2')
+        self.org_id = os.getenv('SC_ORG_ID')  # Optional but recommended for some endpoints
         
         if not self.fm_api_key:
             raise ValueError("SC_FM_APIKEY environment variable is required")
@@ -32,8 +33,19 @@ class FleetManagerGitOps:
             'sec-fetch-dest': 'empty',
             'sec-fetch-mode': 'cors',
             'sec-fetch-site': 'same-site',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            # Realistic UA helps in some edge cases
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
         }
+        if self.org_id:
+            self.headers['organizationid'] = self.org_id
+
+    def _debug_fail(self, resp: requests.Response, context: str) -> None:
+        print(f"❌ {context} (status: {resp.status_code})")
+        try:
+            print(f"Response JSON: {resp.json()}")
+        except Exception:
+            print(f"Response Text: {resp.text[:500]}")
 
     def get_changed_files(self) -> List[str]:
         """Get list of changed manifest files"""
@@ -99,7 +111,9 @@ class FleetManagerGitOps:
                 json=payload,
                 timeout=30
             )
-            response.raise_for_status()
+            if response.status_code >= 400:
+                self._debug_fail(response, "Create application PUT /deployment-applications")
+                response.raise_for_status()
             
             data = response.json()
             app_id = data.get('id')
@@ -125,7 +139,9 @@ class FleetManagerGitOps:
                 json=payload,
                 timeout=30
             )
-            response.raise_for_status()
+            if response.status_code >= 400:
+                self._debug_fail(response, f"Update application PUT /deployment-applications/{app_id}")
+                response.raise_for_status()
             
             print(f"✅ Updated application: {app_name} (ID: {app_id})")
             return True
@@ -143,7 +159,9 @@ class FleetManagerGitOps:
                 headers=self.headers,
                 timeout=30
             )
-            response.raise_for_status()
+            if response.status_code >= 400:
+                self._debug_fail(response, "List deployments GET /deployments")
+                response.raise_for_status()
             
             deployments = response.json().get('items', [])
             deployment_id = None
@@ -163,7 +181,9 @@ class FleetManagerGitOps:
                 headers=self.headers,
                 timeout=30
             )
-            response.raise_for_status()
+            if response.status_code >= 400:
+                self._debug_fail(response, f"Trigger deploy POST /deployments/{deployment_id}/deploy")
+                response.raise_for_status()
             
             print(f"✅ Triggered deployment for: {app_name}")
             return True
@@ -220,8 +240,7 @@ class FleetManagerGitOps:
             if response.status_code == 200:
                 print("✅ Fleet Manager API connection successful")
             else:
-                print(f"❌ Fleet Manager API connection failed (status: {response.status_code})")
-                print(f"Response: {response.text[:200]}")
+                self._debug_fail(response, "Connectivity check GET /clusters")
                 return False
         except Exception as e:
             print(f"❌ Fleet Manager API connection error: {e}")
