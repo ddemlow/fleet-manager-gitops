@@ -17,7 +17,6 @@ class FleetManagerGitOps:
     def __init__(self):
         self.fm_api_key = os.getenv('SC_FM_APIKEY')
         self.fm_api_url = os.getenv('FLEET_MANAGER_API_URL', 'https://api.scalecomputing.com/api/v2')
-        self.org_id = os.getenv('SC_ORG_ID')  # Optional but recommended for some endpoints
         
         if not self.fm_api_key:
             raise ValueError("SC_FM_APIKEY environment variable is required")
@@ -37,8 +36,6 @@ class FleetManagerGitOps:
             # Realistic UA helps in some edge cases
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36'
         }
-        if self.org_id:
-            self.headers['organizationid'] = self.org_id
 
     def _debug_fail(self, resp: requests.Response, context: str) -> None:
         print(f"❌ {context} (status: {resp.status_code})")
