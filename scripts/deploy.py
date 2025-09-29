@@ -68,7 +68,7 @@ class FleetManagerGitOps:
         """Find existing deployment application by name"""
         try:
             response = requests.get(
-                f"{self.fm_api_url}/deployment-applications",
+                f"{self.fm_api_url}/deployment-applications?limit=200",
                 headers=self.headers,
                 timeout=30
             )
@@ -139,7 +139,7 @@ class FleetManagerGitOps:
         try:
             # First, find the deployment for this application
             response = requests.get(
-                f"{self.fm_api_url}/deployments",
+                f"{self.fm_api_url}/deployments?limit=200",
                 headers=self.headers,
                 timeout=30
             )
@@ -157,7 +157,7 @@ class FleetManagerGitOps:
                 print(f"❌ No deployment found for application: {app_name}")
                 return False
             
-            # Trigger deployment
+            # Trigger deployment using POST (as shown in your examples)
             response = requests.post(
                 f"{self.fm_api_url}/deployments/{deployment_id}/deploy",
                 headers=self.headers,
