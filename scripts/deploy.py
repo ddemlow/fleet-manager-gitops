@@ -500,6 +500,7 @@ class FleetManagerGitOps:
             group_id = name_to_id[group_name]
             deployment_name = f"{app_name}-{group_name}"
             dep_id = self.find_deployment(deployment_name)
+            created = False
             if dep_id:
                 # Only trigger release if app content changed
                 ok = True
@@ -509,10 +510,11 @@ class FleetManagerGitOps:
             else:
                 dep_id = self.create_deployment(app_id, deployment_name, group_id, app_name, app_version)
                 ok = dep_id is not None
+                created = ok and dep_id is not None
             all_ok = all_ok and ok
 
             # For newly created deployment, trigger release immediately
-            if ok and dep_id and not self.find_deployment(deployment_name):
+            if created and dep_id:
                 released = self.trigger_deployment_release(dep_id)
                 all_ok = all_ok and released
 
