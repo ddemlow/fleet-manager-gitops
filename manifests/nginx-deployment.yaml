@@ -2,7 +2,7 @@ version: "1"
 type: "Application"
 metadata:
   name: "nginx-deployment-gitops-2"
-  description: "Nginx web server deployment 7 (post old vm cleanup)"
+  description: "Nginx web server deployment 8 (post old vm cleanup)"
   clusterGroups:
     - DDvsns
   vmname: &vmname "anchor1"
