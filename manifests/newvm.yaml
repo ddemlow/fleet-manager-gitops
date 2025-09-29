@@ -1,4 +1,4 @@
-iversion: "1"
+version: "1"
 type: "Application"
 metadata:
   name: "gitops-example-vm2"
