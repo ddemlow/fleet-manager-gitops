@@ -1,42 +1,41 @@
 version: "1"
 type: "Application"
 metadata:
-  name: "example-vm"
+  name: "gitops-example-vm"
   description: "Example virtual machine deployment"
   clusterGroups:
     - DDvsns
   labels:
     - development
-    - platform
+
 spec:
   assets:
-    - name: "example-disk"
-      type: "virtual_disk"
-      format: "qcow2"
-      size: "20Gi"
-      url: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
-    - name: "example-vm"
-      type: "virtual_machine"
-      vcpus: 2
-      memory: "4Gi"
-      disks:
-        - name: "example-disk"
-          size: "20Gi"
-      networks:
-        - name: "default"
-          type: "bridge"
-      userData: |
-        #cloud-config
-        users:
-          - name: ubuntu
-            sudo: ALL=(ALL) NOPASSWD:ALL
-            ssh_authorized_keys:
-              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7... # Your SSH key here
-        packages:
-          - docker.io
-          - git
-        runcmd:
-          - systemctl enable docker
-          - systemctl start docker
-          - usermod -aG docker ubuntu
-# Test comment for GitOps deployment
+    - name: test-disk
+      type: virtual_disk
+      format: raw
+      url: https://storage.googleapis.com/demo-bucket-lfm/netboot.xyz.img
+  resources:
+    - name: gitops-example-vm
+      type: virdomain
+      spec:
+        description: A simple VM for testing
+        cpu: 1
+        memory: 100000000
+        machine_type: uefi
+        storage_devices:
+          - name: cdrom1
+            type: ide_cdrom
+            boot: 1
+          - name: disk1
+            source: test-disk
+            boot: 2
+          - name: disk2
+            type: virtio_disk
+            capacity: 100000000000
+        network_devices:
+          - name: nic1
+            type: virtio
+        tags:
+          - kraken
+          - test
+        state: running
