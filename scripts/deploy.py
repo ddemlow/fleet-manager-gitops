@@ -71,6 +71,17 @@ class FleetManagerGitOps:
                     ]
                     if changed_files:
                         return sorted(set(changed_files))
+                # Some push events only populate head_commit
+                head = event.get('head_commit') or {}
+                if head:
+                    gh_candidates = (head.get('added') or []) + (head.get('modified') or [])
+                    changed_files = [
+                        f for f in gh_candidates if f and 
+                        f.startswith(('manifests/', 'applications/')) and 
+                        f.endswith(('.yaml', '.yml'))
+                    ]
+                    if changed_files:
+                        return sorted(set(changed_files))
         except Exception:
             pass
 
