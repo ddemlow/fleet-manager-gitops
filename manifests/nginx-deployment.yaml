@@ -38,8 +38,8 @@ spec:
 
         tags:
           - microos
-          - {{clusterName}}
-          - {{clusterId}}
+          - "{{clusterName}}"
+          - "{{clusterId}}"
           - kraken
           - production
           - *vmname
