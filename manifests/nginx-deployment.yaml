@@ -2,7 +2,7 @@ version: "1"
 type: "Application"
 metadata:
   name: "nginx-deployment"
-  description: "Nginx web server deployment (GH Actions test)"
+  description: "Nginx web server deployment 3 (GH Actions test)"
   clusterGroups:
     - DDvsns
   labels:
