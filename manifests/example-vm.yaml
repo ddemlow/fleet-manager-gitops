@@ -20,7 +20,7 @@ spec:
       spec:
         description: A simple VM for testing
         cpu: 1
-        memory: 100000000
+        memory: "2147483648"
         machine_type: uefi
         storage_devices:
           - name: cdrom1
