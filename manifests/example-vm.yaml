@@ -3,6 +3,8 @@ type: "Application"
 metadata:
   name: "example-vm"
   description: "Example virtual machine deployment"
+  clusterGroups:
+    - DDvsns
   labels:
     environment: "development"
     team: "platform"

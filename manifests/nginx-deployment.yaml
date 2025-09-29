@@ -3,6 +3,8 @@ type: "Application"
 metadata:
   name: "nginx-deployment"
   description: "Nginx web server deployment"
+  clusterGroups:
+    - DDvsns
   labels:
     environment: "production"
     team: "web"
