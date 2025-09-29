@@ -86,7 +86,7 @@ class FleetManagerGitOps:
             return None
 
     def create_deployment_application(self, app_name: str, manifest: str) -> str:
-        """Create a new deployment application using PUT"""
+        """Create a new deployment application (use POST)."""
         try:
             payload = {
                 "name": app_name,
@@ -94,15 +94,15 @@ class FleetManagerGitOps:
                 "sourceConfig": manifest
             }
             
-            # Use PUT for deployment-applications (always PUT according to API)
-            response = requests.put(
+            # Create without UUID uses POST; PUT with UUID is for updates
+            response = requests.post(
                 f"{self.fm_api_url}/deployment-applications",
                 headers=self.headers,
                 json=payload,
                 timeout=30
             )
             if response.status_code >= 400:
-                self._debug_fail(response, "Create application PUT /deployment-applications")
+                self._debug_fail(response, "Create application POST /deployment-applications")
                 response.raise_for_status()
             
             data = response.json()
