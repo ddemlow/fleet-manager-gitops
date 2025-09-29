@@ -2,7 +2,7 @@ version: "1"
 type: "Application"
 metadata:
   name: "nginx-deployment-gitops"
-  description: "Nginx web server deployment 5 (GH Actions test)"
+  description: "Nginx web server deployment 6 (GH Actions test)"
   clusterGroups:
     - DDvsns
   vmname: &vmname "anchor1"
