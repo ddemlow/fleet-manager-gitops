@@ -1,0 +1,39 @@
+version: "1"
+type: "Application"
+metadata:
+  name: "gitops-isoboot"
+  description: "Example virtual machine deployment"
+  clusterGroups:
+    - DDvsns
+  labels:
+    - development
+
+spec:
+  assets:
+    - name: tinyiso
+      type: virtual_disk
+      format: iso
+      url: http://tinycorelinux.net/16.x/x86/release/Core-current.iso
+  resources:
+    - name: gitops-example-vm2
+      type: virdomain
+      spec:
+        description: A simple VM for testing
+        cpu: 1
+        memory: "1073741824"
+        machine_type: bios
+        storage_devices:
+          - name: cdrom1
+            source: tinyiso
+            type: ide_cdrom
+            boot: 1
+          - name: disk2
+            type: virtio_disk
+            capacity: 100000000000
+        network_devices:
+          - name: nic1
+            type: virtio
+        tags:
+          - kraken
+          - test
+        state: running
