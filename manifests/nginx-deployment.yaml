@@ -23,7 +23,7 @@ spec:
       name: "gitops-kraken-{{clusterName}}"
       spec:
         description: "name {{clusterName}} id {{clusterId}}kraken microos domain"
-        cpu: 4
+        cpu: 2
         memory: "4294967296" 
         machine_type: "uefi"
         storage_devices:
