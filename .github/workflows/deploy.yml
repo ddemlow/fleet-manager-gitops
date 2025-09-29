@@ -55,6 +55,7 @@ jobs:
       - name: Deploy to Fleet Manager
         env:
           SC_FM_APIKEY: ${{ secrets.SC_FM_APIKEY }}
+          SC_ORG_ID: ${{ secrets.SC_ORG_ID }}
         run: |
           python scripts/deploy.py
 
