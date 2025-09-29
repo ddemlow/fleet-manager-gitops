@@ -178,6 +178,9 @@ git push origin main
 - Verify required fields are present
 - Use `python scripts/validate-manifests.py` locally
 
+#### **Deleted Manifest Still Appears in CI:**
+- Push payloads can include deleted files. The deploy script now skips missing files and logs `Skipping deleted files: ...`. Deleting a manifest does not currently delete its corresponding Deployment Application or Deployment in Fleet Manager. This may be added in the future.
+
 #### **Application Not Found:**
 - Check application name in manifest
 - Verify it exists in Fleet Manager

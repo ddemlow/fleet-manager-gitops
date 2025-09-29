@@ -544,6 +544,12 @@ class FleetManagerGitOps:
         
         # Get changed files
         changed_files = self.get_changed_files()
+        # Skip files that were deleted (can appear in event payload)
+        existing_changed_files = [f for f in changed_files if os.path.exists(f)]
+        missing_files = [f for f in changed_files if not os.path.exists(f)]
+        if missing_files:
+            print(f"ℹ️  Skipping deleted files: {', '.join(missing_files)}")
+        changed_files = existing_changed_files
         if not changed_files:
             print("ℹ️  No manifest files changed")
             return True
