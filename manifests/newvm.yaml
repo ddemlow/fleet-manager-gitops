@@ -14,6 +14,10 @@ spec:
       type: virtual_disk
       format: raw
       url: https://storage.googleapis.com/demo-bucket-lfm/netboot.xyz.img
+    - name: tinyiso
+      type: virtual_disk
+      format: iso
+      url: http://tinycorelinux.net/16.x/x86/release/Core-current.iso
   resources:
     - name: gitops-example-vm2
       type: virdomain
@@ -24,6 +28,7 @@ spec:
         machine_type: bios
         storage_devices:
           - name: cdrom1
+            source: tinyiso
             type: ide_cdrom
             boot: 1
           - name: disk1
