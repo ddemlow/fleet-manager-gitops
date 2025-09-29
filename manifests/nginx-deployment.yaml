@@ -11,7 +11,7 @@ metadata:
     app: "nginx"
 spec:
   assets:
-    - name: test-disk
+    - name: test-disk2
       type: virtual_disk
       format: iso
       url: https://releases.ubuntu.com/24.04/ubuntu-24.04.2-live-server-amd64.iso
