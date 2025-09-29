@@ -2,6 +2,7 @@ version: "1"
 type: Application
 metadata:
   name: example-with-cluster-groups
+  description:  change this to test
   # You can target a single group with 'clusterGroup'
   # clusterGroup: DDvsns
   # Or target multiple groups with 'clusterGroups'
