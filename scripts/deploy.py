@@ -21,18 +21,18 @@ class FleetManagerGitOps:
         if not self.fm_api_key:
             raise ValueError("SC_FM_APIKEY environment variable is required")
             
-        # Try different authentication methods
+        # Fleet Manager API headers (based on actual API usage)
         self.headers = {
-            'Authorization': f'Bearer {self.fm_api_key}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-        
-        # Alternative headers for different API key formats
-        self.alt_headers = {
-            'X-API-Key': self.fm_api_key,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'authority': 'api.scalecomputing.com',
+            'accept': 'application/json, text/plain, */*',
+            'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+            'api-key': self.fm_api_key,
+            'origin': 'https://fleet.scalecomputing.com',
+            'referer': 'https://fleet.scalecomputing.com/',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-site',
+            'Content-Type': 'application/json'
         }
 
     def get_changed_files(self) -> List[str]:
@@ -211,33 +211,19 @@ class FleetManagerGitOps:
         print("🚀 Starting GitOps deployment to Fleet Manager")
         print(f"📡 Fleet Manager API: {self.fm_api_url}")
         
-        # Test connection with different authentication methods
+        # Test connection to Fleet Manager API
         try:
-            # Try Bearer token first
             response = requests.get(
                 f"{self.fm_api_url}/clusters",
                 headers=self.headers,
                 timeout=10
             )
             if response.status_code == 200:
-                print("✅ Fleet Manager API connection successful (Bearer token)")
+                print("✅ Fleet Manager API connection successful")
             else:
-                print(f"❌ Bearer token failed (status: {response.status_code})")
-                # Try X-API-Key
-                response = requests.get(
-                    f"{self.fm_api_url}/clusters",
-                    headers=self.alt_headers,
-                    timeout=10
-                )
-                if response.status_code == 200:
-                    print("✅ Fleet Manager API connection successful (X-API-Key)")
-                    # Switch to the working headers
-                    self.headers = self.alt_headers
-                else:
-                    print(f"❌ Both authentication methods failed")
-                    print(f"Bearer token status: {response.status_code}")
-                    print(f"Response: {response.text[:200]}")
-                    return False
+                print(f"❌ Fleet Manager API connection failed (status: {response.status_code})")
+                print(f"Response: {response.text[:200]}")
+                return False
         except Exception as e:
             print(f"❌ Fleet Manager API connection error: {e}")
             return False
