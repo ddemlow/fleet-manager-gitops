@@ -20,8 +20,6 @@ gitops/
 ├── manifests/                     # Application manifests
 │   ├── example-vm.yaml
 │   └── nginx-deployment.yaml
-├── manifests/                      # Application definitions (YAML)
-│   └── k3s-cluster.yaml
 ├── scripts/
 │   ├── deploy.py                  # Main deployment script
 │   └── validate-manifests.py      # Manifest validation
@@ -64,44 +62,53 @@ Go to your repository settings → Secrets and variables → Actions, and add th
 
 ## 📝 **Manifest Format**
 
-Your deployment manifests should follow this structure:
+Your deployment manifests should follow this structure - standard Fleet Manager application manifest but can also include the additional metadata to automatially create one or more "Application Deployment" relationships
+
+  clusterGroups:
+    - DDvsns
 
 ```yaml
 version: "1"
 type: "Application"
 metadata:
-  name: "my-app"
-  description: "My application description"
+  name: "gitops-example-vm2"
+  description: "Example virtual machine deployment"
+  clusterGroups:
+    - DDvsns
   labels:
-    environment: "production"
-    team: "platform"
+    - development
+
 spec:
   assets:
-    - name: "app-disk"
-      type: "virtual_disk"
-      format: "qcow2"
-      size: "20Gi"
-      url: "https://example.com/image.img"
-    - name: "app-vm"
-      type: "virtual_machine"
-      vcpus: 2
-      memory: "4Gi"
-      disks:
-        - name: "app-disk"
-          size: "20Gi"
-      networks:
-        - name: "default"
-          type: "bridge"
-      userData: |
-        #cloud-config
-        users:
-          - name: ubuntu
-            sudo: ALL=(ALL) NOPASSWD:ALL
-        packages:
-          - docker.io
-        runcmd:
-          - systemctl enable docker
-          - systemctl start docker
+    - name: test-disk
+      type: virtual_disk
+      format: raw
+      url: https://storage.googleapis.com/demo-bucket-lfm/netboot.xyz.img
+  resources:
+    - name: gitops-example-vm2
+      type: virdomain
+      spec:
+        description: A simple VM for testing
+        cpu: 1
+        memory: "2147483648"
+        machine_type: bios
+        storage_devices:
+          - name: cdrom1
+            type: ide_cdrom
+            boot: 1
+          - name: disk1
+            source: test-disk
+            boot: 2
+          - name: disk2
+            type: virtio_disk
+            capacity: 100000000000
+        network_devices:
+          - name: nic1
+            type: virtio
+        tags:
+          - kraken
+          - test
+        state: running
 ```
 
 ## 🔄 **GitOps Workflow**
