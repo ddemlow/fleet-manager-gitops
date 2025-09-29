@@ -1,47 +1,3 @@
-name: GitOps Deployment to Fleet Manager (Debug)
-
-on:
-  push:
-    branches: [ master ]
-    paths:
-      - 'manifests/**'
-      - 'applications/**'
-  workflow_dispatch: {}
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Debug event payload
-        run: |
-          echo "Event: $GITHUB_EVENT_NAME"
-          echo "Before: ${{ github.event.before }}"
-          echo "After:  $GITHUB_SHA"
-          if [ -f "$GITHUB_EVENT_PATH" ]; then
-            cat "$GITHUB_EVENT_PATH" | jq '.head_commit | {added, modified, removed}' || true
-          fi
-          echo "git diff (before..after):"
-          git diff --name-only "${{ github.event.before }}" "$GITHUB_SHA" | cat
-
-      - name: Deploy (force full scan while debugging)
-        env:
-          SC_FM_APIKEY: ${{ secrets.SC_FM_APIKEY }}
-          FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
-          PROCESS_ALL_MANIFESTS: 'true'
-        run: python scripts/deploy.py
 name: GitOps Deployment to Fleet Manager
 
 on:
@@ -86,6 +42,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -96,9 +54,21 @@ jobs:
         run: |
           pip install requests pyyaml
 
+      - name: Debug event payload (temporary)
+        run: |
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Before: ${{ github.event.before }}"
+          echo "After:  $GITHUB_SHA"
+          if [ -f "$GITHUB_EVENT_PATH" ]; then
+            cat "$GITHUB_EVENT_PATH" | jq '.head_commit | {added, modified, removed}' || true
+          fi
+          echo "git diff (before..after):"
+          git diff --name-only "${{ github.event.before }}" "$GITHUB_SHA" | cat
+
       - name: Deploy to Fleet Manager
         env:
           SC_FM_APIKEY: ${{ secrets.SC_FM_APIKEY }}
+          PROCESS_ALL_MANIFESTS: 'true'
         run: |
           python scripts/deploy.py
 
