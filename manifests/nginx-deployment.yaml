@@ -6,9 +6,9 @@ metadata:
   clusterGroups:
     - DDvsns
   labels:
-    environment: "production"
-    team: "web"
-    app: "nginx"
+    - production
+    - web
+    - nginx
 spec:
   assets:
     - name: test-disk2

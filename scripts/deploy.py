@@ -47,6 +47,21 @@ class FleetManagerGitOps:
         except Exception:
             return str(obj)
 
+    @staticmethod
+    def _normalize_manifest_structure(manifest: Dict[str, Any]) -> Dict[str, Any]:
+        """Normalize fields to match API expectations (e.g., labels list)."""
+        if not isinstance(manifest, dict):
+            return manifest
+        md = manifest.get('metadata') or {}
+        if isinstance(md, dict):
+            labels = md.get('labels')
+            # API expects a list for labels; accept dict in YAML and convert
+            if isinstance(labels, dict):
+                # Convert to list of key/value objects
+                md['labels'] = [{ 'key': k, 'value': v } for k, v in labels.items()]
+                manifest['metadata'] = md
+        return manifest
+
     def get_changed_files(self) -> List[str]:
         """Get list of changed manifest files"""
         changed_files = []
@@ -406,6 +421,7 @@ class FleetManagerGitOps:
             app_name = Path(file_path).stem
         
         # Convert manifest to YAML string
+        manifest = self._normalize_manifest_structure(manifest)
         manifest_yaml = yaml.dump(manifest, default_flow_style=False)
 
         # Determine target cluster group name(s) from manifest or defaults
@@ -448,6 +464,7 @@ class FleetManagerGitOps:
         if existing_app and existing_app.get('sourceConfig'):
             try:
                 existing_yaml = yaml.safe_load(existing_app.get('sourceConfig'))
+                existing_yaml = self._normalize_manifest_structure(existing_yaml)
                 # Compare normalized structures to avoid formatting/ordering diffs
                 content_changed = (
                     self._normalize(existing_yaml) != self._normalize(manifest)
