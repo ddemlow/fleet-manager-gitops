@@ -43,18 +43,26 @@ def ensure_dir(path: Path):
 def to_application(container_def: dict, runtime_def: dict) -> dict:
     name = container_def.get('metadata', {}).get('name')
     md = container_def.get('metadata', {})
-    runtime = runtime_def.get('spec', {}).get('runtime', {}) if runtime_def else {}
-    network = runtime_def.get('spec', {}).get('network', []) if runtime_def else []
+    # Runtime defaults from runtime.yaml (can be overridden by container spec)
+    runtime_defaults = (runtime_def.get('spec', {}) or {}).get('runtime', {}) if runtime_def else {}
+    network = (runtime_def.get('spec', {}) or {}).get('network', []) if runtime_def else []
+    vm_state = (runtime_def.get('spec', {}) or {}).get('vmState', 'running') if runtime_def else 'running'
+    policies = (runtime_def.get('spec', {}) or {}).get('policies', {}) if runtime_def else {}
+    # Container overrides
+    container_runtime = (container_def.get('spec', {}) or {}).get('runtime', {})
     containers = container_def.get('spec', {}).get('containers', [])
     content = container_def.get('spec', {}).get('content', [])
 
-    vcpus = runtime.get('vcpus', 2)
-    memory = runtime.get('memory', '2Gi')
-    disk_cfg = runtime.get('disk', {})
-    disk_name = disk_cfg.get('name', 'rootdisk')
-    disk_capacity = disk_cfg.get('capacity', '40Gi')
-    disk_image = disk_cfg.get('imageUrl') or disk_cfg.get('url')
-    disk_format = disk_cfg.get('format', 'raw')
+    # Merge runtime (container overrides runtime defaults)
+    vcpus = container_runtime.get('vcpus') or runtime_defaults.get('vcpus', 2)
+    memory = container_runtime.get('memory') or runtime_defaults.get('memory', '2Gi')
+    disk_cfg_defaults = runtime_defaults.get('disk', {}) or {}
+    disk_cfg_overrides = container_runtime.get('disk', {}) or {}
+    merged_disk = {**disk_cfg_defaults, **disk_cfg_overrides}
+    disk_name = merged_disk.get('name', 'rootdisk')
+    disk_capacity = merged_disk.get('capacity', '40Gi')
+    disk_image = merged_disk.get('imageUrl') or merged_disk.get('url')
+    disk_format = merged_disk.get('format', 'raw')
 
     # Map simplified to Application
     tags = list(md.get('labels') or [])
@@ -111,7 +119,7 @@ def to_application(container_def: dict, runtime_def: dict) -> dict:
                             for n in (network or [{'name': 'eth0', 'type': 'virtio'}])
                         ],
                         'tags': tags,
-                        'state': 'running',
+                        'state': vm_state,
                         'cloud_init_data': {
                             'user_data': USER_DATA_PLACEHOLDER,
                             'meta_data': LiteralString(_meta_data(name))
@@ -122,11 +130,11 @@ def to_application(container_def: dict, runtime_def: dict) -> dict:
         }
     }
     # Attach the rendered user_data separately for pretty YAML block emission later
-    app['__rendered_user_data__'] = _container_quadlet_user_data(containers, content, merged_cloud_init)
+    app['__rendered_user_data__'] = _container_quadlet_user_data(containers, content, merged_cloud_init, policies)
     return app
 
 
-def _container_quadlet_user_data(containers: list, content: list, cloud_init: dict | None = None) -> str:
+def _container_quadlet_user_data(containers: list, content: list, cloud_init: dict | None = None, policies: dict | None = None) -> str:
     lines = [
         '#cloud-config',
     ]
@@ -180,9 +188,18 @@ def _container_quadlet_user_data(containers: list, content: list, cloud_init: di
         'runcmd:',
     ]
 
-    # Base system prep
-    lines.append('  - systemctl enable podman.socket')
-    lines.append('  - systemctl enable --now podman-auto-update.timer')
+    # Base system prep (policy-controlled)
+    pol = policies or {}
+    enable_podman_socket = pol.get('enablePodmanSocket', True)
+    enable_auto_update_timer = pol.get('enableAutoUpdateTimer', True)
+    setup_qga = pol.get('setupQemuGuestAgent', True)
+    reboot_after_qga = pol.get('rebootAfterQga', True)
+    auto_update_label = pol.get('autoUpdateLabel', True)
+
+    if enable_podman_socket:
+        lines.append('  - systemctl enable podman.socket')
+    if enable_auto_update_timer:
+        lines.append('  - systemctl enable --now podman-auto-update.timer')
     lines.append('  - mkdir -p /etc/containers/systemd')
     lines.append('  - mkdir -p /var/edge/www')
 
@@ -216,7 +233,8 @@ def _container_quadlet_user_data(containers: list, content: list, cloud_init: di
             lines.append(f"    Volume={hp}:{mp}{sel}")
         for e in env:
             lines.append(f"    Environment={e.get('name')}={e.get('value')}")
-        lines.append('    Label=io.containers.autoupdate=registry')
+        if auto_update_label:
+            lines.append('    Label=io.containers.autoupdate=registry')
         lines.append('')
         lines.append('    [Install]')
         lines.append('    WantedBy=multi-user.target')
@@ -227,32 +245,34 @@ def _container_quadlet_user_data(containers: list, content: list, cloud_init: di
         lines.append(f"  - systemctl restart {c.get('name','app')}.service")
 
     # Optional: install qemu-guest-agent transactionally and enable next boot
-    lines.append('  - transactional-update --non-interactive pkg install qemu-guest-agent || true')
-    lines.append('  - mkdir -p /etc/systemd/system')
-    lines.append('  - |')
-    lines.append("    cat <<'EOF' > /etc/systemd/system/enable-qemu-guest-agent.service")
-    lines.append('    [Unit]')
-    lines.append('    Description=Enable qemu-guest-agent post-reboot')
-    lines.append('    After=multi-user.target')
-    lines.append('')
-    lines.append('    [Service]')
-    lines.append('    Type=oneshot')
-    lines.append('    ExecStart=/usr/bin/systemctl enable --now qemu-guest-agent.service')
-    lines.append('    RemainAfterExit=yes')
-    lines.append('')
-    lines.append('    [Install]')
-    lines.append('    WantedBy=multi-user.target')
-    lines.append('    EOF')
-    lines.append('  - systemctl enable enable-qemu-guest-agent.service || true')
-    # Match nginx-deployment: create override dir/file and reboot
-    lines.append('  - mkdir -p /etc/systemd/system/qemu-guest-agent.service.d')
-    lines.append('  - |')
-    lines.append("    cat <<'EOF' > /etc/systemd/system/qemu-guest-agent.service.d/override.conf")
-    lines.append('    [Unit]')
-    lines.append('    Requires=')
-    lines.append('    After=')
-    lines.append('    EOF')
-    lines.append('  - reboot')
+    if setup_qga:
+        lines.append('  - transactional-update --non-interactive pkg install qemu-guest-agent || true')
+        lines.append('  - mkdir -p /etc/systemd/system')
+        lines.append('  - |')
+        lines.append("    cat <<'EOF' > /etc/systemd/system/enable-qemu-guest-agent.service")
+        lines.append('    [Unit]')
+        lines.append('    Description=Enable qemu-guest-agent post-reboot')
+        lines.append('    After=multi-user.target')
+        lines.append('')
+        lines.append('    [Service]')
+        lines.append('    Type=oneshot')
+        lines.append('    ExecStart=/usr/bin/systemctl enable --now qemu-guest-agent.service')
+        lines.append('    RemainAfterExit=yes')
+        lines.append('')
+        lines.append('    [Install]')
+        lines.append('    WantedBy=multi-user.target')
+        lines.append('    EOF')
+        lines.append('  - systemctl enable enable-qemu-guest-agent.service || true')
+        # Match nginx-deployment: create override dir/file
+        lines.append('  - mkdir -p /etc/systemd/system/qemu-guest-agent.service.d')
+        lines.append('  - |')
+        lines.append("    cat <<'EOF' > /etc/systemd/system/qemu-guest-agent.service.d/override.conf")
+        lines.append('    [Unit]')
+        lines.append('    Requires=')
+        lines.append('    After=')
+        lines.append('    EOF')
+        if reboot_after_qga:
+            lines.append('  - reboot')
 
     return "\n".join(lines) + "\n"
 

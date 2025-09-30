@@ -207,6 +207,92 @@ python scripts/deploy.py
 
 ## 📚 **Advanced Usage**
 
+### **ContainerDefinition + runtime.yaml (Compiler Workflow)**
+
+This repo supports a simplified authoring workflow using a compiler that turns a `ContainerDefinition` + shared `runtime.yaml` into a full Fleet Manager `Application` manifest.
+
+Folders:
+- `manifests/containers/*.container.yaml` → container apps
+- `manifests/containers/runtime_configuration/runtime.yaml` → shared runtime defaults/policies (override per-app with `<name>.runtime.yaml` if needed)
+- Compiled output: `manifests/_compiled/*.yaml` (ignored by Git)
+
+ContainerDefinition (example):
+```yaml
+version: "1"
+type: "ContainerDefinition"
+metadata:
+  name: "nginx"
+  clusterGroups: [DDvsns]
+  labels: [scruntime, nginx]
+spec:
+  runtime:                  # optional per-app overrides
+    vcpus: 2
+    memory: "2Gi"
+    disk:
+      capacity: "40Gi"
+  containers:
+    - name: "nginx"
+      image: "docker.io/library/nginx:1.27-alpine"
+      ports: ["80:80"]
+      mounts:
+        - hostPath: "/var/edge/www"
+          mountPath: "/usr/share/nginx/html"
+          selinuxRelabel: true
+  content:
+    - path: "/var/edge/www/index.html"
+      mode: "0644"
+      data: |
+        <!doctype html>
+        <html>...</html>
+```
+
+runtime.yaml (shared defaults and policies):
+```yaml
+version: "1"
+type: "RuntimeConfiguration"
+metadata:
+  name: "default-runtime"
+spec:
+  cloudInit:
+    ssh:
+      passwordAuth: true
+      disableRoot: false
+  runtime:
+    vcpus: 2
+    memory: "2Gi"
+    disk:
+      name: "rootdisk"
+      capacity: "40Gi"
+      format: "raw"
+      url: "https://.../OpenStack-Cloud.raw"
+  network:
+    - name: "eth0"
+      type: "virtio"
+  vmState: "running"
+  policies:
+    enablePodmanSocket: true
+    enableAutoUpdateTimer: true
+    setupQemuGuestAgent: true
+    rebootAfterQga: true
+    autoUpdateLabel: true
+```
+
+How compilation works:
+- The compiler merges `ContainerDefinition` with `runtime.yaml`
+- `spec.runtime` in the container overrides values from `runtime.yaml`
+- Multi-line `cloud_init_data.user_data` is rendered as a readable YAML block
+- Output is written to `manifests/_compiled/<name>.yaml`
+
+Run locally:
+```bash
+python scripts/compile_manifests.py
+python scripts/deploy.py
+```
+
+Notes:
+- Place per-app runtime at `manifests/containers/runtime_configuration/<name>.runtime.yaml` to override shared defaults.
+- Deleting source files does not delete resources in Fleet Manager yet (see Known limitations).
+
 ### **Environment-Specific Deployments:**
 Create different branches for different environments:
 - `main` → Production
