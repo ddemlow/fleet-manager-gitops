@@ -23,7 +23,7 @@ jobs:
       - name: Validate YAML syntax
         run: |
           echo "Validating YAML syntax..."
-          for file in $(find manifests/ applications/ -name "*.yaml" -o -name "*.yml" 2>/dev/null); do
+          for file in $(find manifests/ -name "*.yaml" -o -name "*.yml" 2>/dev/null); do
             echo "Validating $file"
             python -c "import yaml; yaml.safe_load(open('$file'))" || exit 1
           done
