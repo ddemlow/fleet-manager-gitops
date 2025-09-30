@@ -49,7 +49,7 @@ spec:
           </head>
           <body>
             <div class="wrap">
-              <h1>Welcome to nginx on MicroOS - Scale Computing Runtime Demo</h1>
+              <h1>Welcome to nginx on MicroOS - Scale Computing Runtime Demo touch</h1>
               <p class="meta">This node is serving a custom page from a bind-mounted volume.</p>
               <div class="card">
                 <p><strong>Cluster:</strong> <code>{{clusterName}}</code></p>
