@@ -125,6 +125,11 @@ class ManifestValidator:
         # Validate each file
         success_count = 0
         for file_path in manifest_files:
+            # Hard-skip container/runtime definition files by path
+            if '/containers/' in file_path:
+                print(f"⏭️  Skipping non-Application manifest: {file_path} (by path)")
+                success_count += 1
+                continue
             if self.validate_manifest(file_path):
                 success_count += 1
         
