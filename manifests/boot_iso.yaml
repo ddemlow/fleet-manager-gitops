@@ -14,7 +14,7 @@ spec:
       type: virtual_disk
       format: iso
       url: http://tinycorelinux.net/16.x/x86/release/Core-current.iso
-   resources: []
+  resources: []
   #   - name: gitops-isoboot-example
   #     type: virdomain
   #     spec:
