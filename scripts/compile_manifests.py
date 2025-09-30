@@ -67,7 +67,7 @@ def to_application(container_def: dict, runtime_def: dict) -> dict:
             'resources': [
                 {
                     'type': 'virdomain',
-                    'name': f"{name}-domain",
+                    'name': name,
                     'spec': {
                         'cpu': vcpus,
                         'memory': memory,

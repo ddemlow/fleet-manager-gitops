@@ -1,7 +1,7 @@
 version: "1"
 type: "ContainerDefinition"
 metadata:
-  name: "nginx-simplified"
+  name: "nginx"
   clusterGroups:
     - DDvsns
   labels:
