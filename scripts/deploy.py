@@ -583,14 +583,41 @@ class FleetManagerGitOps:
             return True
         
         print(f"📋 Found {len(changed_files)} changed manifest files")
-        
-        # Include compiled outputs (treat as changed if present)
-        compiled_dir = Path('manifests/_compiled')
-        if compiled_dir.exists():
-            for compiled_file in compiled_dir.glob('*.yaml'):
-                path_str = str(compiled_file)
-                if path_str not in changed_files:
-                    changed_files.append(path_str)
+
+        # Map container/runtime sources → compiled outputs and include only those whose sources changed
+        try:
+            # Remove any compiled paths from the raw change list (we'll re-add selectively)
+            changed_files = [f for f in changed_files if not f.startswith('manifests/_compiled/')]
+
+            generic_runtime = 'manifests/containers/runtime_configuration/runtime.yaml'
+            container_files = glob.glob('manifests/containers/*.container.yaml')
+            compiled_to_add: List[str] = []
+            for cfile in container_files:
+                name = Path(cfile).stem.replace('.container', '')
+                per_app_runtime = f'manifests/containers/runtime_configuration/{name}.runtime.yaml'
+                compiled_path = f'manifests/_compiled/{name}.yaml'
+                # If any of the sources changed in this run, include its compiled output
+                if any(src in changed_files for src in [cfile, per_app_runtime, generic_runtime]):
+                    if os.path.exists(compiled_path):
+                        compiled_to_add.append(compiled_path)
+
+            # If no specific sources changed but compiled outputs exist (e.g., local runs), keep behavior unchanged
+            if not compiled_to_add:
+                compiled_dir = Path('manifests/_compiled')
+                if compiled_dir.exists():
+                    compiled_to_add = [str(p) for p in compiled_dir.glob('*.yaml')]
+
+            for p in compiled_to_add:
+                if p not in changed_files:
+                    changed_files.append(p)
+        except Exception:
+            # Fallback to previous behavior: include all compiled outputs if present
+            compiled_dir = Path('manifests/_compiled')
+            if compiled_dir.exists():
+                for compiled_file in compiled_dir.glob('*.yaml'):
+                    path_str = str(compiled_file)
+                    if path_str not in changed_files:
+                        changed_files.append(path_str)
 
         # Only process Application manifests, track skipped
         application_files: List[str] = []
