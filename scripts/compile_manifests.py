@@ -26,8 +26,14 @@ try:
     yaml.add_representer(LiteralString, _represent_literal_str)
     LiteralSafeDumper.add_representer(LiteralString, _represent_literal_str)
     LiteralSafeDumper.add_representer(str, LiteralSafeDumper.represent_str)  # type: ignore[arg-type]
-except Exception:
+    
+    # Debug: print YAML version info
+    import yaml
+    print(f"🔧 Using PyYAML version: {yaml.__version__}")
+    print(f"🔧 LiteralSafeDumper available: {LiteralSafeDumper is not None}")
+except Exception as e:
     # Fallbacks
+    print(f"⚠️  YAML literal block setup failed: {e}")
     LiteralString = str  # type: ignore
     LiteralSafeDumper = None  # type: ignore
 
@@ -319,7 +325,19 @@ def main():
                 for line in user_data_text.splitlines():
                     block += indent + "  " + line + "\n"
                 return block
+            # Try the regex replacement first
             dumped = re.sub(r"^(\s*)user_data: .*__USER_DATA_PLACEHOLDER__.*$", replace_block, dumped, flags=re.M)
+            
+            # If that didn't work (placeholder not found), try to find and replace any quoted user_data
+            if "__USER_DATA_PLACEHOLDER__" not in dumped:
+                # Look for user_data: "..." and replace with literal block
+                def replace_quoted_block(match):
+                    indent = match.group(1)
+                    block = indent + "user_data: |\n"
+                    for line in user_data_text.splitlines():
+                        block += indent + "  " + line + "\n"
+                    return block
+                dumped = re.sub(r"^(\s*)user_data: \".*\"$", replace_quoted_block, dumped, flags=re.M | re.DOTALL)
 
         with open(out_path, 'w') as f:
             f.write(dumped)
