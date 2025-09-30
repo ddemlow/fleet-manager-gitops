@@ -9,7 +9,7 @@ spec:
       passwordAuth: true
       disableRoot: false
     users:
-      - name: dave
+      - name: user
         groups: [wheel]
         sudo: ALL=(ALL) NOPASSWD:ALL
         shell: /bin/bash
@@ -18,7 +18,7 @@ spec:
           - github:daveddemlow
     chpasswd:
       list: |
-        dave:password
+        user:password
       expire: false
   runtime:
     vcpus: 2
