@@ -9,18 +9,6 @@ metadata:
     - nginx
 
 spec:
-  users:
-    - name: dave
-      groups: [wheel]
-      sudo: ALL=(ALL) NOPASSWD:ALL
-      shell: /bin/bash
-      sshAuthorizedKeys:
-        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
-        - github:daveddemlow
-  chpasswd:
-    list: |
-      dave:password
-    expire: false
   containers:
     - name: "nginx"
       image: "docker.io/library/nginx:1.27-alpine"
