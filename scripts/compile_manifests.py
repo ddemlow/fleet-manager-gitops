@@ -6,6 +6,31 @@ import glob
 from pathlib import Path
 
 
+"""Configure YAML to render multi-line strings as literal blocks (|)."""
+try:
+    from yaml.dumper import SafeDumper as _BaseSafeDumper
+
+    class LiteralString(str):
+        pass
+
+    class LiteralSafeDumper(_BaseSafeDumper):
+        def represent_str(self, data):  # type: ignore[override]
+            if isinstance(data, str) and "\n" in data:
+                return super().represent_scalar('tag:yaml.org,2002:str', data, style='|')
+            return super().represent_str(data)
+
+    def _represent_literal_str(dumper, data):
+        return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+
+    # Register for our custom type and ensure plain str uses our override
+    yaml.add_representer(LiteralString, _represent_literal_str)
+    LiteralSafeDumper.add_representer(LiteralString, _represent_literal_str)
+    LiteralSafeDumper.add_representer(str, LiteralSafeDumper.represent_str)  # type: ignore[arg-type]
+except Exception:
+    # Fallbacks
+    LiteralString = str  # type: ignore
+    LiteralSafeDumper = None  # type: ignore
+
 def load_yaml(path: str):
     with open(path, 'r') as f:
         return yaml.safe_load(f)
@@ -47,6 +72,7 @@ def to_application(container_def: dict, runtime_def: dict) -> dict:
     merged_cloud_init.update(ct_cloud)
     merged_cloud_init.update(rc_cloud)
 
+    USER_DATA_PLACEHOLDER = "__USER_DATA_PLACEHOLDER__"
     app = {
         'version': '1',
         'type': 'Application',
@@ -87,14 +113,16 @@ def to_application(container_def: dict, runtime_def: dict) -> dict:
                         'tags': tags,
                         'state': 'running',
                         'cloud_init_data': {
-                            'user_data': _container_quadlet_user_data(containers, content, merged_cloud_init),
-                            'meta_data': _meta_data(name)
+                            'user_data': USER_DATA_PLACEHOLDER,
+                            'meta_data': LiteralString(_meta_data(name))
                         }
                     }
                 }
             ]
         }
     }
+    # Attach the rendered user_data separately for pretty YAML block emission later
+    app['__rendered_user_data__'] = _container_quadlet_user_data(containers, content, merged_cloud_init)
     return app
 
 
@@ -254,8 +282,27 @@ def main():
         runtime_def = load_yaml(rfile) if os.path.exists(rfile) else {}
         app = to_application(container_def, runtime_def)
         out_path = compile_output_dir / f'{name}.yaml'
+        # Dump to string first so we can replace user_data with a literal block
+        DumperClass = LiteralSafeDumper if 'LiteralSafeDumper' in globals() and LiteralSafeDumper else None
+        dumped = yaml.dump(app, Dumper=DumperClass, sort_keys=False) if DumperClass else yaml.safe_dump(app, sort_keys=False)
+
+        if '__rendered_user_data__' in app:
+            user_data_text = app['__rendered_user_data__']
+            # Remove helper key from the output
+            dumped = dumped.replace("\n__rendered_user_data__: |\n", "\n")
+            dumped = dumped.replace("\n__rendered_user_data__: \n", "\n")
+            # Replace placeholder line with a YAML literal block using the same indentation
+            import re
+            def replace_block(match):
+                indent = match.group(1)
+                block = indent + "user_data: |\n"
+                for line in user_data_text.splitlines():
+                    block += indent + "  " + line + "\n"
+                return block
+            dumped = re.sub(r"^(\s*)user_data: .*__USER_DATA_PLACEHOLDER__.*$", replace_block, dumped, flags=re.M)
+
         with open(out_path, 'w') as f:
-            yaml.safe_dump(app, f, sort_keys=False)
+            f.write(dumped)
         print(f"🧩 Compiled {name} → {out_path}")
         compiled += 1
 
