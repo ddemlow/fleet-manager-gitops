@@ -52,6 +52,12 @@ jobs:
         run: |
           pip install requests pyyaml
 
+      - name: Compile container definitions (optional)
+        env:
+          COMPILE_OUTPUT_DIR: manifests/_compiled
+        run: |
+          python scripts/compile_manifests.py || true
+
       - name: Debug event payload (temporary)
         run: |
           echo "Event: $GITHUB_EVENT_NAME"

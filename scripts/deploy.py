@@ -114,6 +114,7 @@ class FleetManagerGitOps:
             diff_last_commits = []
             diff_index_vs_head = []
             diff_worktree_vs_head = []
+            untracked = []
 
             if in_repo and has_head:
                 # 1) Changes between last two commits (CI typical)
@@ -134,10 +135,17 @@ class FleetManagerGitOps:
                     capture_output=True, text=True, check=True
                 ).stdout.strip().split('\n')
 
+                # 4) Untracked files (e.g., freshly compiled outputs not yet added)
+                untracked = subprocess.run(
+                    ['git', 'ls-files', '--others', '--exclude-standard'],
+                    capture_output=True, text=True, check=True
+                ).stdout.strip().split('\n')
+
             candidates = [
                 *diff_last_commits,
                 *diff_index_vs_head,
                 *diff_worktree_vs_head,
+                *untracked,
             ]
 
             changed_files = [
@@ -556,6 +564,14 @@ class FleetManagerGitOps:
         
         print(f"📋 Found {len(changed_files)} changed manifest files")
         
+        # Include compiled outputs (treat as changed if present)
+        compiled_dir = Path('manifests/_compiled')
+        if compiled_dir.exists():
+            for compiled_file in compiled_dir.glob('*.yaml'):
+                path_str = str(compiled_file)
+                if path_str not in changed_files:
+                    changed_files.append(path_str)
+
         # Process each changed file
         success_count = 0
         for file_path in changed_files:

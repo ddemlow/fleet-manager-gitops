@@ -1,0 +1,23 @@
+version: "1"
+type: "RuntimeConfiguration"
+metadata:
+  name: "nginx-simplified"
+
+spec:
+  cloudInit:
+    ssh:
+      passwordAuth: true
+      disableRoot: false
+  runtime:
+    vcpus: 2
+    memory: "2Gi"
+    disk:
+      name: "rootdisk"
+      capacity: "40Gi"
+      format: "raw"
+      url: "https://pm-westfield.s3.us-east-2.amazonaws.com/openSUSE-MicroOS.x86_64-ContainerHost-OpenStack-Cloud.raw"
+
+  network:
+    - name: "eth0"
+      type: "virtio"
+
