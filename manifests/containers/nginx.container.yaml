@@ -9,6 +9,11 @@ metadata:
     - nginx
 
 spec:
+  runtime:
+    vcpus: 2
+    memory: "2Gi"
+    disk:
+      capacity: "40Gi"
   containers:
     - name: "nginx"
       image: "docker.io/library/nginx:1.27-alpine"
