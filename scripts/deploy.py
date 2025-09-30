@@ -60,6 +60,21 @@ class FleetManagerGitOps:
                 # Convert to list of key/value objects
                 md['labels'] = [{ 'key': k, 'value': v } for k, v in labels.items()]
                 manifest['metadata'] = md
+        # Normalize cloud-init user_data whitespace to reduce false positives
+        spec = manifest.get('spec') or {}
+        if isinstance(spec, dict):
+            resources = spec.get('resources') or []
+            if isinstance(resources, list):
+                for res in resources:
+                    if not isinstance(res, dict):
+                        continue
+                    if (res.get('type') == 'virdomain' and isinstance(res.get('spec'), dict)):
+                        rspec = res['spec']
+                        cid = rspec.get('cloud_init_data')
+                        if isinstance(cid, dict) and isinstance(cid.get('user_data'), str):
+                            cid['user_data'] = cid['user_data'].rstrip()
+                            rspec['cloud_init_data'] = cid
+                            res['spec'] = rspec
         return manifest
 
     def get_changed_files(self) -> List[str]:
@@ -420,6 +435,11 @@ class FleetManagerGitOps:
         manifest = self.load_manifest(file_path)
         if not manifest:
             return False
+        # Only process full Application manifests; skip definitions/configs
+        mtype = (manifest.get('type') or '').lower()
+        if mtype != 'application':
+            print(f"ℹ️  Skipping non-Application manifest: {file_path} (type={manifest.get('type')})")
+            return True
         
         # Extract application name from manifest or filename
         app_name = manifest.get('metadata', {}).get('name')
@@ -572,17 +592,32 @@ class FleetManagerGitOps:
                 if path_str not in changed_files:
                     changed_files.append(path_str)
 
-        # Process each changed file
+        # Only process Application manifests, track skipped
+        application_files: List[str] = []
+        skipped_count = 0
+        for cf in changed_files:
+            try:
+                data = self.load_manifest(cf)
+                if data and isinstance(data, dict) and str(data.get('type','')).lower() == 'application':
+                    application_files.append(cf)
+                else:
+                    print(f"ℹ️  Skipping non-Application manifest: {cf} (type={data.get('type') if isinstance(data, dict) else 'unknown'})")
+                    skipped_count += 1
+            except Exception:
+                application_files.append(cf)
+
+        # Process each Application file
         success_count = 0
-        for file_path in changed_files:
+        for file_path in application_files:
             if self.process_manifest(file_path):
                 success_count += 1
         
         print(f"\n📊 Deployment Summary:")
         print(f"✅ Successful: {success_count}")
-        print(f"❌ Failed: {len(changed_files) - success_count}")
+        print(f"⏭️  Skipped: {skipped_count}")
+        print(f"❌ Failed: {len(application_files) - success_count}")
         
-        return success_count == len(changed_files)
+        return success_count == len(application_files)
 
 if __name__ == "__main__":
     try:

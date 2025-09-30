@@ -34,6 +34,19 @@ def to_application(container_def: dict, runtime_def: dict) -> dict:
     # Map simplified to Application
     tags = list(md.get('labels') or [])
 
+    # Merge cloudInit from runtime + container convenience fields
+    merged_cloud_init = {}
+    rc_cloud = (runtime_def.get('spec', {}).get('cloudInit') if runtime_def else {}) or {}
+    ct_cloud = (container_def.get('spec', {}).get('cloudInit') if container_def else {}) or {}
+    # Allow top-level users/chpasswd in container spec
+    if container_def.get('spec', {}).get('users'):
+        ct_cloud['users'] = container_def['spec']['users']
+    if container_def.get('spec', {}).get('chpasswd'):
+        ct_cloud['chpasswd'] = container_def['spec']['chpasswd']
+    # Shallow-merge with runtime taking precedence for ssh settings
+    merged_cloud_init.update(ct_cloud)
+    merged_cloud_init.update(rc_cloud)
+
     app = {
         'version': '1',
         'type': 'Application',
@@ -74,7 +87,7 @@ def to_application(container_def: dict, runtime_def: dict) -> dict:
                         'tags': tags,
                         'state': 'running',
                         'cloud_init_data': {
-                            'user_data': _container_quadlet_user_data(containers, content, container_def.get('spec', {}).get('cloudInit')),
+                            'user_data': _container_quadlet_user_data(containers, content, merged_cloud_init),
                             'meta_data': _meta_data(name)
                         }
                     }
@@ -98,7 +111,8 @@ def _container_quadlet_user_data(containers: list, content: list, cloud_init: di
     if 'disableRoot' in ssh:
         lines.append(f"disable_root: {'true' if ssh.get('disableRoot') else 'false'}")
 
-    users = ci.get('users') or []
+    # Support users either in cloudInit.users or top-level spec.users for convenience
+    users = (ci.get('users') if isinstance(ci.get('users'), list) else [])
     if users:
         lines.append('users:')
         for u in users:
@@ -116,6 +130,21 @@ def _container_quadlet_user_data(containers: list, content: list, cloud_init: di
                 lines.append('    ssh-authorized-keys:')
                 for key in aks:
                     lines.append(f"      - {key}")
+
+    # Also read top-level users from the container def (legacy convenience)
+    # This function receives only the merged cloudInit dict; top-level users/chpasswd
+    # are merged by caller into cloudInit before invoking this function.
+
+    # chpasswd support
+    chpwd = ci.get('chpasswd')
+    if isinstance(chpwd, dict):
+        lines.append('chpasswd:')
+        if 'list' in chpwd:
+            lines.append('  list: |')
+            for ln in str(chpwd.get('list')).splitlines():
+                lines.append(f"    {ln}")
+        if 'expire' in chpwd:
+            lines.append(f"  expire: {'true' if chpwd.get('expire') else 'false'}")
 
     # Files and commands
     lines += [
@@ -187,6 +216,15 @@ def _container_quadlet_user_data(containers: list, content: list, cloud_init: di
     lines.append('    WantedBy=multi-user.target')
     lines.append('    EOF')
     lines.append('  - systemctl enable enable-qemu-guest-agent.service || true')
+    # Match nginx-deployment: create override dir/file and reboot
+    lines.append('  - mkdir -p /etc/systemd/system/qemu-guest-agent.service.d')
+    lines.append('  - |')
+    lines.append("    cat <<'EOF' > /etc/systemd/system/qemu-guest-agent.service.d/override.conf")
+    lines.append('    [Unit]')
+    lines.append('    Requires=')
+    lines.append('    After=')
+    lines.append('    EOF')
+    lines.append('  - reboot')
 
     return "\n".join(lines) + "\n"
 
@@ -208,7 +246,10 @@ def main():
     compiled = 0
     for cfile in container_files:
         name = Path(cfile).stem.replace('.container', '')
-        rfile = f'manifests/containers/runtime_configuration/{name}.runtime.yaml'
+        # Prefer a generic runtime.yaml, fallback to per-app runtime file
+        generic_runtime = 'manifests/containers/runtime_configuration/runtime.yaml'
+        per_app_runtime = f'manifests/containers/runtime_configuration/{name}.runtime.yaml'
+        rfile = generic_runtime if os.path.exists(generic_runtime) else per_app_runtime
         container_def = load_yaml(cfile)
         runtime_def = load_yaml(rfile) if os.path.exists(rfile) else {}
         app = to_application(container_def, runtime_def)
