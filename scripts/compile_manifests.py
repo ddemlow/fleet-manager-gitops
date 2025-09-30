@@ -301,16 +301,16 @@ def main():
         container_def = load_yaml(cfile)
         runtime_def = load_yaml(rfile) if os.path.exists(rfile) else {}
         app = to_application(container_def, runtime_def)
+        
+        # Extract user_data and remove helper key before dumping
+        user_data_text = app.pop('__rendered_user_data__', None)
+        
         out_path = compile_output_dir / f'{name}.yaml'
         # Dump to string first so we can replace user_data with a literal block
         DumperClass = LiteralSafeDumper if 'LiteralSafeDumper' in globals() and LiteralSafeDumper else None
         dumped = yaml.dump(app, Dumper=DumperClass, sort_keys=False) if DumperClass else yaml.safe_dump(app, sort_keys=False)
 
-        if '__rendered_user_data__' in app:
-            user_data_text = app['__rendered_user_data__']
-            # Remove helper key from the output
-            dumped = dumped.replace("\n__rendered_user_data__: |\n", "\n")
-            dumped = dumped.replace("\n__rendered_user_data__: \n", "\n")
+        if user_data_text:
             # Replace placeholder line with a YAML literal block using the same indentation
             import re
             def replace_block(match):
