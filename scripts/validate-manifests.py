@@ -90,6 +90,11 @@ class ManifestValidator:
         try:
             with open(file_path, 'r') as f:
                 manifest = yaml.safe_load(f)
+            # Skip non-Application manifests (e.g., ContainerDefinition, RuntimeConfiguration)
+            mtype = str(manifest.get('type', '')).lower() if isinstance(manifest, dict) else ''
+            if mtype != 'application':
+                print(f"⏭️  Skipping non-Application manifest: {file_path} (type={manifest.get('type') if isinstance(manifest, dict) else 'unknown'})")
+                return True
             
             if not self.validate_manifest_structure(manifest, file_path):
                 return False
