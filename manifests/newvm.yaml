@@ -43,4 +43,4 @@ spec:
         tags:
           - kraken
           - test
-        state: running
+        state: shutoff
