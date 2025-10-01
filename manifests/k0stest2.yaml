@@ -3,7 +3,7 @@ version: '1'
 metadata:
   description: K0s Kubernetes cluster deployment
   clusterGroups:
-    - DDGroup
+    - DDgroup
   labels:
     - app:kubernetes
     - environment:production
@@ -19,9 +19,9 @@ spec:
 
   resources: 
     - type: "virdomain"
-      name: "gitops-k0s-single-{{clusterName}}"
+      name: "gitops-k0sdemo-{{clusterName}}"
       spec:
-        description: "name {{clusterName}} id {{clusterId}}"
+        description: "demo port-random name {{clusterName}} id {{clusterId}}"
         cpu: 2
         memory: "2147483648" #2GB in bytes
         machine_type: "uefi"
@@ -41,7 +41,6 @@ spec:
           - kraken
           - gitops
         state: running
-
         cloud_init_data:
           user_data: |
             #cloud-config
@@ -62,33 +61,16 @@ spec:
                 - ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
             chpasswd:
               list: |
-                dave:password
+                user:password
               expire: false
             packages:
               - qemu-guest-agent
               - git
               - curl
               - wget
-              - htop
-              - nano
               - jq
-            write_files:
-              - content: "{{ inventory_hostname }}"
-                path: /clusterip.txt
-              - path: /etc/systemd/system/getty@tty1.service.d/override.conf
-                content: |
-                  [Service]
-                  # Override getty@.service for tty1 to enable autologin
-                  ExecStart=
-                  ExecStart=-/sbin/agetty --autologin user --noclear %I $TERM
-                permissions: '0644'
-            bootcmd:
-              - [ sh, -c, 'sudo echo GRUB_CMDLINE_LINUX="nomodeset" >> /etc/default/grub' ]
-              - [ sh, -c, 'sudo echo GRUB_GFXPAYLOAD_LINUX="1024x768" >> /etc/default/grub' ]
-              - [ sh, -c, 'sudo echo GRUB_DISABLE_LINUX_UUID=true >> /etc/default/grub' ]
-              - [ sh, -c, 'sudo update-grub' ]
             runcmd:
-              - [ systemctl, restart, --no-block, qemu-guest-agent ]
+              - systemctl restart --no-block qemu-guest-agent
               - curl -sSf https://get.k0s.sh | sh
               - k0s install controller --single
               - k0s start
