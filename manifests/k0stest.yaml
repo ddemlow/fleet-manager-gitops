@@ -15,53 +15,53 @@ spec:
       url: "https://storage.googleapis.com/demo-bucket-lfm/focal-server-cloudimg-amd64.img"
 
 
-  resources: 
-    - type: "virdomain"
-      name: "gitops-k0s-{{clusterName}}"
-      spec:
-        description: "name {{clusterName}} id {{clusterId}}"
-        cpu: 2
-        memory: "2147483648" #2GB in bytes
-        machine_type: "uefi"
-        storage_devices:
-          - name: "bootdisk"
-            type: "virtio_disk"
-            source: "k3s-disk"
-            boot: 1
-            capacity: 42949672960  # 40 GB
-        network_devices:
-          - name: eth0
-            type: virtio
+  resources: []
+    # - type: "virdomain"
+    #   name: "gitops-k0s-{{clusterName}}"
+    #   spec:
+    #     description: "name {{clusterName}} id {{clusterId}}"
+    #     cpu: 2
+    #     memory: "2147483648" #2GB in bytes
+    #     machine_type: "uefi"
+    #     storage_devices:
+    #       - name: "bootdisk"
+    #         type: "virtio_disk"
+    #         source: "k3s-disk"
+    #         boot: 1
+    #         capacity: 42949672960  # 40 GB
+    #     network_devices:
+    #       - name: eth0
+    #         type: virtio
 
-        tags:
-          - ubuntu
-          - "{{clusterName}}"
-          - kraken
-          - gitops
-        state: running
+    #     tags:
+    #       - ubuntu
+    #       - "{{clusterName}}"
+    #       - kraken
+    #       - gitops
+    #     state: running
 
-        cloud_init_data:
-          user_data: |
-            #cloud-config
-            password: "password"
-            chpasswd: { expire: False }
-            ssh_pwauth: True
-            ssh_authorized_keys:
-              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
-            disable_root: false
-            ssh_pwauth: True
-            ssh_import_id:  gh:ddemlow
-            users:
-            - name: dave
-              groups: [wheel]
-              sudo: ALL=(ALL) NOPASSWD:ALL
-              shell: /bin/bash
-              ssh-authorized-keys:
-                - ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
-            chpasswd:
-              list: |
-                dave:password
-              expire: false
-          meta_data: |
-            dsmode: local
-            local-hostname: "gitops-k0s-{{clusterName}}"
+    #     cloud_init_data:
+    #       user_data: |
+    #         #cloud-config
+    #         password: "password"
+    #         chpasswd: { expire: False }
+    #         ssh_pwauth: True
+    #         ssh_authorized_keys:
+    #           - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+    #         disable_root: false
+    #         ssh_pwauth: True
+    #         ssh_import_id:  gh:ddemlow
+    #         users:
+    #         - name: dave
+    #           groups: [wheel]
+    #           sudo: ALL=(ALL) NOPASSWD:ALL
+    #           shell: /bin/bash
+    #           ssh-authorized-keys:
+    #             - ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+    #         chpasswd:
+    #           list: |
+    #             dave:password
+    #           expire: false
+    #       meta_data: |
+    #         dsmode: local
+    #         local-hostname: "gitops-k0s-{{clusterName}}"
