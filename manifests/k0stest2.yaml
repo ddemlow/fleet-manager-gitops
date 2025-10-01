@@ -2,21 +2,25 @@ type: Application
 version: '1'
 metadata:
   description: K0s Kubernetes cluster deployment
-  clusterGroups:
-    - DDgroup
-  name: k0s-demo
+  labels:
+    - app:kubernetes
+    - environment:production
+    - team:platform
+  name: k0s-nodefixed
 spec:
   assets:
     - name: ubuntu_focal
       type: virtual_disk
       format: raw
       url: "https://storage.googleapis.com/demo-bucket-lfm/focal-server-cloudimg-amd64.img"
+
+
   resources: 
     - type: "virdomain"
-      name: "gitops-k0sdemo-{{clusterName}}"
+      name: "gitops-k0s-{{clusterName}}"
       spec:
         description: "demo port-random name {{clusterName}} id {{clusterId}}"
-        cpu: 4
+        cpu: 2
         memory: "2147483648" #2GB in bytes
         machine_type: "uefi"
         storage_devices:
@@ -28,6 +32,7 @@ spec:
         network_devices:
           - name: eth0
             type: virtio
+
         tags:
           - ubuntu
           - "{{clusterName}}"
