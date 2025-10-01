@@ -2,11 +2,13 @@ type: Application
 version: '1'
 metadata:
   description: K0s Kubernetes cluster deployment
+  clusterGroups:
+    - DDGroup
   labels:
     - app:kubernetes
     - environment:production
     - team:platform
-  name: k0s-single
+  name: k0s-demo
 spec:
   assets:
     - name: ubuntu_focal
