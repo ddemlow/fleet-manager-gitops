@@ -1,0 +1,60 @@
+type: Application
+version: '1'
+metadata:
+  description: K0s Kubernetes cluster deployment (simplified)
+  labels:
+    - app:kubernetes
+    - environment:production
+    - team:platform
+  name: k0s-node-simple
+spec:
+  assets:
+    - name: ubuntu_focal
+      type: virtual_disk
+      format: raw
+      url: "https://storage.googleapis.com/demo-bucket-lfm/focal-server-cloudimg-amd64.img"
+
+  resources: []
+    # - type: "virdomain"
+    #   name: "gitops-k0s-simple-{{clusterName}}"
+    #   spec:
+    #     description: "name {{clusterName}} id {{clusterId}}"
+    #     cpu: 2
+    #     memory: "2147483648"
+    #     machine_type: "uefi"
+    #     storage_devices:
+    #       - name: "bootdisk"
+    #         type: "virtio_disk"
+    #         source: "ubuntu_focal"
+    #         boot: 1
+    #         capacity: 42949672960
+    #     network_devices:
+    #       - name: eth0
+    #         type: virtio
+    #     tags:
+    #       - ubuntu
+    #       - "{{clusterName}}"
+    #       - kraken
+    #       - gitops
+    #     state: running
+    #     cloud_init_data:
+    #       user_data: |
+    #         #cloud-config
+    #         users:
+    #         - name: user
+    #           groups: [wheel]
+    #           sudo: ALL=(ALL) NOPASSWD:ALL
+    #           shell: /bin/bash
+    #           ssh-authorized-keys:
+    #             - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+    #         packages:
+    #           - qemu-guest-agent
+    #           - git
+    #           - curl
+    #         runcmd:
+    #           - curl -sSf https://get.k0s.sh | sh
+    #           - k0s install controller --single
+    #           - k0s start
+    #       meta_data: |
+    #         dsmode: local
+    #         local-hostname: "gitops-k0s-simple-{{clusterName}}"
