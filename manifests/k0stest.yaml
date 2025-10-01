@@ -38,10 +38,9 @@ spec:
           - "{{clusterName}}"
           - kraken
           - gitops
-          - *vmname
         state: running
 
-        cloud_init_data:  # note microos does not support write_files: as an immutable os
+        cloud_init_data:
           user_data: |
             #cloud-config
             password: "password"
