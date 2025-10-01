@@ -2,11 +2,9 @@ type: Application
 version: '1'
 metadata:
   description: K0s Kubernetes cluster deployment
-  labels:
-    - app:kubernetes
-    - environment:production
-    - team:platform
-  name: k0s-nodefixed
+  clusterGroups:
+    - DDvsns
+  name: k0s-nodefixed3-github
 spec:
   assets:
     - name: ubuntu_focal
@@ -19,8 +17,8 @@ spec:
     - type: "virdomain"
       name: "gitops-k0s-{{clusterName}}"
       spec:
-        description: "demo port 31329 name {{clusterName}} id {{clusterId}}"
-        cpu: 2
+        description: "name {{clusterName}} id {{clusterId}}"
+        cpu: 4
         memory: "2147483648" #2GB in bytes
         machine_type: "uefi"
         storage_devices:
@@ -34,10 +32,7 @@ spec:
             type: virtio
 
         tags:
-          - ubuntu
-          - "{{clusterName}}"
-          - kraken
-          - gitops
+          - k0s
         state: running
         cloud_init_data:
           user_data: |
@@ -65,8 +60,6 @@ spec:
               - qemu-guest-agent
               - git
               - curl
-              - wget
-              - jq
             runcmd:
               - systemctl restart --no-block qemu-guest-agent
               - curl -sSf https://get.k0s.sh | sh
@@ -83,4 +76,4 @@ spec:
               - k0s kubectl get service frontend-external
           meta_data: |
             dsmode: local
-            local-hostname: "gitops-k0s-{{clusterName}}"
+            local-hostname: "k0s-{{clusterName}}"
