@@ -59,7 +59,7 @@ spec:
                 - ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
             chpasswd:
               list: |
-                dave:password
+                user:password
               expire: false
             packages:
               - qemu-guest-agent
