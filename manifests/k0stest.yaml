@@ -19,7 +19,7 @@ spec:
     - type: "virdomain"
       name: "gitops-k0s-{{clusterName}}"
       spec:
-        description: "demo port 31329 name {{clusterName}} id {{clusterId}}"
+        description: "demo port-random name {{clusterName}} id {{clusterId}}"
         cpu: 2
         memory: "2147483648" #2GB in bytes
         machine_type: "uefi"
