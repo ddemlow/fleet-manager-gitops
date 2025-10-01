@@ -9,10 +9,10 @@ metadata:
   name: k0s-node
 spec:
   assets:
-    - name: k3s-disk
-      format: raw
+    - name: ubuntu_k3s_base
       type: virtual_disk
-      url: https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img
+      format: raw
+      url: "https://storage.googleapis.com/demo-bucket-lfm/focal-server-cloudimg-amd64.img"
 
 
   resources: 
