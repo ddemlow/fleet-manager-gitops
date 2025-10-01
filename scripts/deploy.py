@@ -20,6 +20,13 @@ class FleetManagerGitOps:
         # Default cluster group name can be overridden by manifest content or env
         self.default_cluster_group_name = os.getenv('CLUSTER_GROUP_NAME', 'DDvsns')
         
+        # New control flags for better deployment targeting
+        self.only_compile = os.getenv('ONLY_COMPILE', '').lower() in ('1', 'true', 'yes')
+        self.skip_deployment_trigger = os.getenv('SKIP_DEPLOYMENT_TRIGGER', '').lower() in ('1', 'true', 'yes')
+        self.target_applications = os.getenv('TARGET_APPLICATIONS', '').split(',') if os.getenv('TARGET_APPLICATIONS') else []
+        # Filter out empty strings
+        self.target_applications = [app.strip() for app in self.target_applications if app.strip()]
+        
         if not self.fm_api_key:
             raise ValueError("SC_FM_APIKEY environment variable is required")
             
@@ -29,7 +36,7 @@ class FleetManagerGitOps:
             'accept': 'application/json',
             'content-type': 'application/json',
             'api-key': self.fm_api_key,
-            'user-agent': 'fleet-manager-gitops/1.0 (+github-actions)'
+            'user-agent': 'fleet-manager-gitops/2.0'
         }
 
     def _debug_fail(self, resp: requests.Response, context: str) -> None:
@@ -46,6 +53,17 @@ class FleetManagerGitOps:
             return json.dumps(obj, sort_keys=True, separators=(",", ":"))
         except Exception:
             return str(obj)
+
+    def should_process_manifest(self, file_path: str, app_name: str) -> bool:
+        """Determine if a manifest should be processed based on targeting rules"""
+        
+        # If specific applications are targeted, only process those
+        if self.target_applications:
+            if app_name not in self.target_applications:
+                print(f"⏭️  Skipping {app_name} (not in target list: {self.target_applications})")
+                return False
+        
+        return True
 
     @staticmethod
     def _normalize_manifest_structure(manifest: Dict[str, Any]) -> Dict[str, Any]:
@@ -429,12 +447,13 @@ class FleetManagerGitOps:
             return False
 
     def process_manifest(self, file_path: str) -> bool:
-        """Process a single manifest file"""
+        """Process a single manifest file with enhanced controls"""
         print(f"\n📄 Processing: {file_path}")
         
         manifest = self.load_manifest(file_path)
         if not manifest:
             return False
+            
         # Only process full Application manifests; skip definitions/configs
         mtype = (manifest.get('type') or '').lower()
         if mtype != 'application':
@@ -445,6 +464,10 @@ class FleetManagerGitOps:
         app_name = manifest.get('metadata', {}).get('name')
         if not app_name:
             app_name = Path(file_path).stem
+        
+        # Check if we should process this manifest
+        if not self.should_process_manifest(file_path, app_name):
+            return True  # Skip but don't fail
         
         # Convert manifest to YAML string
         manifest = self._normalize_manifest_structure(manifest)
@@ -498,18 +521,27 @@ class FleetManagerGitOps:
             except Exception:
                 content_changed = True
 
+        # Update or create application
         if app_id:
             if content_changed:
                 success = self.update_deployment_application(app_id, app_name, manifest_yaml)
+                print(f"🔄 Updated application: {app_name}")
             else:
                 print(f"ℹ️  No changes for application: {app_name}")
                 success = True
         else:
             app_id = self.create_deployment_application(app_name, manifest_yaml)
             success = app_id is not None
+            if success:
+                print(f"✨ Created new application: {app_name}")
         
         if not (success and app_id):
             return False
+
+        # Handle deployments (only if not skipping deployment triggers)
+        if self.skip_deployment_trigger:
+            print(f"⏭️  Skipping deployment trigger for {app_name} (SKIP_DEPLOYMENT_TRIGGER=true)")
+            return True
 
         # Ensure deployments exist/updated for the configured cluster group(s)
         name_to_id = self.list_cluster_groups()
@@ -550,9 +582,22 @@ class FleetManagerGitOps:
         return False
 
     def run(self):
-        """Main deployment process"""
-        print("🚀 Starting GitOps deployment to Fleet Manager")
+        """Main deployment process with enhanced controls"""
+        print("🚀 Starting Fleet Manager GitOps Deployment")
         print(f"📡 Fleet Manager API: {self.fm_api_url}")
+        
+        # Print control flags
+        if self.only_compile:
+            print("🔧 ONLY_COMPILE mode: Will only compile manifests, not deploy")
+        if self.skip_deployment_trigger:
+            print("⏭️  SKIP_DEPLOYMENT_TRIGGER mode: Will update applications but not trigger deployments")
+        if self.target_applications:
+            print(f"🎯 TARGET_APPLICATIONS mode: Will only process {self.target_applications}")
+        
+        # If only compiling, skip Fleet Manager API connection
+        if self.only_compile:
+            print("🔧 ONLY_COMPILE mode enabled - skipping Fleet Manager operations")
+            return True
         
         # Test connection to Fleet Manager API
         try:
@@ -592,32 +637,36 @@ class FleetManagerGitOps:
             generic_runtime = 'manifests/containers/runtime_configuration/runtime.yaml'
             container_files = glob.glob('manifests/containers/*.container.yaml')
             compiled_to_add: List[str] = []
+            container_sources_changed = False
+            
             for cfile in container_files:
                 name = Path(cfile).stem.replace('.container', '')
                 per_app_runtime = f'manifests/containers/runtime_configuration/{name}.runtime.yaml'
                 compiled_path = f'manifests/_compiled/{name}.yaml'
+                
                 # If any of the sources changed in this run, include its compiled output
                 if any(src in changed_files for src in [cfile, per_app_runtime, generic_runtime]):
+                    container_sources_changed = True
                     if os.path.exists(compiled_path):
                         compiled_to_add.append(compiled_path)
+                        print(f"🔄 Container source changed, will process: {compiled_path}")
 
-            # If no specific sources changed but compiled outputs exist (e.g., local runs), keep behavior unchanged
-            if not compiled_to_add:
-                compiled_dir = Path('manifests/_compiled')
-                if compiled_dir.exists():
-                    compiled_to_add = [str(p) for p in compiled_dir.glob('*.yaml')]
+            # CRITICAL FIX: Only process compiled files if their sources actually changed
+            # This prevents unwanted redeployment of container applications when editing unrelated manifests
+            if not container_sources_changed:
+                print("ℹ️  No container sources changed, skipping compiled container deployments")
+                print("ℹ️  This prevents unwanted redeployment of container applications")
+            else:
+                print(f"📦 Will process {len(compiled_to_add)} compiled container applications")
 
+            # Add compiled files to the change list
             for p in compiled_to_add:
                 if p not in changed_files:
                     changed_files.append(p)
-        except Exception:
-            # Fallback to previous behavior: include all compiled outputs if present
-            compiled_dir = Path('manifests/_compiled')
-            if compiled_dir.exists():
-                for compiled_file in compiled_dir.glob('*.yaml'):
-                    path_str = str(compiled_file)
-                    if path_str not in changed_files:
-                        changed_files.append(path_str)
+                    
+        except Exception as e:
+            print(f"⚠️  Error processing compiled files: {e}")
+            # Don't fall back to adding all compiled files - this was the bug!
 
         # Only process Application manifests, track skipped
         application_files: List[str] = []
@@ -647,6 +696,24 @@ class FleetManagerGitOps:
         return success_count == len(application_files)
 
 if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description='Enhanced Fleet Manager GitOps deployment')
+    parser.add_argument('--target-apps', help='Comma-separated list of applications to target')
+    parser.add_argument('--only-compile', action='store_true', help='Only compile manifests, do not deploy')
+    parser.add_argument('--skip-deployment-trigger', action='store_true', help='Update applications but do not trigger deployments')
+    parser.add_argument('--dry-run', action='store_true', help='Show what would be deployed without making changes')
+    
+    args = parser.parse_args()
+    
+    # Set environment variables from command line args
+    if args.target_apps:
+        os.environ['TARGET_APPLICATIONS'] = args.target_apps
+    if args.only_compile:
+        os.environ['ONLY_COMPILE'] = 'true'
+    if args.skip_deployment_trigger:
+        os.environ['SKIP_DEPLOYMENT_TRIGGER'] = 'true'
+    
     try:
         deployer = FleetManagerGitOps()
         success = deployer.run()

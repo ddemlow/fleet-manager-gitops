@@ -124,7 +124,34 @@ spec:
 
 ### **Manual Deployment:**
 ```bash
-# Run deployment script locally
+# Run deployment script locally (normal deployment)
+python scripts/deploy.py
+
+# Deploy only specific applications
+python scripts/deploy.py --target-apps nginx,nginx2
+
+# Update applications but don't trigger deployments (useful for testing)
+python scripts/deploy.py --skip-deployment-trigger
+
+# Only compile manifests without deploying
+python scripts/deploy.py --only-compile
+
+# Combine multiple controls
+python scripts/deploy.py --target-apps nginx --skip-deployment-trigger
+```
+
+### **Environment Variable Controls:**
+```bash
+# Set target applications
+export TARGET_APPLICATIONS=nginx,nginx2
+python scripts/deploy.py
+
+# Skip deployment triggers
+export SKIP_DEPLOYMENT_TRIGGER=true
+python scripts/deploy.py
+
+# Only compile mode
+export ONLY_COMPILE=true
 python scripts/deploy.py
 ```
 
@@ -170,6 +197,43 @@ git push origin main
 git revert <commit-hash>
 git push origin main
 ```
+
+## 🎯 **Deployment Controls**
+
+### **Problem Solved:**
+The enhanced deployment script now prevents unwanted redeployments when editing unrelated manifests. Previously, editing `boot_iso.yaml` would cause all container applications to redeploy unnecessarily.
+
+### **New Controls:**
+
+#### **Target Applications (`--target-apps`)**
+Deploy only specific applications:
+```bash
+python scripts/deploy.py --target-apps nginx,nginx2
+```
+
+#### **Skip Deployment Trigger (`--skip-deployment-trigger`)**
+Update applications in Fleet Manager but don't trigger actual deployments:
+```bash
+python scripts/deploy.py --skip-deployment-trigger
+```
+
+#### **Only Compile (`--only-compile`)**
+Only compile manifests without any Fleet Manager operations:
+```bash
+python scripts/deploy.py --only-compile
+```
+
+### **GitHub Actions Integration:**
+Use the enhanced workflow (`.github/workflows/enhanced-deploy.yml`) with manual dispatch options:
+- Target specific applications
+- Skip deployment triggers
+- Only compile mode
+
+### **Environment Variables:**
+Set these in your GitHub Actions secrets or local environment:
+- `TARGET_APPLICATIONS`: Comma-separated list of applications
+- `SKIP_DEPLOYMENT_TRIGGER`: Set to `true` to skip deployment triggers
+- `ONLY_COMPILE`: Set to `true` to only compile manifests
 
 ## 🔍 **Troubleshooting**
 
