@@ -15,8 +15,6 @@ spec:
       type: virtual_disk
       format: raw
       url: "https://storage.googleapis.com/demo-bucket-lfm/focal-server-cloudimg-amd64.img"
-
-
   resources: 
     - type: "virdomain"
       name: "gitops-k0sdemo-{{clusterName}}"
@@ -34,7 +32,6 @@ spec:
         network_devices:
           - name: eth0
             type: virtio
-
         tags:
           - ubuntu
           - "{{clusterName}}"
