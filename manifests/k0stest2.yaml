@@ -4,10 +4,6 @@ metadata:
   description: K0s Kubernetes cluster deployment
   clusterGroups:
     - DDgroup
-  labels:
-    - app:kubernetes
-    - environment:production
-    - team:platform
   name: k0s-demo
 spec:
   assets:
