@@ -16,7 +16,7 @@ spec:
       name: "gitops-k0sdemo-{{clusterName}}"
       spec:
         description: "demo port-random name {{clusterName}} id {{clusterId}}"
-        cpu: 2
+        cpu: 4
         memory: "2147483648" #2GB in bytes
         machine_type: "uefi"
         storage_devices:
