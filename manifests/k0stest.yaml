@@ -3,9 +3,8 @@ version: '1'
 metadata:
   description: K0s Kubernetes cluster deployment
   labels:
-    - app:kubernetes
-    - environment:production
-    - team:platform
+    - kubernetes
+    - production
   name: k0s-nodefixed
 spec:
   assets:
