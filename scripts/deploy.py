@@ -23,6 +23,7 @@ class FleetManagerGitOps:
         # New control flags for better deployment targeting
         self.only_compile = os.getenv('ONLY_COMPILE', '').lower() in ('1', 'true', 'yes')
         self.skip_deployment_trigger = os.getenv('SKIP_DEPLOYMENT_TRIGGER', '').lower() in ('1', 'true', 'yes')
+        self.diagnostic_mode = os.getenv('DIAGNOSTIC_MODE', '').lower() in ('1', 'true', 'yes')
         self.target_applications = os.getenv('TARGET_APPLICATIONS', '').split(',') if os.getenv('TARGET_APPLICATIONS') else []
         # Filter out empty strings
         self.target_applications = [app.strip() for app in self.target_applications if app.strip()]
@@ -387,21 +388,102 @@ class FleetManagerGitOps:
             print(f"❌ Error updating deployment {name}: {e}")
             return False
 
-    def trigger_deployment_release(self, dep_id: str) -> bool:
-        """Trigger a deployment release for the given deployment id"""
+    def get_deployment_status(self, dep_id: str) -> Dict[str, Any]:
+        """Get detailed deployment status and information"""
         try:
+            response = requests.get(
+                f"{self.fm_api_url}/deployments/{dep_id}",
+                headers=self.headers,
+                timeout=30
+            )
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f"⚠️  Could not get deployment status for {dep_id}: {response.status_code}")
+                return {}
+        except Exception as e:
+            print(f"⚠️  Error getting deployment status for {dep_id}: {e}")
+            return {}
+
+    def check_deployment_conflicts(self, app_name: str, cluster_groups: List[str]) -> List[Dict[str, Any]]:
+        """Check for potential deployment conflicts"""
+        conflicts = []
+        try:
+            # Get all deployments
+            response = requests.get(
+                f"{self.fm_api_url}/deployments?limit=200",
+                headers=self.headers,
+                timeout=30
+            )
+            response.raise_for_status()
+            deployments = response.json().get('items', [])
+            
+            # Check for naming conflicts
+            for deployment in deployments:
+                dep_name = deployment.get('name')
+                dep_app_id = deployment.get('applicationId')
+                dep_status = deployment.get('status')
+                
+                # Check if deployment name matches expected pattern
+                for group_name in cluster_groups:
+                    expected_name = f"{app_name}-{group_name}"
+                    if dep_name == expected_name:
+                        conflicts.append({
+                            'type': 'naming_conflict',
+                            'deployment_id': deployment.get('id'),
+                            'deployment_name': dep_name,
+                            'status': dep_status,
+                            'application_id': dep_app_id,
+                            'message': f"Deployment {expected_name} already exists with status: {dep_status}"
+                        })
+            
+            return conflicts
+        except Exception as e:
+            print(f"⚠️  Error checking deployment conflicts: {e}")
+            return []
+
+    def trigger_deployment_release(self, dep_id: str, dep_name: str = None) -> bool:
+        """Trigger a deployment release for the given deployment id with enhanced error checking"""
+        try:
+            # Get deployment status first
+            dep_status = self.get_deployment_status(dep_id)
+            if dep_status:
+                current_status = dep_status.get('status', 'unknown')
+                print(f"📊 Deployment {dep_name or dep_id} current status: {current_status}")
+                
+                # Check if deployment is in a problematic state
+                if current_status in ['failed', 'error', 'cancelled']:
+                    print(f"⚠️  Deployment is in {current_status} state - this may cause issues")
+            
+            # Attempt to trigger deployment
             response = requests.post(
                 f"{self.fm_api_url}/deployments/{dep_id}/deploy",
                 headers=self.headers,
                 timeout=30
             )
-            if response.status_code >= 400:
+            
+            if response.status_code in [200, 201]:
+                print(f"🚀 Successfully triggered release for deployment: {dep_name or dep_id}")
+                return True
+            elif response.status_code == 409:
+                print(f"⚠️  Deployment conflict (409) - deployment may already be running or in progress")
+                print(f"   Deployment: {dep_name or dep_id}")
+                return False
+            elif response.status_code == 500:
+                print(f"❌ Server error (500) - Fleet Manager API internal error")
+                print(f"   Deployment: {dep_name or dep_id}")
+                print(f"   This often indicates:")
+                print(f"   - Deployment in problematic state")
+                print(f"   - Resource conflicts")
+                print(f"   - API processing issues")
                 self._debug_fail(response, f"Trigger deploy POST /deployments/{dep_id}/deploy")
-                response.raise_for_status()
-            print(f"🚀 Triggered release for deployment ID: {dep_id}")
-            return True
+                return False
+            else:
+                self._debug_fail(response, f"Trigger deploy POST /deployments/{dep_id}/deploy")
+                return False
+                
         except Exception as e:
-            print(f"❌ Error triggering release for deployment {dep_id}: {e}")
+            print(f"❌ Error triggering release for deployment {dep_name or dep_id}: {e}")
             return False
 
     def deploy_application(self, app_id: str, app_name: str) -> bool:
@@ -543,11 +625,21 @@ class FleetManagerGitOps:
             print(f"⏭️  Skipping deployment trigger for {app_name} (SKIP_DEPLOYMENT_TRIGGER=true)")
             return True
 
+        # Check for deployment conflicts before proceeding
+        print(f"🔍 Checking for deployment conflicts for {app_name}...")
+        conflicts = self.check_deployment_conflicts(app_name, group_names)
+        if conflicts:
+            print(f"⚠️  Found {len(conflicts)} potential deployment conflicts:")
+            for conflict in conflicts:
+                print(f"   - {conflict['message']}")
+            print(f"   💡 Consider using a different application name or cleaning up existing deployments")
+
         # Ensure deployments exist/updated for the configured cluster group(s)
         name_to_id = self.list_cluster_groups()
         missing = [n for n in group_names if n not in name_to_id]
         if missing:
             print(f"❌ Cluster group(s) not found: {', '.join(missing)}")
+            print(f"   Available cluster groups: {', '.join(name_to_id.keys())}")
             return False
 
         all_ok = True
@@ -557,15 +649,22 @@ class FleetManagerGitOps:
         for group_name in group_names:
             group_id = name_to_id[group_name]
             deployment_name = f"{app_name}-{group_name}"
+            print(f"🔍 Processing deployment: {deployment_name}")
+            
             dep_id = self.find_deployment(deployment_name)
             created = False
             if dep_id:
+                print(f"📋 Found existing deployment: {deployment_name} (ID: {dep_id})")
                 # Only trigger release if app content changed
                 ok = True
                 if content_changed:
-                    released = self.trigger_deployment_release(dep_id)
+                    print(f"🔄 Content changed, triggering deployment release...")
+                    released = self.trigger_deployment_release(dep_id, deployment_name)
                     all_ok = all_ok and released
+                else:
+                    print(f"ℹ️  No content changes, skipping deployment trigger")
             else:
+                print(f"✨ Creating new deployment: {deployment_name}")
                 dep_id = self.create_deployment(app_id, deployment_name, group_id, app_name, app_version)
                 ok = dep_id is not None
                 created = ok and dep_id is not None
@@ -573,10 +672,10 @@ class FleetManagerGitOps:
 
             # For newly created deployment, trigger release immediately
             if created and dep_id:
-                released = self.trigger_deployment_release(dep_id)
+                print(f"🚀 Triggering initial deployment release for new deployment...")
+                released = self.trigger_deployment_release(dep_id, deployment_name)
                 all_ok = all_ok and released
 
-        # Do not trigger release here; will be handled in the next step
         return all_ok
         
         return False
@@ -591,6 +690,8 @@ class FleetManagerGitOps:
             print("🔧 ONLY_COMPILE mode: Will only compile manifests, not deploy")
         if self.skip_deployment_trigger:
             print("⏭️  SKIP_DEPLOYMENT_TRIGGER mode: Will update applications but not trigger deployments")
+        if self.diagnostic_mode:
+            print("🔍 DIAGNOSTIC_MODE: Enhanced error checking and conflict detection enabled")
         if self.target_applications:
             print(f"🎯 TARGET_APPLICATIONS mode: Will only process {self.target_applications}")
         
@@ -702,6 +803,7 @@ if __name__ == "__main__":
     parser.add_argument('--target-apps', help='Comma-separated list of applications to target')
     parser.add_argument('--only-compile', action='store_true', help='Only compile manifests, do not deploy')
     parser.add_argument('--skip-deployment-trigger', action='store_true', help='Update applications but do not trigger deployments')
+    parser.add_argument('--diagnostic', action='store_true', help='Enable enhanced error checking and conflict detection')
     parser.add_argument('--dry-run', action='store_true', help='Show what would be deployed without making changes')
     
     args = parser.parse_args()
@@ -713,6 +815,8 @@ if __name__ == "__main__":
         os.environ['ONLY_COMPILE'] = 'true'
     if args.skip_deployment_trigger:
         os.environ['SKIP_DEPLOYMENT_TRIGGER'] = 'true'
+    if args.diagnostic:
+        os.environ['DIAGNOSTIC_MODE'] = 'true'
     
     try:
         deployer = FleetManagerGitOps()
