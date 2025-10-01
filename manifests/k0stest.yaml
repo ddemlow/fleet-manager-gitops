@@ -3,9 +3,9 @@ version: '1'
 metadata:
   description: K0s Kubernetes cluster deployment
   labels:
-    app: kubernetes
-    environment: production
-    team: platform
+    - app:kubernetes
+    - environment:production
+    - team:platform
   name: k0s-node
 spec:
   assets:
@@ -62,3 +62,6 @@ spec:
               list: |
                 dave:password
               expire: false
+          meta_data: |
+            dsmode: local
+            local-hostname: "gitops-k0s-{{clusterName}}"
