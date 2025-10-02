@@ -292,14 +292,31 @@ def main():
     compile_output_dir = Path(os.getenv('COMPILE_OUTPUT_DIR', 'manifests/_compiled'))
     ensure_dir(compile_output_dir)
 
+    # Find container definition files by extension first
     container_files = glob.glob('manifests/containers/*.container.yaml')
+    
+    # Also find any YAML files that contain ContainerDefinition type
+    all_yaml_files = glob.glob('manifests/containers/*.yaml')
+    for yaml_file in all_yaml_files:
+        try:
+            with open(yaml_file, 'r') as f:
+                content = yaml.safe_load(f)
+                if content and content.get('type') == 'ContainerDefinition':
+                    if yaml_file not in container_files:
+                        container_files.append(yaml_file)
+                        print(f"🔍 Found ContainerDefinition in {yaml_file}")
+        except Exception:
+            continue  # Skip files that can't be parsed
+    
     if not container_files:
         print('ℹ️  No container definitions found to compile')
         return 0
 
     compiled = 0
     for cfile in container_files:
-        name = Path(cfile).stem.replace('.container', '')
+        # Extract name from filename, removing .container if present
+        stem = Path(cfile).stem
+        name = stem.replace('.container', '')
         # Prefer a generic runtime.yaml, fallback to per-app runtime file
         generic_runtime = 'manifests/containers/runtime_configuration/runtime.yaml'
         per_app_runtime = f'manifests/containers/runtime_configuration/{name}.runtime.yaml'
