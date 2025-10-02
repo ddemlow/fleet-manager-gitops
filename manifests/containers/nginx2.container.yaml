@@ -1,4 +1,4 @@
-iversion: "1"
+version: "1"
 type: "ContainerDefinition"
 metadata:
   name: "nginx2"

@@ -372,6 +372,35 @@ if: github.ref == 'refs/heads/main'
 ### **Custom Validation:**
 Add custom validation rules in `scripts/validate-manifests.py`
 
+## 🧹 **Deployment Cleanup**
+
+When Fleet Manager deployments get stuck or need to be reset, use the automated cleanup script:
+
+```bash
+# Clean up a deployment (waits 10 minutes for completion)
+./scripts/cleanup.sh manifests/_compiled/nginx2.yaml
+
+# Clean up with custom wait time (5 minutes)
+./scripts/cleanup.sh manifests/_compiled/nginx2.yaml 5
+
+# Clean up without waiting (verify manually)
+./scripts/cleanup.sh manifests/_compiled/nginx2.yaml 0
+```
+
+**What it does:**
+1. Creates a temporary cleanup manifest with `resources: []`
+2. Deploys it to trigger Fleet Manager cleanup (VM deletion)
+3. Waits for cleanup deployment to complete
+4. Restores the original application definition
+5. Removes temporary files
+6. Application is ready for normal deployment
+
+**When to use:**
+- Deployments are stuck or failed
+- VMs need to be completely removed
+- Starting fresh with a deployment
+- Fleet Manager state is inconsistent
+
 ## 🤝 **Contributing**
 
 1. **Fork** the repository
