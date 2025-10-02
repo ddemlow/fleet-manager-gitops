@@ -2,7 +2,7 @@ version: "1"
 type: "Application"
 metadata:
   name: "gitops-example-vm"
-  description: "Example virtual machine deployment"
+  description: "Example virtual machine deployment - touch"
   clusterGroups:
     - DDvsns
   labels:
