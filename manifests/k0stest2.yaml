@@ -4,7 +4,7 @@ metadata:
   description: K0s Kubernetes cluster deployment
   clusterGroups:
     - DDvsns
-  name: k0s-nodefixed3-github
+  name: k0s-demo
 spec:
   assets:
     - name: ubuntu_focal
@@ -12,10 +12,9 @@ spec:
       format: raw
       url: "https://storage.googleapis.com/demo-bucket-lfm/focal-server-cloudimg-amd64.img"
 
-
   resources: 
     - type: "virdomain"
-      name: "gitops-k0s-{{clusterName}}"
+      name: "k0s-{{clusterName}}"
       spec:
         description: "name {{clusterName}} id {{clusterId}} gitops "
         cpu: 4
@@ -30,7 +29,6 @@ spec:
         network_devices:
           - name: eth0
             type: virtio
-
         tags:
           - k0s
         state: running
