@@ -761,7 +761,22 @@ class FleetManagerGitOps:
             changed_files = [f for f in changed_files if not f.startswith('manifests/_compiled/')]
 
             generic_runtime = 'manifests/containers/runtime_configuration/runtime.yaml'
+            
+            # Find container definition files by extension first
             container_files = glob.glob('manifests/containers/*.container.yaml')
+            
+            # Also find any YAML files that contain ContainerDefinition type
+            all_yaml_files = glob.glob('manifests/containers/*.yaml')
+            for yaml_file in all_yaml_files:
+                try:
+                    with open(yaml_file, 'r') as f:
+                        content = yaml.safe_load(f)
+                        if content and content.get('type') == 'ContainerDefinition':
+                            if yaml_file not in container_files:
+                                container_files.append(yaml_file)
+                except Exception:
+                    continue  # Skip files that can't be parsed
+            
             compiled_to_add: List[str] = []
             container_sources_changed = False
             
