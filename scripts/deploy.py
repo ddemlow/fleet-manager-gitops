@@ -209,6 +209,15 @@ class FleetManagerGitOps:
             print(f"❌ Error loading {file_path}: {e}")
             return None
 
+    def load_manifest_raw(self, file_path: str) -> str:
+        """Load raw YAML content (preserving comments) from a manifest file"""
+        try:
+            with open(file_path, 'r') as f:
+                return f.read()
+        except Exception as e:
+            print(f"❌ Error loading raw content from {file_path}: {e}")
+            return None
+
     def find_deployment_application(self, app_name: str) -> str:
         """Find existing deployment application ID by name"""
         app = self.get_deployment_application(app_name)
@@ -563,9 +572,13 @@ class FleetManagerGitOps:
         if not self.should_process_manifest(file_path, app_name):
             return True  # Skip but don't fail
         
-        # Convert manifest to YAML string
-        manifest = self._normalize_manifest_structure(manifest)
-        manifest_yaml = yaml.dump(manifest, default_flow_style=False)
+        # Load raw YAML content to preserve comments
+        manifest_yaml = self.load_manifest_raw(file_path)
+        if not manifest_yaml:
+            return False
+            
+        # Also normalize the parsed manifest for comparison purposes
+        manifest_normalized = self._normalize_manifest_structure(manifest)
 
         # Determine target cluster group name(s) from manifest or defaults
         group_names: List[str] = []
@@ -610,7 +623,7 @@ class FleetManagerGitOps:
                 existing_yaml = self._normalize_manifest_structure(existing_yaml)
                 # Compare normalized structures to avoid formatting/ordering diffs
                 content_changed = (
-                    self._normalize(existing_yaml) != self._normalize(manifest)
+                    self._normalize(existing_yaml) != self._normalize(manifest_normalized)
                 )
             except Exception:
                 content_changed = True
