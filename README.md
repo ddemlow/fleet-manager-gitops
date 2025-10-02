@@ -377,23 +377,31 @@ Add custom validation rules in `scripts/validate-manifests.py`
 When Fleet Manager deployments get stuck or need to be reset, use the automated cleanup script:
 
 ```bash
-# Clean up a deployment (waits 10 minutes for completion)
+# Clean up using compiled manifest
 ./scripts/cleanup.sh manifests/_compiled/nginx2.yaml
 
+# Clean up using source container manifest
+./scripts/cleanup.sh manifests/containers/nginx3.container.yaml
+
+# Clean up using just the app name (for GitHub-compiled containers)
+./scripts/cleanup.sh nginx3
+
 # Clean up with custom wait time (5 minutes)
-./scripts/cleanup.sh manifests/_compiled/nginx2.yaml 5
+./scripts/cleanup.sh nginx2 5
 
 # Clean up without waiting (verify manually)
-./scripts/cleanup.sh manifests/_compiled/nginx2.yaml 0
+./scripts/cleanup.sh nginx3 0
 ```
 
 **What it does:**
 1. Creates a temporary cleanup manifest with `resources: []`
 2. Deploys it to trigger Fleet Manager cleanup (VM deletion)
-3. Waits for cleanup deployment to complete
-4. Restores the original application definition
+3. **Immediately restores** the original application definition (while cleanup runs)
+4. Waits for cleanup deployment to complete (optional)
 5. Removes temporary files
 6. Application is ready for normal deployment
+
+**Key insight:** The application definition can be restored immediately after submitting the cleanup deployment, while the cleanup runs in the background.
 
 **When to use:**
 - Deployments are stuck or failed
