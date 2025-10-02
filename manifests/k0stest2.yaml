@@ -19,7 +19,7 @@ spec:
       spec:
         description: "name {{clusterName}} id {{clusterId}}"
         cpu: 4
-        memory: "2147483648" #2GB in bytes
+        memory: "4294967296" #4GB in bytes
         machine_type: "uefi"
         storage_devices:
           - name: "bootdisk"
