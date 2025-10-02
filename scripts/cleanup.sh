@@ -24,8 +24,20 @@ fi
 
 # Check if it's a file or just an app name
 if [ -f "$MANIFEST_PATH" ]; then
-    # It's a file - use it directly
+    # It's a file - check what type it is
     echo "📄 Using manifest file: $MANIFEST_PATH"
+    
+    # Check if it's a container definition
+    if grep -q "type:.*ContainerDefinition" "$MANIFEST_PATH"; then
+        echo "🔍 Detected ContainerDefinition - this needs to be compiled first"
+        echo "❌ Cannot clean up container definitions directly"
+        echo ""
+        echo "💡 To clean up a compiled container application:"
+        echo "   1. Use the compiled manifest: ./scripts/cleanup.sh manifests/_compiled/nginx3.yaml"
+        echo "   2. Or use just the app name: ./scripts/cleanup.sh nginx3"
+        echo "   3. Or compile first: python3 scripts/compile_manifests.py"
+        exit 1
+    fi
 elif [[ "$MANIFEST_PATH" =~ ^[a-zA-Z0-9_-]+$ ]]; then
     # It's just an app name - create a temporary manifest
     APP_NAME="$MANIFEST_PATH"
@@ -109,17 +121,38 @@ echo "💡 Restoring now while cleanup deployment is queued/running"
 if [[ "$MANIFEST_PATH" == *"/tmp/"* ]]; then
     # This was created from app name - it's likely a compiled container
     echo "🔍 Detected compiled container application"
-    echo "⚠️  For compiled containers, you need to restore from the compiled manifest"
-    echo ""
-    echo "💡 To restore this application:"
-    echo "   1. If you have local compiled files:"
-    echo "      ./scripts/cleanup.sh manifests/_compiled/${APP_NAME}.yaml"
-    echo "   2. If compiled on GitHub Actions:"
-    echo "      - Push changes to trigger compilation"
-    echo "      - Or manually compile: python3 scripts/compile_manifests.py"
-    echo "      - Then: python3 scripts/deploy.py --target-apps $APP_NAME --skip-deployment-trigger"
-    echo ""
-    echo "⚠️  Skipping automatic restoration - manual action required"
+    
+    # Try to find and use a compiled manifest if available
+    COMPILED_MANIFEST="manifests/_compiled/${APP_NAME}.yaml"
+    if [ -f "$COMPILED_MANIFEST" ]; then
+        echo "✅ Found local compiled manifest: $COMPILED_MANIFEST"
+        echo "🔄 Restoring from compiled manifest..."
+        
+        # Copy the compiled manifest to a restore file
+        ORIGINAL_RESTORE_FILE="manifests/${APP_NAME}-restore.yaml"
+        cp "$COMPILED_MANIFEST" "$ORIGINAL_RESTORE_FILE"
+        
+        # Deploy using the compiled manifest
+        python3 scripts/deploy.py --target-apps "$APP_NAME" --skip-deployment-trigger
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ Application definition restored successfully from compiled manifest"
+            rm -f "$ORIGINAL_RESTORE_FILE"
+        else
+            echo "❌ Failed to restore from compiled manifest"
+            rm -f "$ORIGINAL_RESTORE_FILE"
+        fi
+    else
+        echo "⚠️  No local compiled manifest found for $APP_NAME"
+        echo ""
+        echo "💡 To restore this application:"
+        echo "   1. Auto-compile and restore: python3 scripts/restore-container-app.py ${APP_NAME}"
+        echo "   2. Compile locally: python3 scripts/compile_manifests.py"
+        echo "   3. Then restore: ./scripts/cleanup.sh manifests/_compiled/${APP_NAME}.yaml"
+        echo "   4. Or trigger GitHub Actions compilation"
+        echo ""
+        echo "⚠️  Application remains with temporary cleanup metadata"
+    fi
 else
     # This is a regular manifest - restore immediately from the ORIGINAL manifest
     echo "🔄 Restoring from ORIGINAL manifest: $MANIFEST_PATH"
@@ -187,11 +220,14 @@ if [[ "$MANIFEST_PATH" == *"/tmp/"* ]]; then
     echo "   Option 1 - Use compiled manifest (if available):"
     echo "     ./scripts/cleanup.sh manifests/_compiled/${APP_NAME}.yaml"
     echo ""
-    echo "   Option 2 - Compile and restore:"
+    echo "   Option 2 - Auto-compile and restore:"
+    echo "     python3 scripts/restore-container-app.py $APP_NAME"
+    echo ""
+    echo "   Option 3 - Manual compile and restore:"
     echo "     python3 scripts/compile_manifests.py"
     echo "     python3 scripts/deploy.py --target-apps $APP_NAME --skip-deployment-trigger"
     echo ""
-    echo "   Option 3 - Trigger GitHub Actions compilation"
+    echo "   Option 4 - Trigger GitHub Actions compilation"
 else
     echo "🚀 Application '$APP_NAME' is ready for deployment:"
     echo "   python3 scripts/deploy.py --target-apps $APP_NAME"

@@ -140,7 +140,7 @@ def to_application(container_def: dict, runtime_def: dict) -> dict:
     return app
 
 
-def _container_quadlet_user_data(containers: list, content: list, cloud_init: dict | None = None, policies: dict | None = None) -> str:
+def _container_quadlet_user_data(containers: list, content: list, cloud_init=None, policies=None) -> str:
     lines = [
         '#cloud-config',
     ]

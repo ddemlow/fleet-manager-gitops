@@ -217,15 +217,21 @@ class FleetManagerGitOps:
     def get_deployment_application(self, app_name: str) -> Dict[str, Any]:
         """Return full deployment application object by name (or None)"""
         try:
-            response = requests.get(
-                f"{self.fm_api_url}/deployment-applications?limit=200",
-                headers=self.headers,
-                timeout=30
-            )
-            response.raise_for_status()
-            for app in response.json().get('items', []):
-                if app.get('name') == app_name:
-                    return app
+            # Handle pagination to get all applications
+            url = f"{self.fm_api_url}/deployment-applications?limit=50"
+            
+            while url:
+                response = requests.get(url, headers=self.headers, timeout=30)
+                response.raise_for_status()
+                data = response.json()
+                
+                for app in data.get('items', []):
+                    if app.get('name') == app_name:
+                        return app
+                
+                # Check for next page
+                url = data.get('next')
+            
             return None
         except Exception as e:
             print(f"❌ Error getting application {app_name}: {e}")
@@ -309,15 +315,21 @@ class FleetManagerGitOps:
     def find_deployment(self, name: str) -> str:
         """Find an existing deployment id by name"""
         try:
-            response = requests.get(
-                f"{self.fm_api_url}/deployments?limit=200",
-                headers=self.headers,
-                timeout=30
-            )
-            response.raise_for_status()
-            for dep in response.json().get('items', []):
-                if dep.get('name') == name:
-                    return dep.get('id')
+            # Handle pagination to get all deployments
+            url = f"{self.fm_api_url}/deployments?limit=50"
+            
+            while url:
+                response = requests.get(url, headers=self.headers, timeout=30)
+                response.raise_for_status()
+                data = response.json()
+                
+                for dep in data.get('items', []):
+                    if dep.get('name') == name:
+                        return dep.get('id')
+                
+                # Check for next page
+                url = data.get('next')
+            
             return None
         except Exception as e:
             print(f"❌ Error finding deployment {name}: {e}")
