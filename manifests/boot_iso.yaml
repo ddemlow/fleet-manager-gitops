@@ -19,7 +19,7 @@ spec:
       type: virdomain
       spec:
         description: A simple VM for testing
-        cpu: 1
+        cpu: 2
         memory: "1073741824"
         machine_type: bios
         storage_devices:
@@ -36,4 +36,4 @@ spec:
         tags:
           - kraken
           - test
-        state: running
+        state: shutdown #running 
