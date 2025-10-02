@@ -249,10 +249,23 @@ class FleetManagerGitOps:
     def create_deployment_application(self, app_name: str, manifest: str) -> str:
         """Create a new deployment application (use POST)."""
         try:
+            # Add GitOps source information
+            gitops_description = "GitOps managed via fleet-manager-gitops repository"
+            try:
+                import subprocess
+                result = subprocess.run(['git', 'remote', 'get-url', 'origin'], 
+                                      capture_output=True, text=True, timeout=5)
+                if result.returncode == 0:
+                    repo_url = result.stdout.strip()
+                    gitops_description = f"GitOps managed via {repo_url}"
+            except:
+                pass  # Fallback to generic description
+            
             payload = {
                 "name": app_name,
-                "sourceType": "editor",  # Use "editor" like in your example
-                "sourceConfig": manifest
+                "sourceType": "gitops",  # Use "gitops" to distinguish from manual editor
+                "sourceConfig": manifest,
+                "description": gitops_description
             }
             
             # Create without UUID uses POST; PUT with UUID is for updates
@@ -278,10 +291,23 @@ class FleetManagerGitOps:
     def update_deployment_application(self, app_id: str, app_name: str, manifest: str) -> bool:
         """Update an existing deployment application"""
         try:
+            # Add GitOps source information
+            gitops_description = "GitOps managed via fleet-manager-gitops repository"
+            try:
+                import subprocess
+                result = subprocess.run(['git', 'remote', 'get-url', 'origin'], 
+                                      capture_output=True, text=True, timeout=5)
+                if result.returncode == 0:
+                    repo_url = result.stdout.strip()
+                    gitops_description = f"GitOps managed via {repo_url}"
+            except:
+                pass  # Fallback to generic description
+            
             payload = {
                 "name": app_name,
-                "sourceType": "editor",  # Use "editor" like in your example
-                "sourceConfig": manifest
+                "sourceType": "gitops",  # Use "gitops" to distinguish from manual editor
+                "sourceConfig": manifest,
+                "description": gitops_description
             }
             
             response = requests.put(

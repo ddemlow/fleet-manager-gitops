@@ -2,7 +2,7 @@ version: "1"
 type: "Application"
 metadata:
   name: "gitops-isoboot"
-  description: "Example virtual machine deployment"
+  description: "Example virtual machine deployment - touch source type"
   clusterGroups:
     - DDvsns
   labels:
