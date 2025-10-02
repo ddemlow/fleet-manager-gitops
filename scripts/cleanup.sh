@@ -117,6 +117,9 @@ echo ""
 echo "⚡ Step 3: Immediately restoring application definition..."
 echo "💡 Restoring now while cleanup deployment is queued/running"
 
+# Track restoration success
+RESTORATION_SUCCESS=false
+
 # Check what type of restoration is needed
 if [[ "$MANIFEST_PATH" == *"/tmp/"* ]]; then
     # This was created from app name - it's likely a compiled container
@@ -137,6 +140,7 @@ if [[ "$MANIFEST_PATH" == *"/tmp/"* ]]; then
         
         if [ $? -eq 0 ]; then
             echo "✅ Application definition restored successfully from compiled manifest"
+            RESTORATION_SUCCESS=true
             rm -f "$ORIGINAL_RESTORE_FILE"
         else
             echo "❌ Failed to restore from compiled manifest"
@@ -170,6 +174,7 @@ else
     
     if [ $? -eq 0 ]; then
         echo "✅ Application definition restored successfully from original manifest"
+        RESTORATION_SUCCESS=true
         # Clean up the temporary restore file
         rm -f "$ORIGINAL_RESTORE_FILE"
     else
@@ -213,7 +218,12 @@ fi
 
 echo ""
 echo "🎉 Cleanup workflow completed!"
-if [[ "$MANIFEST_PATH" == *"/tmp/"* ]]; then
+
+if [ "$RESTORATION_SUCCESS" = true ]; then
+    echo "✅ Application '$APP_NAME' has been cleaned up and restored successfully!"
+    echo "🚀 Ready for deployment:"
+    echo "   python3 scripts/deploy.py --target-apps $APP_NAME"
+elif [[ "$MANIFEST_PATH" == *"/tmp/"* ]]; then
     echo "⚠️  IMPORTANT: Application '$APP_NAME' has been cleaned up but NOT restored"
     echo "   You need to restore the application definition manually:"
     echo ""
@@ -229,6 +239,6 @@ if [[ "$MANIFEST_PATH" == *"/tmp/"* ]]; then
     echo ""
     echo "   Option 4 - Trigger GitHub Actions compilation"
 else
-    echo "🚀 Application '$APP_NAME' is ready for deployment:"
-    echo "   python3 scripts/deploy.py --target-apps $APP_NAME"
+    echo "❌ Application '$APP_NAME' was cleaned up but restoration failed"
+    echo "   Please restore manually using one of the options above"
 fi
