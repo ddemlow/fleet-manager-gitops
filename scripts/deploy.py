@@ -24,6 +24,7 @@ class FleetManagerGitOps:
         self.only_compile = os.getenv('ONLY_COMPILE', '').lower() in ('1', 'true', 'yes')
         self.skip_deployment_trigger = os.getenv('SKIP_DEPLOYMENT_TRIGGER', '').lower() in ('1', 'true', 'yes')
         self.diagnostic_mode = os.getenv('DIAGNOSTIC_MODE', '').lower() in ('1', 'true', 'yes')
+        self.test_mode = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
         self.target_applications = os.getenv('TARGET_APPLICATIONS', '').split(',') if os.getenv('TARGET_APPLICATIONS') else []
         # Filter out empty strings
         self.target_applications = [app.strip() for app in self.target_applications if app.strip()]
@@ -737,6 +738,8 @@ class FleetManagerGitOps:
         print(f"📡 Fleet Manager API: {self.fm_api_url}")
         
         # Print control flags
+        if self.test_mode:
+            print("🧪 TEST_MODE: Deploying to test cluster group only")
         if self.only_compile:
             print("🔧 ONLY_COMPILE mode: Will only compile manifests, not deploy")
         if self.skip_deployment_trigger:
