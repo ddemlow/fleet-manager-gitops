@@ -1,7 +1,7 @@
 type: Application
 version: '1'
 metadata:
-  description: K0s Kubernetes cluster deployment - GitOps workflow test
+  description: K0s Kubernetes cluster deployment - GitOps workflow test manual
   clusterGroups:
     - DDvsns
   name: k0s-demo
@@ -16,7 +16,7 @@ spec:
     - type: "virdomain"
       name: "k0s-{{clusterName}}"
       spec:
-        description: "name {{clusterName}} id {{clusterId}} gitops "
+        description: "name {{clusterName}} id {{clusterId}} gitops touch "
         cpu: 4
         memory: "4294967296" #4GB in bytes
         machine_type: "uefi"
