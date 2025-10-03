@@ -1,0 +1,39 @@
+version: "1"
+type: "Application"
+metadata:
+  name: "prapproved-vm"
+  description: "Example virtual machine deployment - touch source type"
+  clusterGroups:
+    - DDvsns
+  labels:
+    - development
+
+spec:
+  assets:
+    - name: tinyiso
+      type: virtual_disk
+      format: iso
+      url: http://tinycorelinux.net/16.x/x86/release/Core-current.iso
+  resources:
+    - name: prapproved-example
+      type: virdomain
+      spec:
+        description: A simple VM for testing
+        cpu: 2
+        memory: "1073741824"
+        machine_type: bios
+        storage_devices:
+          - name: cdrom1
+            source: tinyiso
+            type: ide_cdrom
+            boot: 1
+          - name: disk2
+            type: virtio_disk
+            capacity: 100000000000
+        network_devices:
+          - name: nic1
+            type: virtio
+        tags:
+          - kraken
+          - test
+        state: running #running or shutoff - comments preserved 
