@@ -16,7 +16,7 @@ spec:
     - type: "virdomain"
       name: "k0s-{{clusterName}}"
       spec:
-        description: "name {{clusterName}} id {{clusterId}} gitops touch "
+        description: "name {{clusterName}} id {{clusterId}} gitops touch 2 "
         cpu: 4
         memory: "4294967296" #4GB in bytes
         machine_type: "uefi"
