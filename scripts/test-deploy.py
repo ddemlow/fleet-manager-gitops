@@ -24,9 +24,9 @@ def create_test_manifest(manifest_path: str, test_cluster_group: str = "dd_szt15
         # Change cluster groups to test cluster group
         test_manifest['metadata']['clusterGroups'] = [test_cluster_group]
         
-        # Add test suffix to application name - include cluster group to make it unique
+        # Add test suffix to application name - just use 'test' to make it unique
         original_name = test_manifest['metadata'].get('name', '')
-        test_manifest['metadata']['name'] = f"{original_name}-test-{test_cluster_group}"
+        test_manifest['metadata']['name'] = f"{original_name}-test"
         
         # Add test description
         original_desc = test_manifest['metadata'].get('description', '')
