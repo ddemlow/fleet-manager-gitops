@@ -35,25 +35,30 @@ spec:
         cloud_init_data:
           user_data: |
             #cloud-config
-            password: "password"
-            chpasswd: { expire: False }
-            ssh_pwauth: True
-            ssh_authorized_keys:
-              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
-            disable_root: false
-            ssh_pwauth: True
-            ssh_import_id:  gh:ddemlow
-            users:
-            - name: user
-              groups: [wheel]
-              sudo: ALL=(ALL) NOPASSWD:ALL
-              shell: /bin/bash
-              ssh-authorized-keys:
-                - ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+            # Modern password configuration
             chpasswd:
               list: |
+                root:password
                 user:password
               expire: false
+            
+            # SSH configuration
+            ssh_pwauth: true
+            disable_root: false
+            
+            # Global SSH keys (applied to all users)
+            ssh_authorized_keys:
+              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+            
+            # User configuration
+            ssh_import_id: [gh:ddemlow]
+            users:
+              - name: user
+                groups: [wheel]
+                sudo: ALL=(ALL) NOPASSWD:ALL
+                shell: /bin/bash
+                ssh_authorized_keys:
+                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
             packages:
               - qemu-guest-agent
               - git
