@@ -38,4 +38,4 @@ spec:
         tags:
           - kraken
           - test
-        state: running
+        state: shutoff #running or shutoff - comments preserved 
