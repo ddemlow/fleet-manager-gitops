@@ -10,12 +10,12 @@ metadata:
 
 spec:
   assets:
-    - name: tinyiso-prapproved
+    - name: tinyiso
       type: virtual_disk
       format: iso
       url: http://tinycorelinux.net/16.x/x86/release/Core-current.iso
   resources:
-    - name: gitops-isoboot-example
+    - name: prapproved-example
       type: virdomain
       spec:
         description: A simple VM for testing
