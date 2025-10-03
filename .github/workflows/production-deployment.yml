@@ -1,0 +1,86 @@
+name: Production Deployment
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'manifests/**'
+      - 'scripts/**'
+
+jobs:
+  production-deployment:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Get changed manifests
+      id: changed-files
+      run: |
+        # Get list of changed manifest files from the push
+        CHANGED_FILES=$(git diff --name-only HEAD~1...HEAD -- 'manifests/**' | grep -E '\.(yaml|yml)$' || true)
+        echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+        # Count changed files
+        CHANGED_COUNT=$(echo "$CHANGED_FILES" | grep -c . || echo "0")
+        echo "changed_count=$CHANGED_COUNT" >> $GITHUB_OUTPUT
+        
+        echo "Changed manifest files:"
+        echo "$CHANGED_FILES"
+        echo "Total changed files: $CHANGED_COUNT"
+    
+    - name: Compile manifests
+      if: steps.changed-files.outputs.changed_count > 0
+      run: |
+        python scripts/compile_manifests.py
+    
+    - name: Deploy to production
+      if: steps.changed-files.outputs.changed_count > 0
+      env:
+        SC_FM_APIKEY: ${{ secrets.SC_FM_APIKEY }}
+        FLEET_MANAGER_API_URL: ${{ secrets.FLEET_MANAGER_API_URL }}
+        PROCESS_ALL_MANIFESTS: false
+      run: |
+        echo "🚀 Deploying to production cluster groups"
+        python scripts/deploy.py
+    
+    - name: Create production deployment summary
+      if: steps.changed-files.outputs.changed_count > 0
+      run: |
+        echo "## 🚀 Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Deployment Status:** ✅ Successfully deployed to production" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Deployed Files:**" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "${{ steps.changed-files.outputs.changed_files }}" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Monitor Deployment:" >> $GITHUB_STEP_SUMMARY
+        echo "- [All Deployments](https://fleet.scalecomputing.com/deployments?org=63b8337ec6939fdfb0f716af)" >> $GITHUB_STEP_SUMMARY
+        echo "- [Applications](https://fleet.scalecomputing.com/deployment-applications?org=63b8337ec6939fdfb0f716af)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### ✅ Production Deployment Complete" >> $GITHUB_STEP_SUMMARY
+        echo "Changes have been deployed to all production cluster groups." >> $GITHUB_STEP_SUMMARY
+    
+    - name: No changes detected
+      if: steps.changed-files.outputs.changed_count == 0
+      run: |
+        echo "## ℹ️ No Manifest Changes Detected" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "No manifest files were changed in this push, so no deployment was needed." >> $GITHUB_STEP_SUMMARY

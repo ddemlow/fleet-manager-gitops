@@ -372,6 +372,18 @@ if: github.ref == 'refs/heads/main'
 ### **Custom Validation:**
 Add custom validation rules in `scripts/validate-manifests.py`
 
+## 🧪 **Testing Workflow**
+
+All production deployments must be tested first in the `dd_szt15b` cluster group before being approved for production.
+
+### Process:
+1. **Create Pull Request** → Changes automatically deployed to `dd_szt15b`
+2. **Human Verification** → Reviewer tests deployment in Fleet Manager UI
+3. **Approve PR** → Only after successful testing
+4. **Production Deployment** → Automatic deployment to production cluster groups
+
+See [TESTING_WORKFLOW.md](TESTING_WORKFLOW.md) for detailed documentation.
+
 ## 🧹 **Deployment Cleanup**
 
 When Fleet Manager deployments get stuck or need to be reset, use the automated cleanup script:
