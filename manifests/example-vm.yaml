@@ -18,7 +18,7 @@ spec:
     - name: gitops-example-vm
       type: virdomain
       spec:
-        description: A simple VM for testing - gitops demo pr 
+        description: A simple VM for testing - gitops demo pr 2 
         cpu: 1
         memory: "2147483648"
         machine_type: bios
@@ -38,4 +38,4 @@ spec:
         tags:
           - kraken
           - test
-        state: shutoff #running or shutoff - comments preserved 
+        state: running #running or shutoff - comments preserved 
