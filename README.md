@@ -375,6 +375,43 @@ export TEST_MODE=false  # Skip testonly manifests
 
 For detailed information, see **[LIFECYCLE_MANAGEMENT.md](LIFECYCLE_MANAGEMENT.md)**.
 
+## 🛡️ **Best Practices**
+
+### **Manifest Organization**
+- Use descriptive names: `web-app`, `database-cluster`, `monitoring-stack`
+- Organize by environment: `production/`, `staging/`, `development/`
+- Use lifecycle states appropriately: `draft` → `testonly` → `production`
+
+### **Security**
+- Never commit API keys or secrets
+- Use environment variables for sensitive data
+- Enable branch protection rules
+- Require code reviews for all changes
+
+### **Testing**
+- Always test with `testonly` lifecycle first
+- Use test cluster group for validation
+- Verify deployments before promoting to production
+- Monitor deployment status and logs
+
+### **Documentation**
+- Document all applications in manifests
+- Use clear, descriptive names and descriptions
+- Generate documentation automatically
+- Keep README and guides up to date
+
+### **Workflow**
+- Create feature branches for changes
+- Use descriptive commit messages
+- Test locally before pushing
+- Monitor GitHub Actions workflows
+
+## 📚 **Additional Documentation**
+
+- **[docs/applications.md](docs/applications.md)**: Application catalog (auto-generated)
+- **[.github/BRANCH_PROTECTION.md](.github/BRANCH_PROTECTION.md)**: Branch protection setup guide
+- **[manifests/templates/application-template.yaml](manifests/templates/application-template.yaml)**: Manifest template
+
 ## 🔍 **Troubleshooting**
 
 ### **Common Issues:**
