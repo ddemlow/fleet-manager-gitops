@@ -1,0 +1,36 @@
+type: Application
+version: '1'
+metadata:
+  name: example-draft
+  description: Example application in draft state - will be skipped during deployment
+  lifecycle: draft  # This manifest will be skipped during deployment
+  clusterGroups:
+    - DDvsns
+spec:
+  assets:
+    - name: test-disk
+      type: virtual_disk
+      format: raw
+      url: https://storage.googleapis.com/demo-bucket-lfm/netboot.xyz.img
+  resources:
+    - name: example-draft-vm
+      type: virdomain
+      spec:
+        description: A draft VM that won't be deployed
+        cpu: 1
+        memory: "1073741824"
+        machine_type: bios
+        storage_devices:
+          - name: cdrom1
+            type: ide_cdrom
+            boot: 1
+          - name: disk1
+            source: test-disk
+            boot: 2
+        network_devices:
+          - name: nic1
+            type: virtio
+        tags:
+          - draft
+          - example
+        state: running

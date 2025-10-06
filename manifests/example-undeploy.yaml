@@ -1,0 +1,36 @@
+type: Application
+version: '1'
+metadata:
+  name: example-undeploy
+  description: Example application marked for undeployment - will trigger cleanup
+  lifecycle: undeploy  # This manifest will trigger cleanup of existing deployments
+  clusterGroups:
+    - DDvsns
+spec:
+  assets:
+    - name: test-disk
+      type: virtual_disk
+      format: raw
+      url: https://storage.googleapis.com/demo-bucket-lfm/netboot.xyz.img
+  resources:
+    - name: example-undeploy-vm
+      type: virdomain
+      spec:
+        description: A VM that will be cleaned up when this manifest is processed
+        cpu: 1
+        memory: "1073741824"
+        machine_type: bios
+        storage_devices:
+          - name: cdrom1
+            type: ide_cdrom
+            boot: 1
+          - name: disk1
+            source: test-disk
+            boot: 2
+        network_devices:
+          - name: nic1
+            type: virtio
+        tags:
+          - undeploy
+          - example
+        state: running

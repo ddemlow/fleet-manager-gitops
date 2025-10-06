@@ -1,0 +1,36 @@
+type: Application
+version: '1'
+metadata:
+  name: example-testonly
+  description: Example application that should only be deployed during testing
+  lifecycle: testonly  # This manifest will only be deployed in test mode
+  clusterGroups:
+    - DDvsns
+spec:
+  assets:
+    - name: test-disk
+      type: virtual_disk
+      format: raw
+      url: https://storage.googleapis.com/demo-bucket-lfm/netboot.xyz.img
+  resources:
+    - name: example-testonly-vm
+      type: virdomain
+      spec:
+        description: A test-only VM that won't be deployed to production
+        cpu: 1
+        memory: "1073741824"
+        machine_type: bios
+        storage_devices:
+          - name: cdrom1
+            type: ide_cdrom
+            boot: 1
+          - name: disk1
+            source: test-disk
+            boot: 2
+        network_devices:
+          - name: nic1
+            type: virtio
+        tags:
+          - testonly
+          - example
+        state: running

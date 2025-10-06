@@ -6,7 +6,6 @@ This guide walks you through setting up a complete GitOps workflow for Fleet Man
 
 - GitHub account
 - Fleet Manager API access
-- MCP server running (or access to one)
 - Basic knowledge of YAML and Git
 
 ## 📋 **Step-by-Step Setup**
@@ -81,21 +80,21 @@ mkdir -p scripts
    - Look for new applications in the Deployments section
    - Check if the deployment was successful
 
-2. **Check MCP Server Logs**:
-   - Look at your MCP server logs
+2. **Check Fleet Manager Logs**:
+   - Look at deployment logs in Fleet Manager UI
    - Verify API calls were made
    - Check for any errors
 
 ## 🔧 **Configuration Options**
 
-### **Custom MCP Server URL**
+### **Custom Fleet Manager API URL**
 
-If you're running your own MCP server:
+If you're using a custom Fleet Manager instance:
 
-1. **Update the workflow** in `.github/workflows/deploy.yml`:
+1. **Update the workflow** in `.github/workflows/production-deployment.yml`:
    ```yaml
    env:
-     MCP_SERVER_URL: https://your-mcp-server.com/api/v2
+     FLEET_MANAGER_API_URL: https://your-fleet-manager.com/api/v2
    ```
 
 2. **Or set it as a secret** in GitHub
@@ -210,12 +209,12 @@ on:
 #### **"API key required" Error**
 - **Check**: GitHub secrets are set correctly
 - **Verify**: API keys are valid
-- **Test**: MCP server is accessible
+- **Test**: Fleet Manager API is accessible
 
 #### **"Deployment failed" Error**
 - **Check**: Fleet Manager API is accessible
 - **Verify**: Application name is unique
-- **Look**: At MCP server logs for details
+- **Look**: At deployment logs in Fleet Manager UI
 
 #### **"Manifest validation failed" Error**
 - **Check**: YAML syntax is correct
@@ -250,7 +249,7 @@ Once your basic setup is working:
 
 - **GitHub Issues**: Report bugs in your repository
 - **Fleet Manager Docs**: [Scale Computing Documentation](https://docs.scalecomputing.com)
-- **MCP Server**: Check the MCP server documentation
+- **API Documentation**: [Fleet Manager API Reference](https://api.scalecomputing.com/docs)
 
 ---
 

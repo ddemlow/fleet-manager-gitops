@@ -2,20 +2,20 @@
 
 ## **What Changed**
 
-The GitOps solution has been updated to use the Fleet Manager API directly instead of going through the MCP server.
+The GitOps solution uses the Fleet Manager API directly for all deployments and management operations.
 
 ## **Key Changes Made**
 
-### **1. GitHub Actions Workflow (`.github/workflows/deploy.yml`)**
-- ✅ Removed `MCP_SERVER_URL` environment variable
-- ✅ Removed `MCP_API_KEY` secret requirement
+### **1. GitHub Actions Workflows**
 - ✅ Simplified to only require `SC_FM_APIKEY`
+- ✅ Direct Fleet Manager API integration
+- ✅ Test and production deployment workflows
 
-### **2. Deployment Script (`scripts/deploy.py`)**
-- ✅ Updated to use Fleet Manager API directly (`https://api.scalecomputing.com/api/v2`)
-- ✅ Changed authentication from `X-Api-Key` to `Authorization: Bearer`
-- ✅ Updated all API endpoints to use Fleet Manager API directly
-- ✅ Removed MCP server dependency
+### **2. Deployment Scripts**
+- ✅ Direct Fleet Manager API integration (`https://api.scalecomputing.com/api/v2`)
+- ✅ Bearer token authentication
+- ✅ Test deployment script for safe testing
+- ✅ Production deployment script for main branch
 
 ### **3. Documentation Updates**
 - ✅ Updated `README.md` to reflect direct API usage
@@ -27,7 +27,7 @@ The GitOps solution has been updated to use the Fleet Manager API directly inste
 
 ### **✅ Simplified Setup**
 - Only one API key required (`SC_FM_APIKEY`)
-- No MCP server dependency
+- Direct API integration
 - Faster deployment process
 
 ### **✅ Better Performance**
@@ -46,9 +46,8 @@ The GitOps solution has been updated to use the Fleet Manager API directly inste
 - **`SC_FM_APIKEY`**: Your Fleet Manager API key (required)
 - **`FLEET_MANAGER_API_URL`**: Fleet Manager API URL (optional, defaults to `https://api.scalecomputing.com/api/v2`)
 
-### **Removed Secrets:**
-- ~~`MCP_API_KEY`~~ (no longer needed)
-- ~~`MCP_SERVER_URL`~~ (no longer needed)
+### **Required Secrets:**
+- `SC_FM_APIKEY` (Fleet Manager API key)
 
 ## **API Endpoints Used**
 
@@ -63,17 +62,8 @@ The deployment script now directly calls these Fleet Manager API endpoints:
 
 ## **Authentication**
 
-Changed from MCP server authentication to direct Fleet Manager API authentication:
+Direct Fleet Manager API authentication:
 
-**Before:**
-```python
-headers = {
-    'X-Api-Key': mcp_api_key,
-    'Content-Type': 'application/json'
-}
-```
-
-**After:**
 ```python
 headers = {
     'Authorization': f'Bearer {fm_api_key}',
@@ -102,13 +92,9 @@ python scripts/deploy.py
 
 ## **Migration Guide**
 
-If you were using the MCP server version:
+If you were using an older version:
 
-1. **Remove old secrets** from GitHub repository:
-   - Delete `MCP_API_KEY` secret
-   - Delete `MCP_SERVER_URL` secret (if you had one)
-
-2. **Ensure you have** the required secret:
+1. **Ensure you have** the required secret:
    - `SC_FM_APIKEY`: Your Fleet Manager API key
 
 3. **Test the deployment** with a small manifest change

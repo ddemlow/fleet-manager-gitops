@@ -14,15 +14,25 @@ GitOps is a methodology that uses Git as the single source of truth for declarat
 ## 📁 **Repository Structure**
 
 ```
-gitops/
+fleet-manager-gitops/
 ├── .github/workflows/
-│   └── deploy.yml                 # GitHub Actions workflow
+│   ├── test-deployment.yml        # PR test deployment workflow
+│   └── production-deployment.yml  # Production deployment workflow
 ├── manifests/                     # Application manifests
+│   ├── containers/                # Container definitions
 │   ├── example-vm.yaml
+│   ├── k0stest2.yaml
 │   └── nginx-deployment.yaml
 ├── scripts/
 │   ├── deploy.py                  # Main deployment script
+│   ├── test-deploy.py             # Test deployment script
+│   ├── production-deploy.py       # Production deployment script
+│   ├── monitor-deployment-releases.py  # Deployment monitoring
+│   ├── full-test-cleanup.py       # Complete test cleanup
+│   ├── cleanup-test-apps.py       # Basic test cleanup
 │   └── validate-manifests.py      # Manifest validation
+├── API_DOCUMENTATION.md           # Comprehensive API docs
+├── TESTING_WORKFLOW.md            # Testing workflow guide
 └── README.md                      # This file
 ```
 
@@ -52,6 +62,7 @@ Go to your repository settings → Secrets and variables → Actions, and add th
 
 #### **Optional Secrets:**
 - `FLEET_MANAGER_API_URL`: Fleet Manager API URL (default: `https://api.scalecomputing.com/api/v2`)
+- `MONITOR_DEPLOYMENTS`: Set to `true` to enable deployment monitoring (optional)
 
 ### **Step 3: Test the Workflow**
 
@@ -113,7 +124,14 @@ spec:
 
 ## 🔄 **GitOps Workflow**
 
-### **Automatic Deployment:**
+### **Testing Workflow (Recommended):**
+1. **Create a feature branch** for your changes
+2. **Edit manifest** files in `manifests/`
+3. **Create a Pull Request** - this triggers test deployment to `dd_szt15b`
+4. **Verify test deployment** in Fleet Manager UI
+5. **Merge PR** - this triggers production deployment
+
+### **Direct Deployment:**
 1. **Edit manifest** files in `manifests/`
 2. **Commit and push** changes
 3. **GitHub Actions** automatically:
@@ -155,6 +173,34 @@ export ONLY_COMPILE=true
 python scripts/deploy.py
 ```
 
+## ✨ **Key Features**
+
+### **🧪 Safe Testing Workflow**
+- **PR-based testing**: Changes are tested in `dd_szt15b` cluster group before production
+- **Configurable test targets**: Specify test cluster groups in manifest metadata
+- **Automatic test cleanup**: Remove test deployments after successful production deployment
+
+### **📊 Deployment Monitoring**
+- **Real-time monitoring**: Track deployment progress and results
+- **Comprehensive reporting**: Detailed status reports with job-level information
+- **Timeout handling**: Configurable timeouts for long-running deployments
+
+### **🧹 Advanced Cleanup Options**
+- **Full VM cleanup**: Remove VMs before deleting deployments
+- **Test deployment isolation**: Separate test applications with unique naming
+- **Automated cleanup scripts**: Multiple cleanup options for different scenarios
+
+### **🔍 Enhanced UI Documentation**
+- **GitOps source tracking**: Clear indicators in Fleet Manager UI
+- **Comprehensive descriptions**: Repository, commit, branch, and timestamp information
+- **Test mode indicators**: Visual distinction between test and production deployments
+
+### **🔄 Manifest Lifecycle Management**
+- **Lifecycle states**: Control deployment behavior with draft, testonly, production, undeploy
+- **Destructive change detection**: Automatic detection of problematic changes (cloud-init, VM names)
+- **Cleanup via PR**: Remove applications by setting lifecycle to undeploy
+- **Safe development workflow**: Draft state for work in progress, testonly for demos
+
 ## 📊 **Monitoring Deployments**
 
 ### **GitHub Actions:**
@@ -164,8 +210,20 @@ python scripts/deploy.py
 
 ### **Fleet Manager:**
 - Check the **Deployments** section
-- View application status
-- Monitor job progress
+- View application status with GitOps indicators
+- Monitor job progress and detailed logs
+
+### **Deployment Monitoring Script:**
+```bash
+# Monitor specific deployments
+python scripts/monitor-deployment-releases.py deployment-id-1 deployment-id-2
+
+# Monitor with custom timeout
+python scripts/monitor-deployment-releases.py deployment-id --timeout 60
+
+# Save results to file
+python scripts/monitor-deployment-releases.py deployment-id --output results.json
+```
 
 ## 🛠️ **Development Workflow**
 
@@ -234,6 +292,88 @@ Set these in your GitHub Actions secrets or local environment:
 - `TARGET_APPLICATIONS`: Comma-separated list of applications
 - `SKIP_DEPLOYMENT_TRIGGER`: Set to `true` to skip deployment triggers
 - `ONLY_COMPILE`: Set to `true` to only compile manifests
+
+## 🧹 **Cleanup Operations**
+
+### **Basic Test Cleanup:**
+```bash
+# Dry run to see what would be cleaned up
+python scripts/cleanup-test-apps.py
+
+# Actually delete test applications and deployments
+python scripts/cleanup-test-apps.py --execute
+```
+
+### **Full Test Cleanup (including VMs):**
+```bash
+# Dry run to see full cleanup plan
+python scripts/full-test-cleanup.py
+
+# Full cleanup including VM removal
+python scripts/full-test-cleanup.py --execute
+
+# Skip VM cleanup, only delete deployments/applications
+python scripts/full-test-cleanup.py --execute --no-vm-cleanup
+
+# Custom timeout for VM cleanup
+python scripts/full-test-cleanup.py --execute --timeout 20
+```
+
+### **Test Cluster Group Configuration:**
+Add to your manifest metadata to specify custom test cluster group:
+```yaml
+metadata:
+  name: my-app
+  clusterGroups:
+    - DDvsns
+  # Optional: specify test cluster group for PR testing
+  testClusterGroup: my-test-cluster
+```
+
+## 🔄 **Manifest Lifecycle Management**
+
+### **Lifecycle States:**
+Control how manifests are deployed using the `lifecycle` field:
+
+```yaml
+metadata:
+  name: my-app
+  lifecycle: draft      # Skip deployment (work in progress)
+  lifecycle: testonly   # Deploy only during testing
+  lifecycle: production # Deploy to production (default)
+  lifecycle: undeploy   # Trigger cleanup and removal
+```
+
+### **Development Workflow:**
+1. **Start with draft**: `lifecycle: draft` for work in progress
+2. **Move to testing**: `lifecycle: testonly` for experimental features
+3. **Promote to production**: `lifecycle: production` when ready
+4. **Clean up old versions**: `lifecycle: undeploy` to remove
+
+### **Demo Reset Workflow:**
+1. **Mark for cleanup**: Set `lifecycle: undeploy` in PR
+2. **Merge PR**: Triggers cleanup of existing deployment
+3. **Create new version**: Add new manifest with `lifecycle: production`
+4. **Deploy**: New version replaces old one
+
+### **Destructive Change Detection:**
+The system automatically detects problematic changes:
+- **Cloud-init changes**: Modifications to user_data after deployment
+- **VM name changes**: Changes to VM names after deployment
+- **Warning behavior**: Test mode shows warnings, production mode fails (configurable)
+
+### **Environment Variables:**
+```bash
+# Control destructive change behavior
+export BAIL_ON_DESTRUCTIVE_CHANGES=true   # Fail on destructive changes (production)
+export BAIL_ON_DESTRUCTIVE_CHANGES=false  # Warn only (testing)
+
+# Control test mode
+export TEST_MODE=true   # Deploy testonly manifests
+export TEST_MODE=false  # Skip testonly manifests
+```
+
+For detailed information, see **[LIFECYCLE_MANAGEMENT.md](LIFECYCLE_MANAGEMENT.md)**.
 
 ## 🔍 **Troubleshooting**
 

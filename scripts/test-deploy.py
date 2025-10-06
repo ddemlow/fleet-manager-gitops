@@ -21,6 +21,14 @@ def create_test_manifest(manifest_path: str, test_cluster_group: str = "dd_szt15
     
     # Modify for testing
     if 'metadata' in test_manifest:
+        # Check if manifest specifies a test cluster group
+        manifest_test_group = test_manifest['metadata'].get('testClusterGroup')
+        if manifest_test_group:
+            test_cluster_group = manifest_test_group
+            print(f"📋 Using test cluster group from manifest: {test_cluster_group}")
+        else:
+            print(f"📋 Using default test cluster group: {test_cluster_group}")
+        
         # Change cluster groups to test cluster group
         test_manifest['metadata']['clusterGroups'] = [test_cluster_group]
         
@@ -28,9 +36,31 @@ def create_test_manifest(manifest_path: str, test_cluster_group: str = "dd_szt15
         original_name = test_manifest['metadata'].get('name', '')
         test_manifest['metadata']['name'] = f"{original_name}-test"
         
-        # Add test description
+        # Add comprehensive test description
+        from datetime import datetime
         original_desc = test_manifest['metadata'].get('description', '')
-        test_manifest['metadata']['description'] = f"[TEST] {original_desc} - {test_cluster_group}"
+        
+        # Create detailed test description
+        test_desc_parts = [
+            "🧪 TEST DEPLOYMENT",
+            f"📦 Original: {original_desc}",
+            f"🎯 Test Cluster: {test_cluster_group}",
+            f"🕐 Created: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC",
+            "🤖 GitOps Automated Test"
+        ]
+        
+        # Add git information if available
+        try:
+            import subprocess
+            result = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], 
+                                  capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                commit_sha = result.stdout.strip()
+                test_desc_parts.append(f"📝 Commit: {commit_sha}")
+        except:
+            pass
+        
+        test_manifest['metadata']['description'] = " | ".join(test_desc_parts)
     
     # Create test manifest file
     test_manifest_path = manifest_path.replace('.yaml', '-test.yaml')

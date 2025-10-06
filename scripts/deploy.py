@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GitOps deployment script for Fleet Manager
-Automatically deploys manifests from GitHub to Fleet Manager via MCP server
+Automatically deploys manifests from GitHub to Fleet Manager via direct API calls
 """
 
 import os
@@ -25,9 +25,13 @@ class FleetManagerGitOps:
         self.skip_deployment_trigger = os.getenv('SKIP_DEPLOYMENT_TRIGGER', '').lower() in ('1', 'true', 'yes')
         self.diagnostic_mode = os.getenv('DIAGNOSTIC_MODE', '').lower() in ('1', 'true', 'yes')
         self.test_mode = os.getenv('TEST_MODE', '').lower() in ('1', 'true', 'yes')
+        self.monitor_deployments = os.getenv('MONITOR_DEPLOYMENTS', '').lower() in ('1', 'true', 'yes')
         self.target_applications = os.getenv('TARGET_APPLICATIONS', '').split(',') if os.getenv('TARGET_APPLICATIONS') else []
         # Filter out empty strings
         self.target_applications = [app.strip() for app in self.target_applications if app.strip()]
+        
+        # Track deployments for monitoring
+        self.created_deployments = []
         
         if not self.fm_api_key:
             raise ValueError("SC_FM_APIKEY environment variable is required")
@@ -47,6 +51,184 @@ class FleetManagerGitOps:
             print(f"Response JSON: {resp.json()}")
         except Exception:
             print(f"Response Text: {resp.text[:500]}")
+
+    def _create_gitops_description(self, app_name: str, action: str = "managed") -> str:
+        """Create comprehensive GitOps description for UI visibility"""
+        from datetime import datetime
+        
+        # Base GitOps information
+        description_parts = [
+            "🤖 GitOps Managed Application",
+            f"📦 Application: {app_name}",
+            f"🔄 Action: {action.title()}",
+            f"🕐 Timestamp: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC"
+        ]
+        
+        # Repository information
+        try:
+            import subprocess
+            result = subprocess.run(['git', 'remote', 'get-url', 'origin'], 
+                                  capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                repo_url = result.stdout.strip()
+                description_parts.append(f"🔗 Repository: {repo_url}")
+        except:
+            description_parts.append("🔗 Repository: fleet-manager-gitops")
+        
+        # Git commit information
+        try:
+            import subprocess
+            result = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], 
+                                  capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                commit_sha = result.stdout.strip()
+                description_parts.append(f"📝 Commit: {commit_sha}")
+        except:
+            pass
+        
+        # Branch information
+        try:
+            import subprocess
+            result = subprocess.run(['git', 'branch', '--show-current'], 
+                                  capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                branch = result.stdout.strip()
+                if branch:
+                    description_parts.append(f"🌿 Branch: {branch}")
+        except:
+            pass
+        
+        # Test mode indicator
+        if self.test_mode:
+            description_parts.append("🧪 TEST MODE DEPLOYMENT")
+        
+        # Join with newlines for better readability in UI
+        return " | ".join(description_parts)
+
+    def get_manifest_lifecycle_state(self, manifest: dict) -> str:
+        """Get the lifecycle state of a manifest"""
+        metadata = manifest.get('metadata', {})
+        
+        # Check for explicit lifecycle state
+        lifecycle = metadata.get('lifecycle', '').lower()
+        if lifecycle in ['draft', 'testonly', 'production', 'undeploy']:
+            return lifecycle
+        
+        # Check for legacy draft flag
+        if metadata.get('draft', False):
+            return 'draft'
+        
+        # Default to production for backward compatibility
+        return 'production'
+
+    def should_skip_manifest(self, manifest: dict, lifecycle_state: str) -> tuple[bool, str]:
+        """Determine if a manifest should be skipped based on lifecycle state and context"""
+        if lifecycle_state == 'draft':
+            return True, "Manifest is in draft state - skipping deployment"
+        
+        if lifecycle_state == 'testonly' and not self.test_mode:
+            return True, "Manifest is test-only and not in test mode - skipping production deployment"
+        
+        if lifecycle_state == 'undeploy':
+            return True, "Manifest is marked for undeployment - will be handled by cleanup process"
+        
+        return False, ""
+
+    def detect_destructive_changes(self, app_name: str, new_manifest: dict, existing_manifest: dict = None) -> list[str]:
+        """Detect potentially destructive changes that could cause deployment issues"""
+        warnings = []
+        
+        if not existing_manifest:
+            return warnings
+        
+        # Check for cloud-init changes
+        new_cloud_init = new_manifest.get('spec', {}).get('resources', [])
+        existing_cloud_init = existing_manifest.get('spec', {}).get('resources', [])
+        
+        for i, new_resource in enumerate(new_cloud_init):
+            if new_resource.get('type') == 'virdomain':
+                new_cloud_init_data = new_resource.get('spec', {}).get('cloud_init_data', {})
+                
+                # Find corresponding existing resource
+                existing_resource = None
+                for existing_res in existing_cloud_init:
+                    if existing_res.get('type') == 'virdomain':
+                        existing_resource = existing_res
+                        break
+                
+                if existing_resource:
+                    existing_cloud_init_data = existing_resource.get('spec', {}).get('cloud_init_data', {})
+                    
+                    # Compare cloud-init user_data
+                    new_user_data = new_cloud_init_data.get('user_data', '')
+                    existing_user_data = existing_cloud_init_data.get('user_data', '')
+                    
+                    if new_user_data != existing_user_data and existing_user_data:
+                        warnings.append(f"Cloud-init user_data changed for resource '{new_resource.get('name', 'unknown')}' - this may cause deployment issues")
+                    
+                    # Check for VM name changes
+                    new_vm_name = new_resource.get('name', '')
+                    existing_vm_name = existing_resource.get('name', '')
+                    
+                    if new_vm_name != existing_vm_name and existing_vm_name:
+                        warnings.append(f"VM name changed from '{existing_vm_name}' to '{new_vm_name}' - this may cause deployment issues")
+        
+        return warnings
+
+    def handle_undeploy_manifest(self, app_name: str, manifest: dict) -> bool:
+        """Handle undeployment of a manifest by triggering cleanup"""
+        print(f"🗑️  Handling undeployment for application: {app_name}")
+        
+        # Get cluster groups from manifest
+        cluster_groups = manifest.get('metadata', {}).get('clusterGroups', [])
+        if not cluster_groups:
+            cluster_groups = [self.default_cluster_group_name]
+        
+        # Find existing deployments
+        deployments_deleted = 0
+        for cluster_group in cluster_groups:
+            deployment_name = f"{app_name}-{cluster_group}"
+            dep_id = self.find_deployment(deployment_name)
+            
+            if dep_id:
+                print(f"🗑️  Deleting deployment: {deployment_name}")
+                
+                # Delete deployment
+                try:
+                    url = f"{self.fm_api_url}/deployments/{dep_id}"
+                    response = requests.delete(url, headers=self.headers)
+                    
+                    if response.status_code == 204:
+                        print(f"✅ Deleted deployment: {deployment_name}")
+                        deployments_deleted += 1
+                    else:
+                        print(f"❌ Failed to delete deployment {deployment_name}: {response.status_code}")
+                        if response.status_code == 409:
+                            print(f"   Deployment may still be running - check Fleet Manager UI")
+                except Exception as e:
+                    print(f"❌ Error deleting deployment {deployment_name}: {e}")
+            else:
+                print(f"ℹ️  No deployment found for: {deployment_name}")
+        
+        # Delete application if no deployments remain
+        app_id = self.find_deployment_application(app_name)
+        if app_id:
+            print(f"🗑️  Deleting application: {app_name}")
+            try:
+                url = f"{self.fm_api_url}/deployment-applications/{app_id}"
+                response = requests.delete(url, headers=self.headers)
+                
+                if response.status_code == 204:
+                    print(f"✅ Deleted application: {app_name}")
+                else:
+                    print(f"❌ Failed to delete application {app_name}: {response.status_code}")
+                    if response.status_code == 409:
+                        print(f"   Application may still have active deployments")
+            except Exception as e:
+                print(f"❌ Error deleting application {app_name}: {e}")
+        
+        print(f"📊 Undeployment summary: {deployments_deleted} deployments deleted")
+        return deployments_deleted > 0
 
     @staticmethod
     def _normalize(obj: Any) -> str:
@@ -250,17 +432,8 @@ class FleetManagerGitOps:
     def create_deployment_application(self, app_name: str, manifest: str) -> str:
         """Create a new deployment application (use POST)."""
         try:
-            # Add GitOps source information
-            gitops_description = "GitOps managed via fleet-manager-gitops repository"
-            try:
-                import subprocess
-                result = subprocess.run(['git', 'remote', 'get-url', 'origin'], 
-                                      capture_output=True, text=True, timeout=5)
-                if result.returncode == 0:
-                    repo_url = result.stdout.strip()
-                    gitops_description = f"GitOps managed via {repo_url}"
-            except:
-                pass  # Fallback to generic description
+            # Add comprehensive GitOps source information
+            gitops_description = self._create_gitops_description(app_name, "created")
             
             payload = {
                 "name": app_name,
@@ -292,17 +465,8 @@ class FleetManagerGitOps:
     def update_deployment_application(self, app_id: str, app_name: str, manifest: str) -> bool:
         """Update an existing deployment application"""
         try:
-            # Add GitOps source information
-            gitops_description = "GitOps managed via fleet-manager-gitops repository"
-            try:
-                import subprocess
-                result = subprocess.run(['git', 'remote', 'get-url', 'origin'], 
-                                      capture_output=True, text=True, timeout=5)
-                if result.returncode == 0:
-                    repo_url = result.stdout.strip()
-                    gitops_description = f"GitOps managed via {repo_url}"
-            except:
-                pass  # Fallback to generic description
+            # Add comprehensive GitOps source information
+            gitops_description = self._create_gitops_description(app_name, "updated")
             
             payload = {
                 "name": app_name,
@@ -595,6 +759,42 @@ class FleetManagerGitOps:
         if not app_name:
             app_name = Path(file_path).stem
         
+        # Check lifecycle state
+        lifecycle_state = self.get_manifest_lifecycle_state(manifest)
+        print(f"🔍 Lifecycle state: {lifecycle_state}")
+        
+        # Handle undeploy lifecycle
+        if lifecycle_state == 'undeploy':
+            return self.handle_undeploy_manifest(app_name, manifest)
+        
+        # Check if manifest should be skipped
+        should_skip, skip_reason = self.should_skip_manifest(manifest, lifecycle_state)
+        if should_skip:
+            print(f"⏭️  {skip_reason}")
+            return True  # Skip but don't fail
+        
+        # Check for destructive changes if application exists
+        existing_app = self.get_deployment_application(app_name)
+        if existing_app and existing_app.get('sourceConfig'):
+            try:
+                existing_manifest = yaml.safe_load(existing_app.get('sourceConfig'))
+                warnings = self.detect_destructive_changes(app_name, manifest, existing_manifest)
+                
+                if warnings:
+                    print(f"⚠️  DESTRUCTIVE CHANGES DETECTED for {app_name}:")
+                    for warning in warnings:
+                        print(f"   - {warning}")
+                    
+                    # Check if we should bail out on destructive changes
+                    if os.getenv('BAIL_ON_DESTRUCTIVE_CHANGES', '').lower() in ('true', '1', 'yes'):
+                        print(f"❌ Bailing out due to destructive changes (BAIL_ON_DESTRUCTIVE_CHANGES=true)")
+                        return False
+                    else:
+                        print(f"⚠️  Continuing deployment despite destructive changes...")
+                        print(f"   Set BAIL_ON_DESTRUCTIVE_CHANGES=true to stop on such changes")
+            except Exception as e:
+                print(f"⚠️  Could not check for destructive changes: {e}")
+        
         # Check if we should process this manifest
         if not self.should_process_manifest(file_path, app_name):
             return True  # Skip but don't fail
@@ -639,8 +839,7 @@ class FleetManagerGitOps:
         if not group_names:
             group_names = [self.default_cluster_group_name]
         
-        # Check if application already exists and whether content changed
-        existing_app = self.get_deployment_application(app_name)
+        # Get application ID (existing_app already retrieved earlier)
         app_id = existing_app.get('id') if existing_app else None
 
         content_changed = True
@@ -720,6 +919,15 @@ class FleetManagerGitOps:
                 dep_id = self.create_deployment(app_id, deployment_name, group_id, app_name, app_version)
                 ok = dep_id is not None
                 created = ok and dep_id is not None
+                
+                # Track deployment for monitoring
+                if created and self.monitor_deployments:
+                    self.created_deployments.append({
+                        'id': dep_id,
+                        'name': deployment_name,
+                        'app_name': app_name,
+                        'cluster_group': group_name
+                    })
             all_ok = all_ok and ok
 
             # For newly created deployment, trigger release immediately
@@ -862,6 +1070,25 @@ class FleetManagerGitOps:
         print(f"✅ Successful: {success_count}")
         print(f"⏭️  Skipped: {skipped_count}")
         print(f"❌ Failed: {len(application_files) - success_count}")
+        
+        # Monitor deployments if requested
+        if self.monitor_deployments and self.created_deployments:
+            print(f"\n🔍 Monitoring {len(self.created_deployments)} deployments...")
+            try:
+                from monitor_deployment_releases import DeploymentReleaseMonitor
+                monitor = DeploymentReleaseMonitor()
+                deployment_ids = [dep['id'] for dep in self.created_deployments]
+                results = monitor.report_deployment_results(deployment_ids, timeout_minutes=30)
+                
+                # Update success count based on monitoring results
+                if results['summary']['failed'] > 0:
+                    print(f"⚠️  Some deployments failed during monitoring")
+                    return False
+                    
+            except ImportError:
+                print(f"⚠️  Monitoring script not available, skipping deployment monitoring")
+            except Exception as e:
+                print(f"⚠️  Error during monitoring: {e}")
         
         return success_count == len(application_files)
 
