@@ -1,49 +1,74 @@
-## 🧪 Test Deployment Checklist
+# 🚀 GitOps Deployment PR
 
-### Pre-Deployment Testing
-- [ ] Changes have been tested locally (if applicable)
-- [ ] YAML syntax is valid
-- [ ] All required fields are present
+## 📋 **Pre-Deployment Checklist**
 
-### Test Deployment Verification
-- [ ] **Test deployment to `dd_szt15b` completed successfully**
-- [ ] **Verified deployment in Fleet Manager UI**
-- [ ] **Tested deployed applications in `dd_szt15b` cluster group**
-- [ ] **Confirmed applications are working as expected**
+### **Manifest Validation**
+- [ ] Manifest follows the [application template](manifests/templates/application-template.yaml)
+- [ ] All required fields are present: `name`, `description`, `lifecycle`, `clusterGroups`
+- [ ] Lifecycle state is appropriate for this change
+- [ ] Application name is unique and descriptive
 
-### Production Readiness
-- [ ] All tests passed in test environment
-- [ ] No breaking changes detected
-- [ ] Documentation updated (if needed)
+### **Lifecycle State**
+- [ ] `draft` - Work in progress (will be skipped)
+- [ ] `testonly` - Experimental/demo (test deployment only)
+- [ ] `production` - Ready for production
+- [ ] `undeploy` - Remove existing deployment
 
-### Deployment Details
-**Files Changed:**
-<!-- List the manifest files that were changed -->
+### **Destructive Changes**
+- [ ] No changes to cloud-init `user_data` after initial deployment
+- [ ] No changes to VM names after initial deployment
+- [ ] No changes to storage device types
+- [ ] No changes to network interface configurations
 
-**Cluster Groups Affected:**
-<!-- List which cluster groups will be affected by this deployment -->
+### **Testing**
+- [ ] Tested locally with `python scripts/deploy.py --target-apps <app-name>`
+- [ ] Verified test deployment works (if applicable)
+- [ ] Checked for destructive change warnings
 
-**Testing Notes:**
-<!-- Describe what was tested and any specific test scenarios -->
+## 🔄 **Deployment Plan**
 
----
+### **What will be deployed:**
+- Application: `[app-name]`
+- Cluster Groups: `[cluster-groups]`
+- Lifecycle State: `[lifecycle]`
 
-## 📋 Test Deployment Process
+### **Expected behavior:**
+- [ ] New application creation
+- [ ] Existing application update
+- [ ] Application cleanup (undeploy)
+- [ ] Test deployment only
+- [ ] Production deployment
 
-1. **Automated Test Deployment**: This PR will automatically deploy changes to the `dd_szt15b` test cluster group
-2. **Manual Verification**: A human reviewer must verify the deployment works correctly
-3. **Approval**: Only after successful testing should this PR be approved for merge
-4. **Production Deployment**: Once merged to master, changes will be deployed to production cluster groups
+## 🧪 **Testing Instructions**
 
-### 🔗 Fleet Manager Links
-- [Test Cluster Group: dd_szt15b](https://fleet.scalecomputing.com/cluster-groups?org=63b8337ec6939fdfb0f716af)
-- [All Deployments](https://fleet.scalecomputing.com/deployments?org=63b8337ec6939fdfb0f716af)
-- [Applications](https://fleet.scalecomputing.com/deployment-applications?org=63b8337ec6939fdfb0f716af)
+### **For Reviewers:**
+1. Review the manifest for correctness
+2. Check that lifecycle state is appropriate
+3. Verify no destructive changes are present
+4. Test deployment (if applicable):
+   ```bash
+   python scripts/deploy.py --target-apps [app-name]
+   ```
 
----
+### **After Merge:**
+1. Monitor deployment in Fleet Manager UI
+2. Verify application status
+3. Test application functionality (if applicable)
 
-## ⚠️ Important Notes
+## 📊 **Deployment Monitoring**
 
-- **Do not merge until test deployment is verified**
-- **Test in `dd_szt15b` before production deployment**
-- **If deployment fails, request changes to fix issues**
+- **Fleet Manager UI**: [Link to deployments](https://fleet.scalecomputing.com/deployments?org=63b8337ec6939fdfb0f716af)
+- **Test Cluster Group**: `dd_szt15b` (if testonly)
+- **Production Cluster Groups**: `DDvsns` (if production)
+
+## 🚨 **Rollback Plan**
+
+If deployment fails:
+1. Set lifecycle to `undeploy` in a new PR
+2. Merge to trigger cleanup
+3. Fix issues in manifest
+4. Set lifecycle back to `production`
+
+## 📝 **Additional Notes**
+
+<!-- Add any additional context, concerns, or notes here -->

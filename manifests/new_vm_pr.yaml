@@ -36,4 +36,4 @@ spec:
         tags:
           - kraken
           - test
-        state: running #running or shutoff - comments preserved 
+        state: shutoff #running or shutoff - comments preserved 

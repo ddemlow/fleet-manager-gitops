@@ -1,0 +1,33 @@
+# Environment Configuration
+# Define different environments and their settings
+
+environments:
+  development:
+    cluster_groups: ["dev-cluster"]
+    lifecycle_default: "draft"
+    bail_on_destructive_changes: false
+    monitor_deployments: false
+    
+  staging:
+    cluster_groups: ["staging-cluster"]
+    lifecycle_default: "testonly"
+    bail_on_destructive_changes: false
+    monitor_deployments: true
+    
+  production:
+    cluster_groups: ["DDvsns"]
+    lifecycle_default: "production"
+    bail_on_destructive_changes: true
+    monitor_deployments: true
+    
+  demo:
+    cluster_groups: ["demo-cluster"]
+    lifecycle_default: "testonly"
+    bail_on_destructive_changes: false
+    monitor_deployments: false
+
+# Default settings
+defaults:
+  test_cluster_group: "dd_szt15b"
+  timeout_minutes: 30
+  check_interval_seconds: 30

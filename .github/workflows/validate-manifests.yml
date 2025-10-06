@@ -1,0 +1,74 @@
+name: Validate Manifests
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'manifests/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Validate manifest syntax
+      run: |
+        echo "🔍 Validating manifest syntax and structure..."
+        python scripts/validate-manifests.py
+        
+    - name: Check for required fields
+      run: |
+        echo "📋 Checking for required manifest fields..."
+        
+        # Check that all manifests have required fields
+        REQUIRED_FIELDS="name description lifecycle clusterGroups"
+        
+        for manifest in manifests/*.yaml; do
+          if [[ -f "$manifest" ]]; then
+            echo "Checking $manifest..."
+            
+            # Check if it's an Application manifest
+            if grep -q "type: Application" "$manifest"; then
+              for field in $REQUIRED_FIELDS; do
+                if ! grep -q "$field:" "$manifest"; then
+                  echo "❌ Missing required field '$field' in $manifest"
+                  exit 1
+                fi
+              done
+              echo "✅ $manifest has all required fields"
+            fi
+          fi
+        done
+    
+    - name: Validate lifecycle states
+      run: |
+        echo "🔄 Validating lifecycle states..."
+        
+        VALID_LIFECYCLES="draft testonly production undeploy"
+        
+        for manifest in manifests/*.yaml; do
+          if [[ -f "$manifest" ]]; then
+            if grep -q "lifecycle:" "$manifest"; then
+              lifecycle=$(grep "lifecycle:" "$manifest" | awk '{print $2}')
+              if [[ " $VALID_LIFECYCLES " =~ " $lifecycle " ]]; then
+                echo "✅ Valid lifecycle '$lifecycle' in $manifest"
+              else
+                echo "❌ Invalid lifecycle '$lifecycle' in $manifest"
+                echo "   Valid options: $VALID_LIFECYCLES"
+                exit 1
+              fi
+            fi
+          fi
+        done
