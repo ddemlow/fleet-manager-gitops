@@ -5,7 +5,6 @@ on:
     branches: [ master ]
     paths:
       - 'manifests/**'
-      - 'scripts/**'
 
 jobs:
   production-deployment:
