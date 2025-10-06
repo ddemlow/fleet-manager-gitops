@@ -55,9 +55,12 @@ jobs:
       env:
         SC_FM_APIKEY: ${{ secrets.SC_FM_APIKEY }}
         FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
+        TEST_MODE: true
+        BAIL_ON_DESTRUCTIVE_CHANGES: false
       run: |
         echo "🚀 Deploying changed manifests to test cluster group: dd_szt15b"
         echo "🧪 Using separate test applications to avoid affecting production"
+        echo "📋 Lifecycle states: draft (skip), testonly (deploy), production (skip), undeploy (cleanup)"
         
         # Deploy each changed manifest in test mode
         CHANGED_FILES="${{ steps.changed-files.outputs.changed_files }}"

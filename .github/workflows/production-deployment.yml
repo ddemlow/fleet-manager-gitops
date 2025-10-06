@@ -55,8 +55,11 @@ jobs:
         SC_FM_APIKEY: ${{ secrets.SC_FM_APIKEY }}
         FLEET_MANAGER_API_URL: https://api.scalecomputing.com/api/v2
         PROCESS_ALL_MANIFESTS: false
+        BAIL_ON_DESTRUCTIVE_CHANGES: true
       run: |
         echo "🚀 Deploying to production cluster groups"
+        echo "📋 Lifecycle states: draft (skip), testonly (skip), production (deploy), undeploy (cleanup)"
+        echo "⚠️  Destructive changes will cause deployment to fail (BAIL_ON_DESTRUCTIVE_CHANGES=true)"
         python scripts/deploy.py
     
     - name: Create production deployment summary

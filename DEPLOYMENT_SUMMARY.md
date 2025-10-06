@@ -61,10 +61,6 @@ In GitHub: **Settings** → **Secrets and variables** → **Actions**
 
 **Required:**
 - `SC_FM_APIKEY`: Your Fleet Manager API key
-- `MCP_API_KEY`: `fm-mcp-2024`
-
-**Optional:**
-- `MCP_SERVER_URL`: Your MCP server URL
 
 ### **Step 3: Test Deployment**
 ```bash
@@ -167,12 +163,12 @@ if: github.ref == 'refs/heads/main'
 **"API key required" Error**
 - Check GitHub secrets are set
 - Verify API keys are valid
-- Test MCP server connectivity
+- Test Fleet Manager API connectivity
 
 **"Deployment failed" Error**
 - Check Fleet Manager API access
 - Verify application names are unique
-- Look at MCP server logs
+- Check deployment logs in Fleet Manager UI
 
 **"Manifest validation failed" Error**
 - Check YAML syntax
@@ -182,14 +178,13 @@ if: github.ref == 'refs/heads/main'
 ### **Debug Commands:**
 ```bash
 # Test API connectivity
-curl -H "X-Api-Key: fm-mcp-2024" https://3033155bdc29.ngrok.app/api/v2/health
+curl -H "Authorization: Bearer your-api-key" https://api.scalecomputing.com/api/v2/health
 
 # Validate manifests locally
 python scripts/validate-manifests.py
 
 # Test deployment locally
 export SC_FM_APIKEY="your-key"
-export MCP_API_KEY="fm-mcp-2024"
 python scripts/deploy.py
 ```
 
@@ -212,7 +207,7 @@ python scripts/deploy.py
 
 - **GitHub Issues**: Report bugs in your repository
 - **Fleet Manager Docs**: [Scale Computing Documentation](https://docs.scalecomputing.com)
-- **MCP Server**: Check the MCP server documentation
+- **API Documentation**: [Fleet Manager API Reference](https://api.scalecomputing.com/docs)
 
 ---
 

@@ -5,6 +5,9 @@ metadata:
   clusterGroups:
     - DDvsns
   name: k0s-demo
+  lifecycle: production  # This manifest will be deployed to production
+  # Optional: specify test cluster group for PR testing (defaults to dd_szt15b)
+  testClusterGroup: dd_szt15b
 spec:
   assets:
     - name: ubuntu_focal
