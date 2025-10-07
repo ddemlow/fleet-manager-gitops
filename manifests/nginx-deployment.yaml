@@ -22,7 +22,7 @@ spec:
     - type: "virdomain"
       name: "gitops-kraken-{{clusterName}}"
       spec:
-        description: "name {{clusterName}} id {{clusterId}}kraken microos domain gitops demo 4"
+        description: "name {{clusterName}} id {{clusterId}}kraken microos domain gitops demo 5"
         cpu: 2
         memory: "4294967296" #4GB in bytes
         machine_type: "uefi"
