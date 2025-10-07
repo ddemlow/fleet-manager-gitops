@@ -18,7 +18,7 @@ spec:
     - name: gitops-example-vm
       type: virdomain
       spec:
-        description: A simple VM for testing - gitops demo pr 2 
+        description: A simple VM for testing - gitops demo pr new test touch
         cpu: 1
         memory: "2147483648"
         machine_type: bios
