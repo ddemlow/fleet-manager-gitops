@@ -408,7 +408,6 @@ For detailed information, see **[LIFECYCLE_MANAGEMENT.md](LIFECYCLE_MANAGEMENT.m
 
 ## 📚 **Additional Documentation**
 
-- **[docs/applications.md](docs/applications.md)**: Application catalog (auto-generated)
 - **[.github/BRANCH_PROTECTION.md](.github/BRANCH_PROTECTION.md)**: Branch protection setup guide
 - **[manifests/templates/application-template.yaml](manifests/templates/application-template.yaml)**: Manifest template
 
