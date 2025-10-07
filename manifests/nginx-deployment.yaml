@@ -5,6 +5,7 @@ metadata:
   description: "Nginx web server deployment 8 (post old vm cleanup)"
   clusterGroups:
     - DDvsns
+  testClusterGroup: "dd_szt15b"
   vmname: &vmname "gitops-kraken"
   labels:
     - kraken
