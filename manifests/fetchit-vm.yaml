@@ -22,10 +22,10 @@ spec:
     - name: fetchit-gitops-vm
       type: virdomain
       spec:
-        description: "GitOps VM with FetchIt - manages containers from fleet-manager-gitops repo"
+        description: "GitOps VM with FetchIt - manages containers from fleet-manager-gitops repo - name {{clusterName}} id {{clusterId}}"
         cpu: 4
         memory: "4294967296"  # 4GB
-        machine_type: q35
+        machine_type: bios
         storage_devices:
           - name: rootdisk
             source: fetchit-runtime
@@ -53,7 +53,6 @@ spec:
                 user:password
               expire: false
             
-            # Install and configure FetchIt
             write_files:
               - path: /etc/fetchit/config.yaml
                 content: |
@@ -89,13 +88,7 @@ spec:
                   
                   [Service]
                   Type=simple
-                  ExecStart=/usr/bin/podman run --rm \
-                    --name fetchit \
-                    -v /etc/fetchit:/opt/mount:ro \
-                    -v /run/user/1000/podman/podman.sock:/run/podman/podman.sock \
-                    -v /var/lib/containers:/var/lib/containers \
-                    --security-opt label=disable \
-                    quay.io/fetchit/fetchit:latest
+                  ExecStart=/usr/bin/podman run --rm --name fetchit -v /etc/fetchit:/opt/mount:ro -v /run/user/1000/podman/podman.sock:/run/podman/podman.sock -v /var/lib/containers:/var/lib/containers --security-opt label=disable quay.io/fetchit/fetchit:latest
                   Restart=always
                   RestartSec=10
                   User=user
@@ -106,33 +99,25 @@ spec:
                 permissions: '0644'
                 owner: root:root
             
-            # Enable required services
             runcmd:
-              # Enable podman socket for user
               - systemctl --user enable podman.socket --now
               - loginctl enable-linger user
-              
-              # Create directories
               - mkdir -p /opt/fetchit
               - mkdir -p /opt/nginx/html
               - mkdir -p /var/lib/containers
-              
-              # Create sample nginx content
-              - echo "<h1>Welcome to GitOps-managed Nginx via FetchIt!</h1><p>Managed by: fleet-manager-gitops</p><p>Container: nginx-demo</p>" > /opt/nginx/html/index.html
-              
-              # Enable and start FetchIt service
+              - mkdir -p /var/log/fetchit
+              - mkdir -p /opt/fetchit/status
+              - echo "<!doctype html><html><head><meta charset=utf-8><title>FetchIt GitOps - {{clusterName}}</title><style>body{font-family:system-ui;margin:2rem;line-height:1.5}h1{color:#2563eb}.card{border:1px solid #e5e7eb;border-radius:.5rem;padding:1rem;margin:1rem 0}code{background:#f3f4f6;padding:.25rem .5rem;border-radius:.25rem}</style></head><body><h1>🚀 FetchIt GitOps Container Management</h1><div class=card><p><strong>Cluster:</strong> <code>{{clusterName}}</code></p><p><strong>Cluster ID:</strong> <code>{{clusterId}}</code></p><p><strong>Managed by:</strong> fleet-manager-gitops</p><p><strong>Container Engine:</strong> Podman + FetchIt</p></div><p>This VM automatically manages containers from the GitOps repository using FetchIt.</p></body></html>" > /opt/nginx/html/index.html
               - systemctl daemon-reload
               - systemctl enable fetchit.service
               - systemctl start fetchit.service
-              
-              # Wait a moment for FetchIt to start
               - sleep 10
-              
-              # Check FetchIt status
               - systemctl status fetchit.service || true
-              
-              # Show running containers
               - podman ps || true
+              - echo "FetchIt GitOps VM deployment completed at $(date)" > /opt/fetchit/status/deployment.log
+              - echo "Cluster: {{clusterName}} ({{clusterId}})" >> /opt/fetchit/status/deployment.log
+              - echo "Repository: https://github.com/ddemlow/fleet-manager-gitops" >> /opt/fetchit/status/deployment.log
+          meta_data: {}
         
         tags:
           - gitops
