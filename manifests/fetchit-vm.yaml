@@ -117,7 +117,9 @@ spec:
               - echo "FetchIt GitOps VM deployment completed at $(date)" > /opt/fetchit/status/deployment.log
               - echo "Cluster: {{clusterName}} ({{clusterId}})" >> /opt/fetchit/status/deployment.log
               - echo "Repository: https://github.com/ddemlow/fleet-manager-gitops" >> /opt/fetchit/status/deployment.log
-          meta_data: {}
+          meta_data: |
+            dsmode: local
+            local-hostname: "gitops-fetchit-{{clusterName}}"
         
         tags:
           - gitops
