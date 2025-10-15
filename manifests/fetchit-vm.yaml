@@ -5,6 +5,7 @@ metadata:
   description: "GitOps VM with FetchIt container management - manages containers from this repo"
   clusterGroups:
     - DDvsns
+  testClusterGroup: "dd_szt15b"
   lifecycle: production
   labels:
     - gitops
