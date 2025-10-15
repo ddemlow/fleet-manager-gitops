@@ -1,21 +1,15 @@
 {
-  "name": "simple-webapp",
-  "image": "docker.io/mmumshad/simple-webapp-color:latest",
-  "ports": [
-    {
-      "hostPort": 9090,
-      "containerPort": 8080,
-      "protocol": "tcp"
-    }
-  ],
-  "environment": {
+  "Image": "docker.io/mmumshad/simple-webapp-color:latest",
+  "Name": "simple-webapp",
+  "Env": {
     "APP_COLOR": "blue",
     "APP_NAME": "GitOps Demo App"
   },
-  "labels": {
-    "app": "simple-webapp",
-    "managed-by": "fetchit",
-    "source": "gitops"
-  },
-  "restart": "unless-stopped"
+  "Ports": [{
+    "host_ip": "",
+    "container_port": 8080,
+    "host_port": 9090,
+    "range": 0,
+    "protocol": "tcp"
+  }]
 }

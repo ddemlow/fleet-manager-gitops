@@ -1,23 +1,16 @@
 {
-  "name": "demo-web",
-  "image": "nginx:alpine",
-  "ports": [
-    {
-      "hostPort": 8080,
-      "containerPort": 80,
-      "protocol": "tcp"
-    }
-  ],
-  "volumes": [
-    {
-      "source": "/var/edge/www",
-      "destination": "/usr/share/nginx/html",
-      "options": "ro"
-    }
-  ],
-  "environment": {
+  "Image": "nginx:alpine",
+  "Name": "demo-web",
+  "Env": {
     "NGINX_HOST": "localhost",
     "NGINX_PORT": "80"
   },
-  "restart": "always"
+  "Mounts": "/var/edge/www:/usr/share/nginx/html:ro",
+  "Ports": [{
+    "host_ip": "",
+    "container_port": 80,
+    "host_port": 8080,
+    "range": 0,
+    "protocol": "tcp"
+  }]
 }

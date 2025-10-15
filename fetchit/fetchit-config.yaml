@@ -9,10 +9,11 @@ targetConfigs:
     targetPath: fetchit/fetchit-config.yaml
     destinationDirectory: /opt/fetchit
     schedule: "*/5 * * * *"
-  container:
+  raw:
   - name: demo-containers
     targetPath: fetchit/containers
     schedule: "*/2 * * * *"
+    pullImage: true
   systemd:
   - name: web-services
     targetPath: fetchit/systemd
