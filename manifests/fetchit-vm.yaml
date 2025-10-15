@@ -67,8 +67,7 @@ spec:
               - mkdir -p /etc/fetchit
               
               # Create FetchIt config file (use /etc/fetchit which is writable)
-              - |
-                cat > /etc/fetchit/config.yaml << 'EOF'
+              - "cat > /etc/fetchit/config.yaml << 'EOF'
                 targetConfigs:
                 - url: https://github.com/ddemlow/fleet-manager-gitops
                   branch: master
@@ -76,24 +75,23 @@ spec:
                   - name: fetchit-config
                     targetPath: fetchit/fetchit-config.yaml
                     destinationDirectory: /opt/fetchit
-                    schedule: "*/5 * * * *"
+                    schedule: \"*/5 * * * *\"
                   raw:
                   - name: demo-containers
                     targetPath: fetchit/containers
-                    schedule: "*/2 * * * *"
+                    schedule: \"*/2 * * * *\"
                   systemd:
                   - name: web-services
                     targetPath: fetchit/systemd
-                    schedule: "*/3 * * * *"
+                    schedule: \"*/3 * * * *\"
                 global:
                   logLevel: info
                   maxRetries: 3
-                  retryDelay: "30s"
-                EOF
+                  retryDelay: \"30s\"
+                EOF"
               
               # Create FetchIt systemd service in /etc/systemd/system (writable on MicroOS)
-              - |
-                cat > /etc/systemd/system/fetchit.service << 'EOF'
+              - "cat > /etc/systemd/system/fetchit.service << 'EOF'
                 [Unit]
                 Description=FetchIt GitOps Container Manager
                 After=network.target podman.socket
@@ -109,11 +107,10 @@ spec:
                 
                 [Install]
                 WantedBy=multi-user.target
-                EOF
+                EOF"
               
               # Create HTML file in /opt (writable location)
-              - |
-                cat > /opt/nginx/html/index.html << 'EOF'
+              - "cat > /opt/nginx/html/index.html << 'EOF'
                 <!doctype html>
                 <html>
                 <head>
@@ -137,7 +134,7 @@ spec:
                   <p>This VM automatically manages containers from the GitOps repository using FetchIt.</p>
                 </body>
                 </html>
-                EOF
+                EOF"
               
               # Set proper ownership for writable locations
               - chown -R user:user /opt/fetchit
