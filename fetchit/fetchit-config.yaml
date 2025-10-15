@@ -1,5 +1,5 @@
-# FetchIt Configuration for GitOps Container Management
-# This configures FetchIt to manage containers from the fleet-manager-gitops repository
+# FetchIt Configuration
+# This file is used by FetchIt to manage GitOps deployments
 
 targetConfigs:
 - url: https://github.com/ddemlow/fleet-manager-gitops
@@ -8,17 +8,15 @@ targetConfigs:
   - name: fetchit-config
     targetPath: fetchit/fetchit-config.yaml
     destinationDirectory: /opt/fetchit
-    schedule: "*/5 * * * *"  # Check every 5 minutes for config changes
+    schedule: "*/5 * * * *"
   raw:
   - name: demo-containers
     targetPath: fetchit/containers
-    schedule: "*/2 * * * *"  # Check every 2 minutes for container definitions
+    schedule: "*/2 * * * *"
   systemd:
   - name: web-services
     targetPath: fetchit/systemd
-    schedule: "*/3 * * * *"  # Check every 3 minutes for systemd services
-
-# Global settings
+    schedule: "*/3 * * * *"
 global:
   logLevel: info
   maxRetries: 3

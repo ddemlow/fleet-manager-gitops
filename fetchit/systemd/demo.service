@@ -1,0 +1,12 @@
+[Unit]
+Description=Demo Web Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/podman run --rm --name demo-web -p 8080:80 -v /var/edge/www:/usr/share/nginx/html:ro nginx:alpine
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
