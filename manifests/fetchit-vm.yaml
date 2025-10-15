@@ -54,11 +54,10 @@ spec:
               groups: [wheel]
               sudo: ALL=(ALL) NOPASSWD:ALL
               shell: /bin/bash
-              ssh-authorized-keys:
+              ssh_authorized_keys:
                 - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
             chpasswd:
-              list: |
-                user:password
+              list: "user:password"
               expire: false
             runcmd:
               - systemctl enable podman.socket
