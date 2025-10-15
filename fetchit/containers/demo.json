@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: registry.k8s.io/pause:3.9 (current), registry.k8s.io/pause:3.8 (rollback option)",
-  "Image": "registry.k8s.io/pause:3.9",
+  "_comment": "Demo version tags: ghcr.io/nginxinc/nginx-unprivileged:1.24 (current), ghcr.io/nginxinc/nginx-unprivileged:1.23 (rollback option)",
+  "Image": "ghcr.io/nginxinc/nginx-unprivileged:1.24",
   "Name": "demo-web",
   "Env": {
     "NGINX_HOST": "localhost",
