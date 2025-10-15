@@ -5,10 +5,6 @@
     "NGINX_HOST": "localhost",
     "NGINX_PORT": "80"
   },
-  "Mounts": [{
-    "Source": "/var/www",
-    "Destination": "/usr/share/nginx/html"
-  }],
   "Ports": [{
     "host_ip": "",
     "container_port": 80,
