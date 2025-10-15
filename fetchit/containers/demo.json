@@ -1,0 +1,14 @@
+{
+  "containers": [
+    {
+      "name": "demo-web",
+      "image": "nginx:alpine",
+      "ports": ["8080:80"],
+      "volumes": ["/var/edge/www:/usr/share/nginx/html:ro"],
+      "environment": {
+        "NGINX_HOST": "localhost",
+        "NGINX_PORT": "80"
+      }
+    }
+  ]
+}

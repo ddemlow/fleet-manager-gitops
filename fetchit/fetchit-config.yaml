@@ -1,0 +1,23 @@
+# FetchIt Configuration
+# This file is used by FetchIt to manage GitOps deployments
+
+targetConfigs:
+- url: https://github.com/ddemlow/fleet-manager-gitops
+  branch: master
+  fileTransfer:
+  - name: fetchit-config
+    targetPath: fetchit/fetchit-config.yaml
+    destinationDirectory: /opt/fetchit
+    schedule: "*/5 * * * *"
+  raw:
+  - name: demo-containers
+    targetPath: fetchit/containers
+    schedule: "*/2 * * * *"
+  systemd:
+  - name: web-services
+    targetPath: fetchit/systemd
+    schedule: "*/3 * * * *"
+global:
+  logLevel: info
+  maxRetries: 3
+  retryDelay: "30s"
