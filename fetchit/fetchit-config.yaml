@@ -9,7 +9,7 @@ targetConfigs:
     targetPath: fetchit/fetchit-config.yaml
     destinationDirectory: /opt/fetchit
     schedule: "*/5 * * * *"
-  raw:
+  container:
   - name: demo-containers
     targetPath: fetchit/containers
     schedule: "*/2 * * * *"
