@@ -5,7 +5,7 @@
     "NGINX_HOST": "localhost",
     "NGINX_PORT": "80"
   },
-  "Mounts": "/var/edge/www:/usr/share/nginx/html:ro",
+  "Mounts": ["/var/edge/www:/usr/share/nginx/html:ro"],
   "Ports": [{
     "host_ip": "",
     "container_port": 80,
