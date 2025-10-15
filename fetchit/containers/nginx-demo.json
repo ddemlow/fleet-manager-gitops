@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: ghcr.io/nginxinc/nginx-unprivileged:1.22 (current), ghcr.io/nginxinc/nginx-unprivileged:1.20 (rollback option)",
-  "Image": "ghcr.io/nginxinc/nginx-unprivileged:1.22",
+  "_comment": "Demo version tags: ghcr.io/nginxinc/nginx-unprivileged:latest (current), ghcr.io/nginxinc/nginx-unprivileged:1.24 (rollback option)",
+  "Image": "ghcr.io/nginxinc/nginx-unprivileged:latest",
   "Name": "nginx-demo",
   "Env": {
     "NGINX_HOST": "localhost",
