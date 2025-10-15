@@ -16,7 +16,7 @@ targetConfigs:
   systemd:
   - name: web-services
     targetPath: fetchit/systemd
-    destinationDirectory: /etc/containers/systemd
+    destinationDirectory: /etc/systemd/system
     schedule: "*/3 * * * *"
 global:
   logLevel: info
