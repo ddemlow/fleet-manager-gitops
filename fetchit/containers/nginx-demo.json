@@ -1,5 +1,6 @@
 {
-  "Image": "docker.io/nginx:alpine",
+  "_comment": "Demo version tags: nginx:1.24-alpine (current), nginx:1.23-alpine (rollback option)",
+  "Image": "docker.io/nginx:1.24-alpine",
   "Name": "nginx-demo",
   "Env": {
     "NGINX_HOST": "localhost",

@@ -1,5 +1,6 @@
 {
-  "Image": "nginx:alpine",
+  "_comment": "Demo version tags: nginx:1.25-alpine (current), nginx:1.24-alpine (rollback option)",
+  "Image": "nginx:1.25-alpine",
   "Name": "demo-web",
   "Env": {
     "NGINX_HOST": "localhost",
