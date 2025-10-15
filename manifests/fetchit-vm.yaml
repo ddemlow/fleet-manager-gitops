@@ -49,11 +49,84 @@ spec:
                 ssh_authorized_keys:
                   - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
                   - github:daveddemlow
+                lock_passwd: false
+                passwd: $6$rounds=4096$salt$hash  # password hash for 'password'
             chpasswd:
-              list: |
-                user:password
+              list: "user:password"
               expire: false
             
+            
+            write_files:
+              - path: /etc/fetchit/config.yaml
+                content: |
+                  targetConfigs:
+                  - url: https://github.com/ddemlow/fleet-manager-gitops
+                    branch: master
+                    fileTransfer:
+                    - name: fetchit-config
+                      targetPath: fetchit/fetchit-config.yaml
+                      destinationDirectory: /opt/fetchit
+                      schedule: "*/5 * * * *"
+                    raw:
+                    - name: demo-containers
+                      targetPath: fetchit/containers
+                      schedule: "*/2 * * * *"
+                    systemd:
+                    - name: web-services
+                      targetPath: fetchit/systemd
+                      schedule: "*/3 * * * *"
+                  global:
+                    logLevel: info
+                    maxRetries: 3
+                    retryDelay: "30s"
+                owner: root:root
+                permissions: '0644'
+              - path: /etc/systemd/system/fetchit.service
+                content: |
+                  [Unit]
+                  Description=FetchIt GitOps Container Manager
+                  After=network.target podman.socket
+                  Requires=podman.socket
+                  
+                  [Service]
+                  Type=simple
+                  ExecStart=/usr/bin/podman run --rm --name fetchit -v /etc/fetchit:/opt/mount:ro -v /run/user/1000/podman/podman.sock:/run/podman/podman.sock -v /var/lib/containers:/var/lib/containers --security-opt label=disable quay.io/fetchit/fetchit:latest
+                  Restart=always
+                  RestartSec=10
+                  User=user
+                  Group=user
+                  
+                  [Install]
+                  WantedBy=multi-user.target
+                owner: root:root
+                permissions: '0644'
+              - path: /opt/nginx/html/index.html
+                content: |
+                  <!doctype html>
+                  <html>
+                  <head>
+                    <meta charset=utf-8>
+                    <title>FetchIt GitOps - {{clusterName}}</title>
+                    <style>
+                      body{font-family:system-ui;margin:2rem;line-height:1.5}
+                      h1{color:#2563eb}
+                      .card{border:1px solid #e5e7eb;border-radius:.5rem;padding:1rem;margin:1rem 0}
+                      code{background:#f3f4f6;padding:.25rem .5rem;border-radius:.25rem}
+                    </style>
+                  </head>
+                  <body>
+                    <h1>🚀 FetchIt GitOps Container Management</h1>
+                    <div class=card>
+                      <p><strong>Cluster:</strong> <code>{{clusterName}}</code></p>
+                      <p><strong>Cluster ID:</strong> <code>{{clusterId}}</code></p>
+                      <p><strong>Managed by:</strong> fleet-manager-gitops</p>
+                      <p><strong>Container Engine:</strong> Podman + FetchIt</p>
+                    </div>
+                    <p>This VM automatically manages containers from the GitOps repository using FetchIt.</p>
+                  </body>
+                  </html>
+                owner: user:user
+                permissions: '0644'
             
             runcmd:
               # Create directories
@@ -63,62 +136,27 @@ spec:
               - mkdir -p /var/log/fetchit
               - mkdir -p /opt/fetchit/status
               - mkdir -p /etc/fetchit
+              - chown -R user:user /opt/fetchit
+              - chown -R user:user /opt/nginx
+              - chown -R user:user /var/lib/containers
+              - chown -R user:user /var/log/fetchit
               
-              # Create FetchIt config file using cat
-              - |
-                cat > /etc/fetchit/config.yaml << 'EOF'
-                targetConfigs:
-                - url: https://github.com/ddemlow/fleet-manager-gitops
-                  branch: master
-                  fileTransfer:
-                  - name: fetchit-config
-                    targetPath: fetchit/fetchit-config.yaml
-                    destinationDirectory: /opt/fetchit
-                    schedule: "*/5 * * * *"
-                  raw:
-                  - name: demo-containers
-                    targetPath: fetchit/containers
-                    schedule: "*/2 * * * *"
-                  systemd:
-                  - name: web-services
-                    targetPath: fetchit/systemd
-                    schedule: "*/3 * * * *"
-                global:
-                  logLevel: info
-                  maxRetries: 3
-                  retryDelay: "30s"
-                EOF
-              
-              # Create FetchIt systemd service using cat
-              - |
-                cat > /etc/systemd/system/fetchit.service << 'EOF'
-                [Unit]
-                Description=FetchIt GitOps Container Manager
-                After=network.target podman.socket
-                Requires=podman.socket
-                
-                [Service]
-                Type=simple
-                ExecStart=/usr/bin/podman run --rm --name fetchit -v /etc/fetchit:/opt/mount:ro -v /run/user/1000/podman/podman.sock:/run/podman/podman.sock -v /var/lib/containers:/var/lib/containers --security-opt label=disable quay.io/fetchit/fetchit:latest
-                Restart=always
-                RestartSec=10
-                User=user
-                Group=user
-                
-                [Install]
-                WantedBy=multi-user.target
-                EOF
-              
-              # Enable podman socket for user
-              - systemctl --user enable podman.socket --now
+              # Enable podman socket for user (run as user)
+              - sudo -u user systemctl --user enable podman.socket
+              - sudo -u user systemctl --user start podman.socket
               - loginctl enable-linger user
-              - echo "<!doctype html><html><head><meta charset=utf-8><title>FetchIt GitOps - {{clusterName}}</title><style>body{font-family:system-ui;margin:2rem;line-height:1.5}h1{color:#2563eb}.card{border:1px solid #e5e7eb;border-radius:.5rem;padding:1rem;margin:1rem 0}code{background:#f3f4f6;padding:.25rem .5rem;border-radius:.25rem}</style></head><body><h1>🚀 FetchIt GitOps Container Management</h1><div class=card><p><strong>Cluster:</strong> <code>{{clusterName}}</code></p><p><strong>Cluster ID:</strong> <code>{{clusterId}}</code></p><p><strong>Managed by:</strong> fleet-manager-gitops</p><p><strong>Container Engine:</strong> Podman + FetchIt</p></div><p>This VM automatically manages containers from the GitOps repository using FetchIt.</p></body></html>" > /opt/nginx/html/index.html
+              
+              # Reload systemd and start fetchit service
               - systemctl daemon-reload
               - systemctl enable fetchit.service
               - systemctl start fetchit.service
+              
+              # Wait and check status
               - sleep 10
               - systemctl status fetchit.service || true
-              - podman ps || true
+              - sudo -u user podman ps || true
+              
+              # Create deployment log
               - echo "FetchIt GitOps VM deployment completed at $(date)" > /opt/fetchit/status/deployment.log
               - echo "Cluster: {{clusterName}} ({{clusterId}})" >> /opt/fetchit/status/deployment.log
               - echo "Repository: https://github.com/ddemlow/fleet-manager-gitops" >> /opt/fetchit/status/deployment.log
