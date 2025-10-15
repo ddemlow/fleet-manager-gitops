@@ -1,13 +1,7 @@
 {
   "name": "simple-webapp",
   "image": "docker.io/mmumshad/simple-webapp-color:latest",
-  "ports": [
-    {
-      "hostPort": 9090,
-      "containerPort": 8080,
-      "protocol": "tcp"
-    }
-  ],
+  "ports": ["9090:8080"],
   "environment": {
     "APP_COLOR": "blue",
     "APP_NAME": "GitOps Demo App"
@@ -17,5 +11,5 @@
     "managed-by": "fetchit",
     "source": "gitops"
   },
-  "restartPolicy": "unless-stopped"
+  "restart": "unless-stopped"
 }
