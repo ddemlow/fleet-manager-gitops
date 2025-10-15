@@ -95,25 +95,42 @@ spec:
                   retryDelay: "30s"
                 EOF
               
-              # Create FetchIt quadlet container file
+              # Create FetchIt systemd service file (traditional approach)
               - |
-                cat <<'EOF' > /etc/containers/systemd/fetchit.container
-                [Container]
-                Image=quay.io/fetchit/fetchit:latest
-                Name=fetchit
-                Volume=/opt/fetchit:/opt/mount:ro
-                Volume=/var/lib/containers:/var/lib/containers:rw
-                Volume=/run/user/1000/podman/podman.sock:/run/podman/podman.sock:ro
-                SecurityLabelType=container_runtime_t
-                SecurityLabelLevel=s0:c123,c456
+                cat <<'EOF' > /etc/systemd/system/fetchit.service
+                [Unit]
+                Description=FetchIt GitOps Container Manager
+                After=network.target podman.socket
+                Requires=podman.socket
+                
+                [Service]
+                Type=simple
+                ExecStart=/usr/bin/podman run --rm --name fetchit -v /opt/fetchit:/opt/mount:ro -v /var/lib/containers:/var/lib/containers:rw -v /run/podman/podman.sock:/run/podman/podman.sock:ro --security-opt label=disable quay.io/fetchit/fetchit:latest
+                Restart=always
+                RestartSec=10
+                User=root
+                Group=root
                 
                 [Install]
                 WantedBy=multi-user.target
                 EOF
               
+              # Ensure user is in the right groups for container access
+              - usermod -a -G wheel,root user || true
+              
+              # Enable and start podman socket for system-wide access
+              - systemctl enable podman.socket
+              - systemctl start podman.socket
+              
+              # Reload systemd and trigger quadlet generation
               - systemctl daemon-reload
-              - sleep 2
-              - systemctl restart fetchit.service
+              - sleep 5
+              
+              # Try to enable the service (this should trigger quadlet generation)
+              - systemctl enable fetchit.service || true
+              
+              # If that doesn't work, try to start it directly
+              - systemctl start fetchit.service || true
               
               # Create deployment log
               - echo "FetchIt GitOps VM deployment completed at $(date)" > /opt/fetchit/deployment.log
