@@ -1,7 +1,13 @@
 {
   "name": "simple-webapp",
   "image": "docker.io/mmumshad/simple-webapp-color:latest",
-  "ports": ["9090:8080"],
+  "ports": [
+    {
+      "hostPort": 9090,
+      "containerPort": 8080,
+      "protocol": "tcp"
+    }
+  ],
   "environment": {
     "APP_COLOR": "blue",
     "APP_NAME": "GitOps Demo App"
