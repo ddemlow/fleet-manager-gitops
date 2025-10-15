@@ -1,28 +1,16 @@
 {
-  "name": "nginx-demo",
-  "image": "docker.io/nginx:alpine",
-  "ports": [
-    {
-      "hostPort": 8080,
-      "containerPort": 80,
-      "protocol": "tcp"
-    }
-  ],
-  "environment": {
+  "Image": "docker.io/nginx:alpine",
+  "Name": "nginx-demo",
+  "Env": {
     "NGINX_HOST": "localhost",
     "NGINX_PORT": "80"
   },
-  "labels": {
-    "app": "nginx-demo",
-    "managed-by": "fetchit",
-    "source": "gitops"
-  },
-  "restartPolicy": "unless-stopped",
-  "volumes": [
-    {
-      "hostPath": "/opt/nginx/html",
-      "containerPath": "/usr/share/nginx/html",
-      "type": "bind"
-    }
-  ]
+  "Mounts": ["/opt/nginx/html:/usr/share/nginx/html:ro"],
+  "Ports": [{
+    "host_ip": "",
+    "container_port": 80,
+    "host_port": 8080,
+    "range": 0,
+    "protocol": "tcp"
+  }]
 }

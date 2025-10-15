@@ -70,6 +70,8 @@ spec:
               - mkdir -p /var/log/fetchit
               - mkdir -p /var/edge/www
               - echo "<h1>FetchIt GitOps Demo</h1><p>This is served by the demo container managed by FetchIt!</p>" > /var/edge/www/index.html
+              - mkdir -p /opt/nginx/html
+              - echo "<h1>Nginx Demo</h1><p>This is served by the nginx-demo container!</p>" > /opt/nginx/html/index.html
               
               # Create FetchIt config file
               - |
