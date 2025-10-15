@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: quay.io/library/nginx:1.23 (current), quay.io/library/nginx:1.22 (rollback option)",
-  "Image": "quay.io/library/nginx:1.23",
+  "_comment": "Demo version tags: registry.k8s.io/pause:3.8 (current), registry.k8s.io/pause:3.7 (rollback option)",
+  "Image": "registry.k8s.io/pause:3.8",
   "Name": "nginx-demo",
   "Env": {
     "NGINX_HOST": "localhost",
