@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: latest (current), alpine (rollback option)",
-  "Image": "docker.io/mmumshad/simple-webapp-color:latest",
+  "_comment": "Demo version tags: quay.io/prometheus/busybox:latest (current), quay.io/prometheus/busybox:1.36 (rollback option)",
+  "Image": "quay.io/prometheus/busybox:latest",
   "Name": "simple-webapp",
   "Env": {
     "APP_COLOR": "blue",

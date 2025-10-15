@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: nginx:1.24 (current), nginx:1.23 (rollback option)",
-  "Image": "nginx:1.24",
+  "_comment": "Demo version tags: quay.io/library/nginx:1.24 (current), quay.io/library/nginx:1.23 (rollback option)",
+  "Image": "quay.io/library/nginx:1.24",
   "Name": "demo-web",
   "Env": {
     "NGINX_HOST": "localhost",
