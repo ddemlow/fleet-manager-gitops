@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: v1.0 (current), latest (rollback option)",
-  "Image": "docker.io/mmumshad/simple-webapp-color:v1.0",
+  "_comment": "Demo version tags: latest (current), alpine (rollback option)",
+  "Image": "docker.io/mmumshad/simple-webapp-color:latest",
   "Name": "simple-webapp",
   "Env": {
     "APP_COLOR": "blue",
