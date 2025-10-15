@@ -1,7 +1,7 @@
 version: "1"
 type: "Application"
 metadata:
-  name: "fetchit-gitops-vm2"
+  name: "fetchit-gitops-vm3"
   description: "GitOps VM with FetchIt container management - manages containers from this repo"
   clusterGroups:
     - DDvsns
