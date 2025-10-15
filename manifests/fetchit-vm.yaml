@@ -60,81 +60,68 @@ spec:
             runcmd:
               # Create directories in writable locations
               - mkdir -p /opt/fetchit
-              - mkdir -p /opt/nginx/html
               - mkdir -p /var/lib/containers
               - mkdir -p /var/log/fetchit
               - mkdir -p /opt/fetchit/status
               - mkdir -p /etc/fetchit
               
               # Create FetchIt config file (use /etc/fetchit which is writable)
-              - "cat > /etc/fetchit/config.yaml << 'EOF'
-                targetConfigs:
-                - url: https://github.com/ddemlow/fleet-manager-gitops
-                  branch: master
-                  fileTransfer:
-                  - name: fetchit-config
-                    targetPath: fetchit/fetchit-config.yaml
-                    destinationDirectory: /opt/fetchit
-                    schedule: \"*/5 * * * *\"
-                  raw:
-                  - name: demo-containers
-                    targetPath: fetchit/containers
-                    schedule: \"*/2 * * * *\"
-                  systemd:
-                  - name: web-services
-                    targetPath: fetchit/systemd
-                    schedule: \"*/3 * * * *\"
-                global:
-                  logLevel: info
-                  maxRetries: 3
-                  retryDelay: \"30s\"
-                EOF"
+              - echo 'targetConfigs:' > /etc/fetchit/config.yaml
+              - echo '- url: https://github.com/ddemlow/fleet-manager-gitops' >> /etc/fetchit/config.yaml
+              - echo '  branch: master' >> /etc/fetchit/config.yaml
+              - echo '  fileTransfer:' >> /etc/fetchit/config.yaml
+              - echo '  - name: fetchit-config' >> /etc/fetchit/config.yaml
+              - echo '    targetPath: fetchit/fetchit-config.yaml' >> /etc/fetchit/config.yaml
+              - echo '    destinationDirectory: /opt/fetchit' >> /etc/fetchit/config.yaml
+              - echo '    schedule: "*/5 * * * *"' >> /etc/fetchit/config.yaml
+              - echo '  raw:' >> /etc/fetchit/config.yaml
+              - echo '  - name: demo-containers' >> /etc/fetchit/config.yaml
+              - echo '    targetPath: fetchit/containers' >> /etc/fetchit/config.yaml
+              - echo '    schedule: "*/2 * * * *"' >> /etc/fetchit/config.yaml
+              - echo '  systemd:' >> /etc/fetchit/config.yaml
+              - echo '  - name: web-services' >> /etc/fetchit/config.yaml
+              - echo '    targetPath: fetchit/systemd' >> /etc/fetchit/config.yaml
+              - echo '    schedule: "*/3 * * * *"' >> /etc/fetchit/config.yaml
+              - echo 'global:' >> /etc/fetchit/config.yaml
+              - echo '  logLevel: info' >> /etc/fetchit/config.yaml
+              - echo '  maxRetries: 3' >> /etc/fetchit/config.yaml
+              - echo '  retryDelay: "30s"' >> /etc/fetchit/config.yaml
               
               # Create FetchIt systemd service in /etc/systemd/system (writable on MicroOS)
-              - "cat > /etc/systemd/system/fetchit.service << 'EOF'
-                [Unit]
-                Description=FetchIt GitOps Container Manager
-                After=network.target podman.socket
-                Requires=podman.socket
-                
-                [Service]
-                Type=simple
-                ExecStart=/usr/bin/podman run --rm --name fetchit -v /etc/fetchit:/opt/mount:ro -v /run/user/1000/podman/podman.sock:/run/podman/podman.sock -v /var/lib/containers:/var/lib/containers --security-opt label=disable quay.io/fetchit/fetchit:latest
-                Restart=always
-                RestartSec=10
-                User=user
-                Group=user
-                
-                [Install]
-                WantedBy=multi-user.target
-                EOF"
-              
+              - echo '[Unit]' > /etc/systemd/system/fetchit.service
+              - echo 'Description=FetchIt GitOps Container Manager' >> /etc/systemd/system/fetchit.service
+              - echo 'After=network.target podman.socket' >> /etc/systemd/system/fetchit.service
+              - echo 'Requires=podman.socket' >> /etc/systemd/system/fetchit.service
+              - echo '' >> /etc/systemd/system/fetchit.service
+              - echo '[Service]' >> /etc/systemd/system/fetchit.service
+              - echo 'Type=simple' >> /etc/systemd/system/fetchit.service
+              - echo 'ExecStart=/usr/bin/podman run --rm --name fetchit -v /etc/fetchit:/opt/mount:ro -v /run/user/1000/podman/podman.sock:/run/podman/podman.sock -v /var/lib/containers:/var/lib/containers --security-opt label=disable quay.io/fetchit/fetchit:latest' >> /etc/systemd/system/fetchit.service
+              - echo 'Restart=always' >> /etc/systemd/system/fetchit.service
+              - echo 'RestartSec=10' >> /etc/systemd/system/fetchit.service
+              - echo 'User=user' >> /etc/systemd/system/fetchit.service
+              - echo 'Group=user' >> /etc/systemd/system/fetchit.service
+              - echo '' >> /etc/systemd/system/fetchit.service
+              - echo '[Install]' >> /etc/systemd/system/fetchit.service
+              - echo 'WantedBy=multi-user.target' >> /etc/systemd/system/fetchit.service
               
               # Set proper ownership for writable locations
-              - chown -R user:user /opt/fetchit
-              - chown -R user:user /opt/nginx
-              - chown -R user:user /var/lib/containers
-              - chown -R user:user /var/log/fetchit
+              - chown -R user:user /opt/fetchit || true
+              - chown -R user:user /var/lib/containers || true
+              - chown -R user:user /var/log/fetchit || true
               
-              # Enable podman socket for user (run as user)
-              - sudo -u user systemctl --user enable podman.socket
-              - sudo -u user systemctl --user start podman.socket
-              - loginctl enable-linger user
+              # Enable podman socket for user (run as user) - with error handling
+              - sudo -u user systemctl --user enable podman.socket || true
+              - sudo -u user systemctl --user start podman.socket || true
+              - loginctl enable-linger user || true
               
-              # Reload systemd and start fetchit service
-              - systemctl daemon-reload
-              - systemctl enable fetchit.service
-              - systemctl start fetchit.service
-              
-              # Wait and check status
-              - sleep 10
-              - systemctl status fetchit.service || true
-              - sudo -u user podman ps || true
+              # Reload systemd and enable fetchit service (but don't start yet)
+              - systemctl daemon-reload || true
+              - systemctl enable fetchit.service || true
               
               # Create deployment log
-              - echo "FetchIt GitOps VM deployment completed at $(date)" > /opt/fetchit/status/deployment.log
-              - 'echo "Cluster: {{clusterName}} ({{clusterId}})" >> /opt/fetchit/status/deployment.log'
-              - 'echo "Repository: https://github.com/ddemlow/fleet-manager-gitops" >> /opt/fetchit/status/deployment.log'
+              - echo "FetchIt GitOps VM deployment completed at $(date)" > /opt/fetchit/status/deployment.log || true
+              - 'echo "Cluster: {{clusterName}} ({{clusterId}})" >> /opt/fetchit/status/deployment.log' || true
+              - 'echo "Repository: https://github.com/ddemlow/fleet-manager-gitops" >> /opt/fetchit/status/deployment.log' || true
           meta_data: |
             dsmode: local
             local-hostname: "gitops-fetchit-{{clusterName}}"
