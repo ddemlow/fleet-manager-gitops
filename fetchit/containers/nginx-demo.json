@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: httpd:2.4.56 (current), httpd:2.4.55 (rollback option)",
-  "Image": "httpd:2.4.55",
+  "_comment": "Demo version tags: ghcr.io/httpd/httpd:2.4-alpine (current), ghcr.io/httpd/httpd:2.4 (rollback option)",
+  "Image": "ghcr.io/httpd/httpd:2.4-alpine",
   "Name": "nginx-demo",
   "Env": {
     "NGINX_HOST": "localhost",
