@@ -3,8 +3,10 @@ kind: ConfigMap
 metadata:
   name: kube-demo-config
 data:
-  APP_NAME: "GitOps Kube Demo"
-  APP_COLOR: "green"
+  APP_NAME: "Kube Demo (Kubernetes Method)"
+  APP_COLOR: "purple"
+  CONTAINER_PORT: "8082"
+  DEPLOYMENT_METHOD: "kubernetes"
 ---
 apiVersion: v1
 kind: Pod
@@ -13,9 +15,9 @@ metadata:
 spec:
   containers:
   - name: kube-demo
-    image: registry.k8s.io/nginx-slim:0.7
+    image: docker.io/mmumshad/simple-webapp-color:latest
     ports:
-    - containerPort: 80
+    - containerPort: 8080
       hostPort: 8082
     envFrom:
     - configMapRef:
