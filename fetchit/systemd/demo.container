@@ -1,9 +1,0 @@
-[Container]
-Image=nginx:alpine
-Name=demo-web
-PublishPort=8080:80
-Volume=/var/edge/www:/usr/share/nginx/html:ro
-Label=io.containers.autoupdate=registry
-
-[Install]
-WantedBy=multi-user.target
