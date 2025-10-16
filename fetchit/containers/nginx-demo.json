@@ -1,6 +1,6 @@
 {
   "_comment": "Demo version tags: httpd:2.4.56 (current), httpd:2.4.55 (rollback option)",
-  "Image": "httpd:2.4.56",
+  "Image": "httpd:2.4.55",
   "Name": "nginx-demo",
   "Env": {
     "NGINX_HOST": "localhost",
