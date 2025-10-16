@@ -1,11 +1,8 @@
 {
-  "_comment": "Demo version tags: ghcr.io/httpd/httpd:2.4 (current), ghcr.io/httpd/httpd:2.4-alpine (rollback option)",
-  "Image": "ghcr.io/httpd/httpd:2.4",
+  "_comment": "Demo version tags: registry.k8s.io/nginx-slim:0.9 (current), registry.k8s.io/nginx-slim:0.8 (rollback option)",
+  "Image": "registry.k8s.io/nginx-slim:0.9",
   "Name": "demo-web",
-  "Env": {
-    "NGINX_HOST": "localhost",
-    "NGINX_PORT": "80"
-  },
+  "Env": {},
   "Ports": [{
     "host_ip": "",
     "container_port": 80,
