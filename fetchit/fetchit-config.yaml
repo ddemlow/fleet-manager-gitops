@@ -5,7 +5,6 @@
 configReload:
   schedule: "*/5 * * * *"
   configUrl: https://raw.githubusercontent.com/ddemlow/fleet-manager-gitops/master/fetchit/fetchit-config.yaml
-
 targetConfigs:
 - url: https://github.com/ddemlow/fleet-manager-gitops
   branch: master
