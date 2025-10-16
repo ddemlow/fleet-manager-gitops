@@ -1,0 +1,11 @@
+[Unit]
+Description=FetchIt Restart Check Timer
+Requires=fetchit-restart.service
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
