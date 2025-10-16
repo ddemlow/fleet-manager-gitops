@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: registry.k8s.io/e2e-test-images/httpd:2.4.52-1 (current), registry.k8s.io/e2e-test-images/httpd:2.4.50-1 (rollback option)",
-  "Image": "registry.k8s.io/e2e-test-images/httpd:2.4.52-1",
+  "_comment": "Demo version tags: httpd:2.4.56 (current), httpd:2.4.55 (rollback option)",
+  "Image": "httpd:2.4.56",
   "Name": "nginx-demo",
   "Env": {
     "NGINX_HOST": "localhost",
