@@ -1,0 +1,10 @@
+[Container]
+# Demo version tags: registry.k8s.io/nginx-slim:0.8 (current), registry.k8s.io/nginx-slim:0.7 (rollback option)
+Image=registry.k8s.io/nginx-slim:0.8
+ContainerName=nginx-demo
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,72 @@
+---
+- name: GitOps Ansible Demo - Configure Edge Device
+  hosts: local
+  become: yes
+  tasks:
+    - name: Create demo directory
+      file:
+        path: /opt/gitops-demo
+        state: directory
+        mode: '0755'
+
+    - name: Create demo HTML file
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>GitOps Ansible Demo</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 40px; }
+              .container { max-width: 800px; margin: 0 auto; }
+              .header { background: #4CAF50; color: white; padding: 20px; border-radius: 8px; }
+              .content { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-top: 20px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>🚀 GitOps Ansible Demo</h1>
+                <p>This page was deployed via Ansible playbook!</p>
+              </div>
+              <div class="content">
+                <h2>Configuration Details:</h2>
+                <ul>
+                  <li><strong>Deployment Method:</strong> Ansible Playbook</li>
+                  <li><strong>Managed by:</strong> FetchIt GitOps</li>
+                  <li><strong>Target:</strong> Edge Device Configuration</li>
+                  <li><strong>Timestamp:</strong> {{ ansible_date_time.iso8601 }}</li>
+                </ul>
+                <p>This demonstrates how GitOps can manage infrastructure configuration alongside containers!</p>
+              </div>
+            </div>
+          </body>
+          </html>
+        dest: /opt/gitops-demo/index.html
+        mode: '0644'
+
+    - name: Install and start nginx for demo
+      package:
+        name: nginx
+        state: present
+
+    - name: Configure nginx to serve demo page
+      copy:
+        content: |
+          server {
+              listen 8083;
+              root /opt/gitops-demo;
+              index index.html;
+              
+              location / {
+                  try_files $uri $uri/ =404;
+              }
+          }
+        dest: /etc/nginx/conf.d/gitops-demo.conf
+        mode: '0644'
+
+    - name: Start and enable nginx
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes
