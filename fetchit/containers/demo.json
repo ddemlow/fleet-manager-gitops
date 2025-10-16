@@ -1,6 +1,6 @@
 {
-  "_comment": "Demo version tags: ghcr.io/nginxinc/nginx-unprivileged:1.24 (current), ghcr.io/nginxinc/nginx-unprivileged:1.23 (rollback option)",
-  "Image": "ghcr.io/nginxinc/nginx-unprivileged:1.24",
+  "_comment": "Demo version tags: registry.k8s.io/e2e-test-images/httpd:2.4.54-1 (current), registry.k8s.io/e2e-test-images/httpd:2.4.52-1 (rollback option)",
+  "Image": "registry.k8s.io/e2e-test-images/httpd:2.4.54-1",
   "Name": "demo-web",
   "Env": {
     "NGINX_HOST": "localhost",
