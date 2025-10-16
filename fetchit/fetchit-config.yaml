@@ -23,10 +23,10 @@ targetConfigs:
     targetPath: fetchit/containers
     destinationDirectory: /etc/containers/systemd
     schedule: "*/3 * * * *"
-  kube:
-  - name: kube-demo
-    targetPath: fetchit/containers
-    schedule: "*/4 * * * *"
+         kube:
+         - name: kube-demo
+           targetPath: fetchit/kube
+           schedule: "*/4 * * * *"
   ansible:
   - name: ansible-demo
     targetPath: fetchit/ansible
