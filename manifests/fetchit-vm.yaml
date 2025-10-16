@@ -109,7 +109,7 @@ spec:
                 
                 [Service]
                 Type=simple
-                ExecStart=/usr/bin/podman run --rm --name fetchit -v /opt/fetchit:/opt/mount:rw -v /var/lib/containers:/var/lib/containers:rw -v /run/podman/podman.sock:/run/podman/podman.sock:ro --security-opt label=disable quay.io/fetchit/fetchit:latest
+                ExecStart=/usr/bin/podman run --rm --name fetchit -v /opt/fetchit:/opt/mount:rw -v /var/lib/containers:/var/lib/containers:rw -v /run/podman/podman.sock:/run/podman/podman.sock:ro -v /etc/systemd/system:/etc/systemd/system:rw -e SYSTEMD_USER=false --security-opt label=disable quay.io/fetchit/fetchit:latest
                 Restart=always
                 RestartSec=10
                 User=root
