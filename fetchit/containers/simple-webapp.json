@@ -1,16 +1,11 @@
 {
   "_comment": "Demo version tags: registry.k8s.io/nginx-slim:0.7 (current), registry.k8s.io/nginx-slim:0.6 (rollback option)",
-  "Image": "docker.io/mmumshad/simple-webapp-color:latest",
+  "Image": "registry.k8s.io/nginx-slim:0.7",
   "Name": "simple-webapp",
-  "Env": {
-    "APP_COLOR": "green",
-    "APP_NAME": "Simple WebApp (Raw Method)",
-    "CONTAINER_PORT": "9090",
-    "DEPLOYMENT_METHOD": "raw"
-  },
+  "Env": {},
   "Ports": [{
     "host_ip": "",
-    "container_port": 8080,
+    "container_port": 80,
     "host_port": 9090,
     "range": 0,
     "protocol": "tcp"

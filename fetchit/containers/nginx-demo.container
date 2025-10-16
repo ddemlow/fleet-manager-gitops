@@ -1,12 +1,8 @@
 [Container]
 # Demo version tags: registry.k8s.io/nginx-slim:0.8 (current), registry.k8s.io/nginx-slim:0.7 (rollback option)
-Image=docker.io/mmumshad/simple-webapp-color:latest
+Image=registry.k8s.io/nginx-slim:0.8
 ContainerName=nginx-demo
-Environment=APP_COLOR=red
-Environment=APP_NAME=Nginx Demo (Systemd Quadlet)
-Environment=CONTAINER_PORT=8081
-Environment=DEPLOYMENT_METHOD=systemd
-PublishPort=8081:8080
+PublishPort=8081:80
 
 [Service]
 Restart=always
