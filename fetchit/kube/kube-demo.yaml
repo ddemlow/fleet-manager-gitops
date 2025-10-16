@@ -7,6 +7,55 @@ data:
   APP_COLOR: "green"
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-demo-html
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Kube Demo (Kubernetes Method)</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: green;
+                color: white;
+                text-align: center;
+                padding: 50px;
+            }
+            .container {
+                background-color: rgba(0,0,0,0.3);
+                padding: 30px;
+                border-radius: 10px;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            h1 { font-size: 2.5em; margin-bottom: 20px; }
+            .info { font-size: 1.2em; margin: 10px 0; }
+            .method { background-color: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; margin: 20px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Kube Demo (Kubernetes Method)</h1>
+            <div class="info">Container Name: kube-demo</div>
+            <div class="info">Port: 8082</div>
+            <div class="info">Deployment Method: kubernetes</div>
+            <div class="info">Image Version: 0.7</div>
+            <div class="method">
+                <strong>GitOps Demo</strong><br>
+                This container was deployed using kubernetes method<br>
+                Managed by FetchIt GitOps
+            </div>
+            <div class="info">
+                <small>Last updated: $(date)</small>
+            </div>
+        </div>
+    </body>
+    </html>
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: kube-demo-pod
@@ -21,3 +70,10 @@ spec:
     - configMapRef:
         name: kube-demo-config
         optional: false
+    volumeMounts:
+    - name: html-content
+      mountPath: /usr/share/nginx/html
+  volumes:
+  - name: html-content
+    configMap:
+      name: kube-demo-html

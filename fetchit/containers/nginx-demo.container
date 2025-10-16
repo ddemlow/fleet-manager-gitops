@@ -3,6 +3,7 @@
 Image=registry.k8s.io/nginx-slim:0.8
 ContainerName=nginx-demo
 PublishPort=8081:80
+Volume=/var/www/nginx:/usr/share/nginx/html:Z
 
 [Service]
 Restart=always

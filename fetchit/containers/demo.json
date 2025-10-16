@@ -2,12 +2,24 @@
   "_comment": "Demo version tags: registry.k8s.io/nginx-slim:0.9 (current), registry.k8s.io/nginx-slim:0.8 (rollback option)",
   "Image": "registry.k8s.io/nginx-slim:0.9",
   "Name": "demo-web",
-  "Env": {},
+  "Env": {
+    "APP_COLOR": "blue",
+    "APP_NAME": "Demo Web (Raw Method)",
+    "CONTAINER_NAME": "demo-web",
+    "CONTAINER_PORT": "8080",
+    "DEPLOYMENT_METHOD": "raw",
+    "IMAGE_VERSION": "0.9"
+  },
   "Ports": [{
     "host_ip": "",
     "container_port": 80,
     "host_port": 8080,
     "range": 0,
     "protocol": "tcp"
+  }],
+  "Mounts": [{
+    "Source": "/var/www/demo",
+    "Destination": "/usr/share/nginx/html",
+    "Options": "ro"
   }]
 }

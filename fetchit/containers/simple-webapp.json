@@ -9,5 +9,10 @@
     "host_port": 9090,
     "range": 0,
     "protocol": "tcp"
+  }],
+  "Mounts": [{
+    "Source": "/var/www/simple",
+    "Destination": "/usr/share/nginx/html",
+    "Options": "ro"
   }]
 }
