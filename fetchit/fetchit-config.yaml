@@ -1,6 +1,11 @@
 # FetchIt Configuration
 # This file is used by FetchIt to manage GitOps deployments
 
+# Dynamic Configuration Reload - allows config changes without container restart
+configReload:
+  schedule: "*/5 * * * *"
+  configUrl: https://raw.githubusercontent.com/ddemlow/fleet-manager-gitops/master/fetchit/fetchit-config.yaml
+
 targetConfigs:
 - url: https://github.com/ddemlow/fleet-manager-gitops
   branch: master
@@ -9,16 +14,15 @@ targetConfigs:
     targetPath: fetchit/fetchit-config.yaml
     destinationDirectory: /opt/fetchit
     schedule: "*/5 * * * *"
+  - name: timer-overrides
+    targetPath: fetchit/timer-configs
+    destinationDirectory: /etc/systemd/system
+    schedule: "*/10 * * * *"
   raw:
   - name: demo-containers
     targetPath: fetchit/containers
     schedule: "*/2 * * * *"
     pullImage: true
-  systemd:
-  - name: web-services
-    targetPath: fetchit/systemd
-    destinationDirectory: /etc/systemd/system
-    schedule: "*/3 * * * *"
 global:
   logLevel: info
   maxRetries: 3
