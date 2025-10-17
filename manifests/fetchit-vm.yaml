@@ -1,7 +1,7 @@
 version: "1"
 type: "Application"
 metadata:
-  name: "fetchit-gitops-vm4"
+  name: "fetchit-gitops-vm5"
   description: "GitOps VM with FetchIt container management - manages containers from this repo"
   clusterGroups:
     - dd_szt15b
@@ -20,7 +20,7 @@ spec:
       url: "https://pm-westfield.s3.us-east-2.amazonaws.com/openSUSE-MicroOS.x86_64-ContainerHost-OpenStack-Cloud.raw"
   
   resources:
-    - name: fetchit-gitops-vm
+    - name: fetchit-gitops-{{clusterName}}
       type: virdomain
       spec:
         description: "GitOps VM with FetchIt - manages containers from fleet-manager-gitops repo - name {{clusterName}} id {{clusterId}}"
