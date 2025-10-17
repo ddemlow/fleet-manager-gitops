@@ -160,9 +160,9 @@ spec:
                 EOF
               - systemctl enable enable-qemu-guest-agent.service
               - reboot
-          meta_data: |
-            dsmode: local
-            local-hostname: "gitops-fetchit-{{clusterName}}"
+        meta_data: |
+          dsmode: local
+          local-hostname: "gitops-fetchit-{{clusterName}}"
         
         tags:
           - gitops
