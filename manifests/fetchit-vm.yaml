@@ -55,7 +55,7 @@ spec:
               sudo: ALL=(ALL) NOPASSWD:ALL
               shell: /bin/bash
               ssh-authorized-keys:
-                - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+                - ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
             chpasswd:
               list: |
                 user:password
