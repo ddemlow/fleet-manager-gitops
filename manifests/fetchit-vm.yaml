@@ -1,7 +1,7 @@
 version: "1"
 type: "Application"
 metadata:
-  name: "fetchit-gitops-revert"
+  name: "fetchit-gitops-quadlets"
   description: "GitOps VM with FetchIt container management - manages containers from this repo"
   clusterGroups:
     - DDvsns
