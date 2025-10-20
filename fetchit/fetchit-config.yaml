@@ -22,7 +22,7 @@ targetConfigs:
   - name: demo-containers
     targetPath: fetchit/containers
     schedule: "*/2 * * * *"
-    pullImage: true
+    pullImage: false
 global:
   logLevel: info
   maxRetries: 3
