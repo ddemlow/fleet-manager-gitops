@@ -16,7 +16,7 @@ targetConfigs:
     schedule: "*/5 * * * *"
   systemd:
   - name: quadlet-services
-    targetPath: fetchit/containers
+    targetPath: fetchit/systemd
     destinationDirectory: /etc/containers/systemd
     schedule: "*/2 * * * *"
   kube:
