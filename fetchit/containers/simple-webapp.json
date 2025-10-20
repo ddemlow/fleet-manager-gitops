@@ -3,7 +3,7 @@
   "Image": "docker.io/mmumshad/simple-webapp-color:latest",
   "Name": "simple-webapp",
   "Env": {
-    "APP_COLOR": "green",
+    "APP_COLOR": "blue",
     "APP_NAME": "GitOps Demo App"
   },
   "Ports": [{
