@@ -14,16 +14,11 @@ targetConfigs:
     targetPath: fetchit/fetchit-config.yaml
     destinationDirectory: /opt/fetchit
     schedule: "*/5 * * * *"
-  raw:
-  - name: demo-containers
-    targetPath: fetchit/containers
-    schedule: "*/2 * * * *"
-    pullImage: false
   systemd:
   - name: quadlet-services
     targetPath: fetchit/containers
     destinationDirectory: /etc/containers/systemd
-    schedule: "*/3 * * * *"
+    schedule: "*/2 * * * *"
   kube:
   - name: kube-demo
     targetPath: fetchit/kube
