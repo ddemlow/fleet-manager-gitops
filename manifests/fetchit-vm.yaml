@@ -20,10 +20,10 @@ spec:
       url: "https://pm-westfield.s3.us-east-2.amazonaws.com/openSUSE-MicroOS.x86_64-ContainerHost-OpenStack-Cloud.raw"
   
   resources:
-    - name: fetchit-gitops-vm
+    - name: fetchit-gitops
       type: virdomain
       spec:
-        description: "GitOps VM with FetchIt - manages containers from fleet-manager-gitops repo - name {{clusterName}} id {{clusterId}}"
+        description: "GitOps VM with FetchIt- name {{clusterName}} id {{clusterId}}"
         cpu: 4
         memory: "4294967296"  # 4GB
         machine_type: bios
