@@ -76,33 +76,34 @@ spec:
               - echo 'targetConfigs:' >> /opt/fetchit/config.yaml
               - echo '- url: https://github.com/ddemlow/fleet-manager-gitops' >> /opt/fetchit/config.yaml
               - echo '  branch: master' >> /opt/fetchit/config.yaml
-              - echo '  systemd:' >> /opt/fetchit/config.yaml
+              - echo '  kube:' >> /opt/fetchit/config.yaml
               - echo '  - name: demo-services' >> /opt/fetchit/config.yaml
-              - echo '    targetPath: fetchit/systemd' >> /opt/fetchit/config.yaml
-              - echo '    root: true' >> /opt/fetchit/config.yaml
-              - echo '    enable: true' >> /opt/fetchit/config.yaml
+              - echo '    targetPath: fetchit/kube' >> /opt/fetchit/config.yaml
               - echo '    schedule: "*/2 * * * *"' >> /opt/fetchit/config.yaml
               - echo 'global:' >> /opt/fetchit/config.yaml
               - echo '  logLevel: info' >> /opt/fetchit/config.yaml
               - echo '  maxRetries: 3' >> /opt/fetchit/config.yaml
               - echo '  retryDelay: "30s"' >> /opt/fetchit/config.yaml
               
-              # Create FetchIt systemd service file (simplified approach)
-              - echo '[Unit]' > /etc/systemd/system/fetchit.service
-              - echo 'Description=FetchIt GitOps Container Manager' >> /etc/systemd/system/fetchit.service
-              - echo 'After=network.target podman.socket' >> /etc/systemd/system/fetchit.service
-              - echo 'Requires=podman.socket' >> /etc/systemd/system/fetchit.service
-              - echo '' >> /etc/systemd/system/fetchit.service
-              - echo '[Service]' >> /etc/systemd/system/fetchit.service
-              - echo 'Type=simple' >> /etc/systemd/system/fetchit.service
-              - echo 'ExecStart=/usr/bin/podman run --rm --name fetchit -v /opt/fetchit:/opt/mount:rw -v /var/lib/containers:/var/lib/containers:rw -v /run/podman/podman.sock:/run/podman/podman.sock:ro -v /etc/systemd/system:/etc/systemd/system:rw -e SYSTEMD_USER=false --security-opt label=disable quay.io/fetchit/fetchit:latest' >> /etc/systemd/system/fetchit.service
-              - echo 'Restart=always' >> /etc/systemd/system/fetchit.service
-              - echo 'RestartSec=10' >> /etc/systemd/system/fetchit.service
-              - echo 'User=root' >> /etc/systemd/system/fetchit.service
-              - echo 'Group=root' >> /etc/systemd/system/fetchit.service
-              - echo '' >> /etc/systemd/system/fetchit.service
-              - echo '[Install]' >> /etc/systemd/system/fetchit.service
-              - echo 'WantedBy=multi-user.target' >> /etc/systemd/system/fetchit.service
+              # Create FetchIt systemd service file
+              - |
+                cat <<'EOF' > /etc/systemd/system/fetchit.service
+                [Unit]
+                Description=FetchIt GitOps Container Manager
+                After=network.target podman.socket
+                Requires=podman.socket
+
+                [Service]
+                Type=simple
+                ExecStart=/usr/bin/podman run --rm --name fetchit -v /opt/fetchit:/opt/mount:rw -v /var/lib/containers:/var/lib/containers:rw -v /run/podman/podman.sock:/run/podman/podman.sock:ro -v /etc/systemd/system:/etc/systemd/system:rw -e SYSTEMD_USER=false --security-opt label=disable quay.io/fetchit/fetchit:latest
+                Restart=always
+                RestartSec=10
+                User=root
+                Group=root
+
+                [Install]
+                WantedBy=multi-user.target
+                EOF
               
               # Ensure user is in the right groups for container access
               - usermod -a -G wheel,root user || true
@@ -120,10 +121,6 @@ spec:
               # If that doesn't work, try to start it directly
               - systemctl start fetchit.service || true
               
-              # Create deployment log
-              - echo "FetchIt GitOps VM deployment completed at $(date)" > /opt/fetchit/deployment.log
-              - 'echo "Cluster: GitOps Demo" >> /opt/fetchit/deployment.log'
-              - 'echo "Repository: https://github.com/ddemlow/fleet-manager-gitops" >> /opt/fetchit/deployment.log'
               
               # install qemu-guest-agent transactionally; MicroOS will handle this via reboot/override below
               - transactional-update --non-interactive pkg install qemu-guest-agent
