@@ -9,11 +9,6 @@ configReload:
 targetConfigs:
 - url: https://github.com/ddemlow/fleet-manager-gitops
   branch: master
-  fileTransfer:
-  - name: fetchit-config
-    targetPath: fetchit/fetchit-config.yaml
-    destinationDirectory: /opt/fetchit
-    schedule: "*/5 * * * *"
   systemd:
   - name: quadlet-services
     targetPath: fetchit/systemd
