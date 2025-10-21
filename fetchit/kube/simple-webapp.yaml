@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-webapp
+spec:
+  containers:
+  - name: simple-webapp
+    image: docker.io/mmumshad/simple-webapp-color:latest
+    ports:
+    - containerPort: 8080
+      hostPort: 9090
+    env:
+    - name: APP_COLOR
+      value: "blue"
+    - name: APP_NAME
+      value: "GitOps Demo App"
+  restartPolicy: Always

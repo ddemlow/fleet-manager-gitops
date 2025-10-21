@@ -9,11 +9,9 @@ configReload:
 targetConfigs:
 - url: https://github.com/ddemlow/fleet-manager-gitops
   branch: master
-  systemd:
+  kube:
   - name: demo-services
-    targetPath: fetchit/systemd
-    root: true
-    enable: true
+    targetPath: fetchit/kube
     schedule: "*/2 * * * *"
 global:
   logLevel: info

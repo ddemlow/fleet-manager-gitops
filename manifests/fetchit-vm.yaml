@@ -43,10 +43,10 @@ spec:
             #cloud-config
             users:
               - name: user
-                password: "password"
+                plain_text_passwd: "password"
                 lock_passwd: false
-                groups: [wheel]
-                sudo: ALL=(ALL) NOPASSWD:ALL
+                groups: "wheel"
+                sudo: "ALL=(ALL) NOPASSWD:ALL"
                 ssh_authorized_keys:
                   - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
             ssh_pwauth: true
@@ -68,29 +68,22 @@ spec:
               - echo "<h1>Nginx Demo</h1><p>This is served by the nginx-demo container!</p>" > /var/www/nginx/index.html
               
               # Create FetchIt bootstrap config - authoritative config loaded via configReload
-              - |
-                cat <<'EOF' > /opt/fetchit/config.yaml
-                configReload:
-                  schedule: "*/5 * * * *"
-                  configUrl: https://raw.githubusercontent.com/ddemlow/fleet-manager-gitops/master/fetchit/fetchit-config.yaml
-                targetConfigs:
-                - url: https://github.com/ddemlow/fleet-manager-gitops
-                  branch: master
-                  fileTransfer:
-                  - name: fetchit-config
-                    targetPath: fetchit/fetchit-config.yaml
-                    destinationDirectory: /opt/fetchit
-                    schedule: "*/5 * * * *"
-                  systemd:
-                  - name: quadlet-services
-                    targetPath: fetchit/systemd
-                    destinationDirectory: /etc/containers/systemd
-                    schedule: "*/2 * * * *"
-                global:
-                  logLevel: info
-                  maxRetries: 3
-                  retryDelay: "30s"
-                EOF
+              - echo 'configReload:' > /opt/fetchit/config.yaml
+              - echo '  schedule: "*/5 * * * *"' >> /opt/fetchit/config.yaml
+              - echo '  configUrl: https://raw.githubusercontent.com/ddemlow/fleet-manager-gitops/master/fetchit/fetchit-config.yaml' >> /opt/fetchit/config.yaml
+              - echo 'targetConfigs:' >> /opt/fetchit/config.yaml
+              - echo '- url: https://github.com/ddemlow/fleet-manager-gitops' >> /opt/fetchit/config.yaml
+              - echo '  branch: master' >> /opt/fetchit/config.yaml
+              - echo '  systemd:' >> /opt/fetchit/config.yaml
+              - echo '  - name: demo-services' >> /opt/fetchit/config.yaml
+              - echo '    targetPath: fetchit/systemd' >> /opt/fetchit/config.yaml
+              - echo '    root: true' >> /opt/fetchit/config.yaml
+              - echo '    enable: true' >> /opt/fetchit/config.yaml
+              - echo '    schedule: "*/2 * * * *"' >> /opt/fetchit/config.yaml
+              - echo 'global:' >> /opt/fetchit/config.yaml
+              - echo '  logLevel: info' >> /opt/fetchit/config.yaml
+              - echo '  maxRetries: 3' >> /opt/fetchit/config.yaml
+              - echo '  retryDelay: "30s"' >> /opt/fetchit/config.yaml
               
               # Create FetchIt systemd service file (simplified approach)
               - echo '[Unit]' > /etc/systemd/system/fetchit.service
