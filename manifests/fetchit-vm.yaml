@@ -86,24 +86,21 @@ spec:
               - echo '  retryDelay: "30s"' >> /opt/fetchit/config.yaml
               
               # Create FetchIt systemd service file
-              - |
-                cat <<'EOF' > /etc/systemd/system/fetchit.service
-                [Unit]
-                Description=FetchIt GitOps Container Manager
-                After=network.target podman.socket
-                Requires=podman.socket
-
-                [Service]
-                Type=simple
-                ExecStart=/usr/bin/podman run --rm --name fetchit -v /opt/fetchit:/opt/mount:rw -v /var/lib/containers:/var/lib/containers:rw -v /run/podman/podman.sock:/run/podman/podman.sock:ro -v /etc/systemd/system:/etc/systemd/system:rw -e SYSTEMD_USER=false --security-opt label=disable quay.io/fetchit/fetchit:latest
-                Restart=always
-                RestartSec=10
-                User=root
-                Group=root
-
-                [Install]
-                WantedBy=multi-user.target
-                EOF
+              - echo '[Unit]' > /etc/systemd/system/fetchit.service
+              - echo 'Description=FetchIt GitOps Container Manager' >> /etc/systemd/system/fetchit.service
+              - echo 'After=network.target podman.socket' >> /etc/systemd/system/fetchit.service
+              - echo 'Requires=podman.socket' >> /etc/systemd/system/fetchit.service
+              - echo '' >> /etc/systemd/system/fetchit.service
+              - echo '[Service]' >> /etc/systemd/system/fetchit.service
+              - echo 'Type=simple' >> /etc/systemd/system/fetchit.service
+              - echo 'ExecStart=/usr/bin/podman run --rm --name fetchit -v /opt/fetchit:/opt/mount:rw -v /var/lib/containers:/var/lib/containers:rw -v /run/podman/podman.sock:/run/podman/podman.sock:ro -v /etc/systemd/system:/etc/systemd/system:rw -e SYSTEMD_USER=false --security-opt label=disable quay.io/fetchit/fetchit:latest' >> /etc/systemd/system/fetchit.service
+              - echo 'Restart=always' >> /etc/systemd/system/fetchit.service
+              - echo 'RestartSec=10' >> /etc/systemd/system/fetchit.service
+              - echo 'User=root' >> /etc/systemd/system/fetchit.service
+              - echo 'Group=root' >> /etc/systemd/system/fetchit.service
+              - echo '' >> /etc/systemd/system/fetchit.service
+              - echo '[Install]' >> /etc/systemd/system/fetchit.service
+              - echo 'WantedBy=multi-user.target' >> /etc/systemd/system/fetchit.service
               
               # Ensure user is in the right groups for container access
               - usermod -a -G wheel,root user || true
@@ -125,27 +122,21 @@ spec:
               # install qemu-guest-agent transactionally; MicroOS will handle this via reboot/override below
               - transactional-update --non-interactive pkg install qemu-guest-agent
               
-              - |
-                cat <<'EOF' > /etc/systemd/system/enable-qemu-guest-agent.service
-                [Unit]
-                Description=Enable qemu-guest-agent post-reboot
-                After=multi-user.target
-                
-                [Service]
-                Type=oneshot
-                ExecStart=/usr/bin/systemctl enable --now qemu-guest-agent.service
-                RemainAfterExit=yes
-                
-                [Install]
-                WantedBy=multi-user.target
-                EOF
+              - echo '[Unit]' > /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo 'Description=Enable qemu-guest-agent post-reboot' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo 'After=multi-user.target' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo '' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo '[Service]' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo 'Type=oneshot' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo 'ExecStart=/usr/bin/systemctl enable --now qemu-guest-agent.service' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo 'RemainAfterExit=yes' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo '' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo '[Install]' >> /etc/systemd/system/enable-qemu-guest-agent.service
+              - echo 'WantedBy=multi-user.target' >> /etc/systemd/system/enable-qemu-guest-agent.service
               - mkdir -p /etc/systemd/system/qemu-guest-agent.service.d
-              - |
-                cat <<'EOF' > /etc/systemd/system/qemu-guest-agent.service.d/override.conf
-                [Unit]
-                Requires=
-                After=
-                EOF
+              - echo '[Unit]' > /etc/systemd/system/qemu-guest-agent.service.d/override.conf
+              - echo 'Requires=' >> /etc/systemd/system/qemu-guest-agent.service.d/override.conf
+              - echo 'After=' >> /etc/systemd/system/qemu-guest-agent.service.d/override.conf
               - systemctl enable enable-qemu-guest-agent.service
               - reboot
           meta_data: |
