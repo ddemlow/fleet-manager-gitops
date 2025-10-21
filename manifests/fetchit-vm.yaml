@@ -73,9 +73,12 @@ spec:
               - mkdir -p /var/www/nginx
               - echo "<h1>Nginx Demo</h1><p>This is served by the nginx-demo container!</p>" > /var/www/nginx/index.html
               
-              # Create FetchIt config file
+              # Create FetchIt bootstrap config - authoritative config loaded via configReload
               - |
                 cat <<'EOF' > /opt/fetchit/config.yaml
+                configReload:
+                  schedule: "*/5 * * * *"
+                  configUrl: https://raw.githubusercontent.com/ddemlow/fleet-manager-gitops/master/fetchit/fetchit-config.yaml
                 targetConfigs:
                 - url: https://github.com/ddemlow/fleet-manager-gitops
                   branch: master
