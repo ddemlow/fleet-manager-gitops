@@ -4,7 +4,7 @@ metadata:
   name: demo-web
 spec:
   containers:
-  - name: demo-web
+  - name: demo-container
     image: registry.k8s.io/nginx-slim:0.9
     ports:
     - containerPort: 80

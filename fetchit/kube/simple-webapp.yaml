@@ -4,7 +4,7 @@ metadata:
   name: simple-webapp
 spec:
   containers:
-  - name: simple-webapp
+  - name: webapp-container
     image: docker.io/mmumshad/simple-webapp-color:latest
     ports:
     - containerPort: 8080
