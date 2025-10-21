@@ -1,0 +1,16 @@
+[Unit]
+Description=Demo Web App Container
+After=network.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/podman run --rm --name demo-web \
+  -p 8080:80 \
+  -v /var/www/demo:/usr/share/nginx/html:ro \
+  registry.k8s.io/nginx-slim:0.9
+ExecStop=/usr/bin/podman stop demo-web
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

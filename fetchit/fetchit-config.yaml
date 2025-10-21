@@ -10,9 +10,10 @@ targetConfigs:
 - url: https://github.com/ddemlow/fleet-manager-gitops
   branch: master
   systemd:
-  - name: quadlet-services
+  - name: demo-services
     targetPath: fetchit/systemd
-    destinationDirectory: /etc/containers/systemd
+    root: true
+    enable: true
     schedule: "*/2 * * * *"
 global:
   logLevel: info
