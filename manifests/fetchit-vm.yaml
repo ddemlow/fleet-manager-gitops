@@ -107,8 +107,7 @@ spec:
               # Ensure user is in the right groups for container access
               - usermod -a -G wheel,root user || true
               
-              # Enable and start podman socket for system-wide access
-              - systemctl enable podman.socket
+              # Start podman socket for system-wide access
               - systemctl start podman.socket
               
               # Reload systemd and trigger quadlet generation
