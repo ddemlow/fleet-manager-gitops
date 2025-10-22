@@ -146,10 +146,6 @@ spec:
               - mkdir -p /var/www/demo
               - chmod -R 755 /var/www
               - chown -R root:root /var/www
-              - chmod -R 644 /var/www/demo/
-              - chmod -R 644 /var/www/nginx/
-              - chown -R 101:101 /var/www/demo/
-              - chown -R 101:101 /var/www/nginx/
               
               # Restart containers to pick up new content
               - sleep 10
@@ -212,7 +208,7 @@ spec:
                 Description=FetchIt GitOps Container Manager
                 After=network.target podman.socket
                 Requires=podman.socket
-
+                
                 [Service]
                 Type=simple
                 ExecStart=/usr/bin/podman run --rm --name fetchit -v /opt/fetchit:/opt/mount:rw -v /var/lib/containers:/var/lib/containers:rw -v /run/podman/podman.sock:/run/podman/podman.sock:ro -v /etc/systemd/system:/etc/systemd/system:rw -e SYSTEMD_USER=false --security-opt label=disable quay.io/fetchit/fetchit:latest
@@ -220,7 +216,7 @@ spec:
                 RestartSec=10
                 User=root
                 Group=root
-
+                
                 [Install]
                 WantedBy=multi-user.target
                 EOF

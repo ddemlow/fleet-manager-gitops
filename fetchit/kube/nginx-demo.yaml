@@ -13,6 +13,11 @@ spec:
     - name: nginx-content
       mountPath: /usr/share/nginx/html
       readOnly: true
+    securityContext:
+      runAsUser: 0
+      runAsGroup: 0
+    command: ["/bin/sh"]
+    args: ["-c", "nginx -g 'daemon off;'"]
     livenessProbe:
       httpGet:
         path: /
