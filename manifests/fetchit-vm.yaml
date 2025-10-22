@@ -144,6 +144,17 @@ spec:
                 </html>
                 EOF
               - mkdir -p /var/www/demo
+              - chmod -R 755 /var/www
+              - chown -R root:root /var/www
+              - chmod -R 644 /var/www/demo/
+              - chmod -R 644 /var/www/nginx/
+              - chown -R 101:101 /var/www/demo/
+              - chown -R 101:101 /var/www/nginx/
+              
+              # Restart containers to pick up new content
+              - sleep 10
+              - podman restart demo-web-demo-container || true
+              - podman restart nginx-demo-nginx-container || true
               - |
                 cat <<'EOF' > /var/www/demo/index.html
                 <!DOCTYPE html>
