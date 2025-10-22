@@ -13,6 +13,18 @@ spec:
     - name: nginx-content
       mountPath: /usr/share/nginx/html
       readOnly: true
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 3
   volumes:
   - name: nginx-content
     hostPath:
