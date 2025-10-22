@@ -11,7 +11,7 @@ spec:
       hostPort: 9090
     env:
     - name: APP_COLOR
-      value: "blue"
+      value: "green"
     - name: APP_NAME
       value: "GitOps Demo App"
   restartPolicy: Always
