@@ -17,7 +17,7 @@ spec:
       format: raw
       # Replace with a valid Debian 12/13 cloud image in raw format accessible to the hypervisor
       # Example (placeholder): https://your-storage.example.com/images/debian-12-cloud-amd64.raw
-      url: "https://cdimage.debian.org/images/cloud/trixie/latest/debian-13-nocloud-amd64.raw"
+      url: "https://cdimage.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-amd64.raw"
 
   resources:
     - name: openmediavault-debian
@@ -27,6 +27,9 @@ spec:
         cpu: 2
         memory: "4294967296"  # 4GiB
         machine_type: bios
+        tags:
+          - kraken
+          - SERIAL
         storage_devices:
           - name: rootdisk
             type: virtio_disk
@@ -41,16 +44,15 @@ spec:
           user_data: |
             #cloud-config
             ssh_pwauth: true
+            ssh_import_id: ["gh:ddemlow"]
             users:
               - name: admin
                 gecos: OMV Admin
-                primary_group: admin
                 groups: ["sudo"]
                 shell: /bin/bash
                 sudo: "ALL=(ALL) NOPASSWD:ALL"
                 lock_passwd: false
-                ssh_authorized_keys:
-                  - github:daveddemlow
+                # ssh_authorized_keys: []  # Keys imported via ssh_import_id
             chpasswd:
               list: |
                 admin:changeme
@@ -61,7 +63,14 @@ spec:
               - gnupg
               - systemd-resolved
 
+            bootcmd:
+              - echo OMV-BOOT > /boot/omv-cloud-init.txt
+
             write_files:
+              - path: /etc/cloud/cloud.cfg.d/99-datasource.cfg
+                permissions: "0644"
+                content: |
+                  datasource_list: [ NoCloud, ConfigDrive ]
               - path: /etc/apt/sources.list.d/openmediavault.list
                 permissions: "0644"
                 content: |
@@ -72,6 +81,11 @@ spec:
               - systemctl enable systemd-resolved
               - systemctl start systemd-resolved
               - resolvectl dns eth0 1.1.1.1
+
+              # Install and enable qemu-guest-agent for IP/reporting to host
+              - apt-get update || true
+              - apt-get install -y qemu-guest-agent || true
+              - systemctl enable --now qemu-guest-agent || true
 
               # Install OMV keyring
               - bash -lc 'wget --quiet --output-document=- https://packages.openmediavault.org/public/archive.key | gpg --dearmor --yes --output /usr/share/keyrings/openmediavault-archive-keyring.gpg'
