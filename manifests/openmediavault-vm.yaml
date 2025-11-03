@@ -53,16 +53,19 @@ spec:
                 sudo: ["ALL=(ALL) NOPASSWD:ALL"]
                 lock_passwd: false
             chpasswd:
-              list: |
-                admin:changeme
+              users:
+                - admin:changeme
               expire: false
             runcmd:
               - apt-get update
               - apt-get install -y gnupg curl ca-certificates
+              - DEBIAN_FRONTEND=noninteractive apt-get install -y qemu-guest-agent
+              - systemctl enable --now qemu-guest-agent
               - curl -fsSL https://packages.openmediavault.org/public/archive.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/openmediavault.gpg
-              - sh -c 'echo "deb [signed-by=/etc/apt/trusted.gpg.d/openmediavault.gpg] https://packages.openmediavault.org/public shaitan main" > /etc/apt/sources.list.d/openmediavault.list'
+              - sh -c 'echo "deb [signed-by=/etc/apt/trusted.gpg.d/openmediavault.gpg] https://packages.openmediavault.org/public sandworm main" > /etc/apt/sources.list.d/openmediavault.list'
               - apt-get update
-              - DEBIAN_FRONTEND=noninteractive apt-get install -y openmediavault
+              - DEBIAN_FRONTEND=noninteractive apt-get install -y openmediavault-keyring
+              - DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openmediavault
               - omv-confdbadm populate
 
           meta_data: |
