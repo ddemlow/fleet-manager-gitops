@@ -52,13 +52,28 @@ spec:
                 shell: /bin/bash
                 sudo: ["ALL=(ALL) NOPASSWD:ALL"]
                 lock_passwd: false
+                ssh_import_id: ["gh:ddemlow"]
+              - name: user
+                gecos: Standard User
+                groups: ["sudo"]
+                shell: /bin/bash
+                lock_passwd: false
             chpasswd:
               users:
                 - admin:changeme
+                - user:changeme
               expire: false
+            write_files:
+              - path: /etc/ssh/sshd_config.d/99-allow-passwords.conf
+                owner: root:root
+                permissions: '0644'
+                content: |
+                  PasswordAuthentication yes
+                  KbdInteractiveAuthentication yes
             runcmd:
               - apt-get update
               - apt-get install -y gnupg curl ca-certificates
+              - systemctl reload ssh || systemctl reload sshd || true
               - DEBIAN_FRONTEND=noninteractive apt-get install -y qemu-guest-agent
               - systemctl enable --now qemu-guest-agent
               - curl -fsSL https://packages.openmediavault.org/public/archive.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/openmediavault.gpg
