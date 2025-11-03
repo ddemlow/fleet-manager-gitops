@@ -60,8 +60,10 @@ spec:
                 lock_passwd: false
             chpasswd:
               users:
-                - admin:changeme
-                - user:changeme
+                - name: admin
+                  password: changeme
+                - name: user
+                  password: changeme
               expire: false
             write_files:
               - path: /etc/ssh/sshd_config.d/99-allow-passwords.conf
