@@ -1,7 +1,7 @@
 version: "1"
 type: "Application"
 metadata:
-  name: "openmediavault-debian-vm"
+  name: "simple-debian-vm"
   description: "Debian VM that installs and configures OpenMediaVault via cloud-init"
   clusterGroups:
     - dd_szt15b
@@ -50,13 +50,20 @@ spec:
                 gecos: OMV Admin
                 groups: ["sudo"]
                 shell: /bin/bash
-                sudo: "ALL=(ALL) NOPASSWD:ALL"
+                sudo: ["ALL=(ALL) NOPASSWD:ALL"]
                 lock_passwd: false
-                # ssh_authorized_keys: []  # Keys imported via ssh_import_id
             chpasswd:
               list: |
                 admin:changeme
               expire: false
+            runcmd:
+              - apt-get update
+              - apt-get install -y gnupg curl ca-certificates
+              - curl -fsSL https://packages.openmediavault.org/public/archive.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/openmediavault.gpg
+              - sh -c 'echo "deb [signed-by=/etc/apt/trusted.gpg.d/openmediavault.gpg] https://packages.openmediavault.org/public shaitan main" > /etc/apt/sources.list.d/openmediavault.list'
+              - apt-get update
+              - DEBIAN_FRONTEND=noninteractive apt-get install -y openmediavault
+              - omv-confdbadm populate
 
           meta_data: |
             dsmode: local
