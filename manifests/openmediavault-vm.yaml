@@ -58,51 +58,6 @@ spec:
                 admin:changeme
               expire: false
 
-            package_update: true
-            packages:
-              - gnupg
-              - systemd-resolved
-
-            bootcmd:
-              - echo OMV-BOOT > /boot/omv-cloud-init.txt
-
-            write_files:
-              - path: /etc/cloud/cloud.cfg.d/99-datasource.cfg
-                permissions: "0644"
-                content: |
-                  datasource_list: [ NoCloud, ConfigDrive ]
-              - path: /etc/apt/sources.list.d/openmediavault.list
-                permissions: "0644"
-                content: |
-                  deb [signed-by=/usr/share/keyrings/openmediavault-archive-keyring.gpg] https://packages.openmediavault.org/public sandworm main
-
-            runcmd:
-              # Ensure systemd-resolved is enabled and set a temporary DNS for initial install (per docs)
-              - systemctl enable systemd-resolved
-              - systemctl start systemd-resolved
-              - resolvectl dns eth0 1.1.1.1
-
-              # Install and enable qemu-guest-agent for IP/reporting to host
-              - apt-get update || true
-              - apt-get install -y qemu-guest-agent || true
-              - systemctl enable --now qemu-guest-agent || true
-
-              # Install OMV keyring
-              - bash -lc 'wget --quiet --output-document=- https://packages.openmediavault.org/public/archive.key | gpg --dearmor --yes --output /usr/share/keyrings/openmediavault-archive-keyring.gpg'
-
-              # Install OpenMediaVault (per https://docs.openmediavault.org/en/stable/installation/on_debian.html)
-              - bash -lc 'export LANG=C.UTF-8 DEBIAN_FRONTEND=noninteractive APT_LISTCHANGES_FRONTEND=none; apt-get update'
-              - bash -lc 'apt-get --yes --auto-remove --show-upgraded --allow-downgrades --allow-change-held-packages --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold install openmediavault'
-
-              # Populate OMV config and redeploy network via systemd-networkd (will adjust networking under OMV control)
-              - bash -lc 'omv-confdbadm populate || true'
-              - bash -lc 'omv-salt deploy run systemd-networkd || true'
-
-              # Optional: allow root SSH temporarily as fallback; comment these if undesired
-              - bash -lc "sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart ssh || true"
-
-              # Note: After OMV takes over networking, the VM IP may change; access OMV Web UI on port 80.
-
           meta_data: |
             dsmode: local
             instance-id: "openmediavault-debian"
