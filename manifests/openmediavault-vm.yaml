@@ -5,7 +5,7 @@ metadata:
   description: "Debian VM that installs and configures OpenMediaVault via cloud-init"
   clusterGroups:
     - dd_szt15b
-  lifecycle: draft
+  lifecycle: production
   labels:
     - storage
     - omv
