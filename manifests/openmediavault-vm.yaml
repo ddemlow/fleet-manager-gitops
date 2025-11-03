@@ -17,7 +17,7 @@ spec:
       format: raw
       # Replace with a valid Debian 12/13 cloud image in raw format accessible to the hypervisor
       # Example (placeholder): https://your-storage.example.com/images/debian-12-cloud-amd64.raw
-      url: "https://cdimage.debian.org/images/cloud/bookworm/latest/debian-12-nocloud-amd64.raw"
+      url: "https://cdimage.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.raw"
 
   resources:
     - name: openmediavault-debian
