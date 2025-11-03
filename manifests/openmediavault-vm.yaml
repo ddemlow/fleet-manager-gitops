@@ -1,7 +1,7 @@
 version: "1"
 type: "Application"
 metadata:
-  name: "simple-debian-vm"
+  name: "simple-debian-vm-generic"
   description: "Debian VM that installs and configures OpenMediaVault via cloud-init"
   clusterGroups:
     - dd_szt15b
