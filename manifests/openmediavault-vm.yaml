@@ -1,0 +1,92 @@
+version: "1"
+type: "Application"
+metadata:
+  name: "openmediavault-debian-vm"
+  description: "Debian VM that installs and configures OpenMediaVault via cloud-init"
+  clusterGroups:
+    - dd_szt15b
+  lifecycle: draft
+  labels:
+    - storage
+    - omv
+
+spec:
+  assets:
+    - name: debian-base-disk
+      type: virtual_disk
+      format: raw
+      # Replace with a valid Debian 12/13 cloud image in raw format accessible to the hypervisor
+      # Example (placeholder): https://your-storage.example.com/images/debian-12-cloud-amd64.raw
+      url: "https://cdimage.debian.org/images/cloud/trixie/latest/debian-13-nocloud-amd64.raw"
+
+  resources:
+    - name: openmediavault-debian
+      type: virdomain
+      spec:
+        description: "OMV on Debian installed using cloud-init runcmd per official docs"
+        cpu: 2
+        memory: "4294967296"  # 4GiB
+        machine_type: bios
+        storage_devices:
+          - name: rootdisk
+            type: virtio_disk
+            source: debian-base-disk
+            boot: 1
+            capacity: 53687091200  # 50GiB
+        network_devices:
+          - name: eth0
+            type: virtio
+        state: running
+        cloud_init_data:
+          user_data: |
+            #cloud-config
+            ssh_pwauth: true
+            users:
+              - name: admin
+                gecos: OMV Admin
+                primary_group: admin
+                groups: ["sudo"]
+                shell: /bin/bash
+                sudo: "ALL=(ALL) NOPASSWD:ALL"
+                lock_passwd: false
+                ssh_authorized_keys:
+                  - github:daveddemlow
+            chpasswd:
+              list: |
+                admin:changeme
+              expire: false
+
+            package_update: true
+            packages:
+              - gnupg
+              - systemd-resolved
+
+            write_files:
+              - path: /etc/apt/sources.list.d/openmediavault.list
+                permissions: "0644"
+                content: |
+                  deb [signed-by=/usr/share/keyrings/openmediavault-archive-keyring.gpg] https://packages.openmediavault.org/public sandworm main
+
+            runcmd:
+              # Ensure systemd-resolved is enabled and set a temporary DNS for initial install (per docs)
+              - [ bash, -lc, "systemctl enable systemd-resolved" ]
+              - [ bash, -lc, "systemctl start systemd-resolved" ]
+              - [ bash, -lc, "resolvectl dns eth0 1.1.1.1" ]
+
+              # Install OMV keyring
+              - [ bash, -lc, "wget --quiet --output-document=- https://packages.openmediavault.org/public/archive.key | gpg --dearmor --yes --output /usr/share/keyrings/openmediavault-archive-keyring.gpg" ]
+
+              # Install OpenMediaVault (per https://docs.openmediavault.org/en/stable/installation/on_debian.html)
+              - [ bash, -lc, "export LANG=C.UTF-8 DEBIAN_FRONTEND=noninteractive APT_LISTCHANGES_FRONTEND=none; apt-get update" ]
+              - [ bash, -lc, "apt-get --yes --auto-remove --show-upgraded --allow-downgrades --allow-change-held-packages --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold install openmediavault" ]
+
+              # Populate OMV config and redeploy network via systemd-networkd (will adjust networking under OMV control)
+              - [ bash, -lc, "omv-confdbadm populate || true" ]
+              - [ bash, -lc, "omv-salt deploy run systemd-networkd || true" ]
+
+              # Optional: allow root SSH temporarily as fallback; comment these if undesired
+              - [ bash, -lc, "sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart ssh || true" ]
+
+              # Note: After OMV takes over networking, the VM IP may change; access OMV Web UI on port 80.
+
+
