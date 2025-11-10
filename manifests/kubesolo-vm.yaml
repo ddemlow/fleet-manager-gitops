@@ -1,0 +1,119 @@
+type: Application
+version: "1"
+metadata:
+  name: kubesolo-debian
+  description: "Single-node Kubernetes via Portainer KubeSolo (k3s-based)"
+  lifecycle: production
+  clusterGroups:
+    - dd_szt15b
+  testClusterGroup: dd_szt15b
+  labels:
+    - kubernetes
+    - kubesolo
+
+spec:
+  assets:
+    - name: debian_bookworm
+      type: virtual_disk
+      format: raw
+      url: "https://cdimage.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.raw"
+
+  resources:
+    - type: virdomain
+      name: "kubesolo-{{clusterName}}"
+      spec:
+        description: "KubeSolo single-node cluster for {{clusterName}} ({{clusterId}})"
+        cpu: 4
+        memory: "4294967296"  # 4GiB
+        machine_type: bios
+        storage_devices:
+          - name: bootdisk
+            type: virtio_disk
+            source: debian_bookworm
+            boot: 1
+            capacity: 42949672960  # 40GiB
+        network_devices:
+          - name: eth0
+            type: virtio
+        tags:
+          - kubesolo
+          - kubernetes
+          - SERIAL
+        state: running
+        cloud_init_data:
+          user_data: |
+            #cloud-config
+            # Baseline auth
+            chpasswd:
+              list: |
+                root:password
+                user:password
+              expire: false
+
+            ssh_pwauth: true
+            disable_root: false
+
+            ssh_authorized_keys:
+              - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+
+            users:
+              - name: user
+                groups: [wheel]
+                sudo: ALL=(ALL) NOPASSWD:ALL
+                shell: /bin/bash
+                ssh_authorized_keys:
+                  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDihWWhjoPj8KVLtdLDwNJQ71zi9An0iUFjefRWu2Eju ddemlow@scalecomputing.com
+
+            packages:
+              - qemu-guest-agent
+              - curl
+              - jq
+              - apt-transport-https
+              - ca-certificates
+              - gnupg
+              - git
+
+            runcmd:
+              - systemctl restart --no-block qemu-guest-agent
+              - |
+                echo "[kubesolo] installing kubectl"
+                install -d -m 0755 /etc/apt/keyrings
+                curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+                chmod 0644 /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+                echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /" > /etc/apt/sources.list.d/kubernetes.list
+                apt-get update
+                DEBIAN_FRONTEND=noninteractive apt-get install -y kubectl
+              - |
+                echo "[kubesolo] installing via official installer"
+                curl -sfL https://get.kubesolo.io | sudo sh -
+              - |
+                echo "[kubesolo] waiting for api to be ready"
+                until kubectl --kubeconfig /var/lib/kubesolo/pki/admin/admin.kubeconfig get nodes >/tmp/kubesolo-nodes 2>&1; do
+                  sleep 10
+                done
+                install -d -m 0750 /home/user/.kube
+                cp /var/lib/kubesolo/pki/admin/admin.kubeconfig /home/user/.kube/config
+                chown -R user:user /home/user/.kube
+                chmod 0600 /home/user/.kube/config
+              - |
+                echo "[kubesolo] deploying microservices-demo"
+                export KUBECONFIG=/home/user/.kube/config
+                kubectl create namespace demo2 --dry-run=client -o yaml | kubectl apply -f -
+                rm -rf /tmp/microservices-demo
+                git clone https://github.com/GoogleCloudPlatform/microservices-demo /tmp/microservices-demo
+                kubectl -n demo2 apply -f /tmp/microservices-demo/release/kubernetes-manifests.yaml
+                kubectl -n demo2 get pods
+                kubectl -n demo2 get svc frontend-external
+              - cat /tmp/kubesolo-nodes
+
+            write_files:
+              - path: /etc/profile.d/kubesolo.sh
+                permissions: "0644"
+                owner: root:root
+                content: |
+                  # Helpful env to access kubesolo kubeconfig
+                  export KUBECONFIG=/home/user/.kube/config
+          meta_data: |
+            dsmode: local
+            local-hostname: "kubesolo-{{clusterName}}"
+
