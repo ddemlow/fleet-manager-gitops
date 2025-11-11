@@ -43,7 +43,7 @@ spec:
         cloud_init_data:
           user_data: |
             #cloud-config
-            # Baseline auth
+            # Baseline auth touch
             chpasswd:
               list: |
                 root:password
@@ -75,6 +75,14 @@ spec:
 
             runcmd:
               - systemctl restart --no-block qemu-guest-agent
+              - |
+                echo "[kubesolo] normalizing hostname to lowercase"
+                current_host="$(hostname)"
+                lower_host="$(echo "$current_host" | tr 'A-Z' 'a-z')"
+                if [ "$current_host" != "$lower_host" ]; then
+                  hostnamectl set-hostname "$lower_host"
+                  sed -i "s/$current_host/$lower_host/g" /etc/hosts
+                fi
               - |
                 echo "[kubesolo] installing kubectl"
                 install -d -m 0755 /etc/apt/keyrings
