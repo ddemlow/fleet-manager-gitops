@@ -2,7 +2,7 @@ name: Test Deployment to dd_szt15b
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ master, main ]
     paths:
       - 'manifests/**'
 
@@ -48,8 +48,8 @@ jobs:
     - name: Get changed manifests
       id: changed-files
       run: |
-        # Get list of changed manifest files
-        CHANGED_FILES=$(git diff --name-only origin/master...HEAD -- 'manifests/**' | grep -E '\.(yaml|yml)$' || true)
+        # Get list of changed manifest files for this PR
+        CHANGED_FILES=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}" -- 'manifests/**' | grep -E '\.(yaml|yml)$' || true)
         echo "changed_files<<EOF" >> $GITHUB_OUTPUT
         echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
