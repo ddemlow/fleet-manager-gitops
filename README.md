@@ -47,10 +47,9 @@ fleet-manager-gitops/
 ```bash
 git clone <your-new-repo-url>
 cd <your-repo-name>
-# Copy the gitops/ contents to your repo
 git add .
 git commit -m "Initial GitOps setup"
-git push origin main
+git push origin <default-branch>  # usually master or main
 ```
 
 ### **Step 2: Configure GitHub Secrets**
@@ -236,7 +235,7 @@ vim manifests/my-new-app.yaml
 # Commit and push
 git add manifests/my-new-app.yaml
 git commit -m "Add my-new-app deployment"
-git push origin main
+git push origin <default-branch>  # usually master or main
 ```
 
 ### **2. Update Existing Application:**
@@ -246,14 +245,14 @@ vim manifests/nginx-deployment.yaml
 # Commit and push
 git add manifests/nginx-deployment.yaml
 git commit -m "Update nginx configuration"
-git push origin main
+git push origin <default-branch>  # usually master or main
 ```
 
 ### **3. Rollback Changes:**
 ```bash
 # Revert to previous version
 git revert <commit-hash>
-git push origin main
+git push origin <default-branch>  # usually master or main
 ```
 
 ## 🎯 **Deployment Controls**
@@ -282,10 +281,12 @@ python scripts/deploy.py --only-compile
 ```
 
 ### **GitHub Actions Integration:**
-Use the enhanced workflow (`.github/workflows/enhanced-deploy.yml`) with manual dispatch options:
-- Target specific applications
-- Skip deployment triggers
-- Only compile mode
+This repository ships the following workflows:
+- `validate-manifests.yml` (PR validation)
+- `test-deployment.yml` (PR test deployment)
+- `production-deployment.yml` (push-to-default-branch production deployment)
+
+If you want “manual dispatch” knobs (target apps, skip triggers, only compile), you can run the scripts locally or add a `workflow_dispatch` trigger and wire the inputs to environment variables.
 
 ### **Environment Variables:**
 Set these in your GitHub Actions secrets or local environment:
@@ -435,7 +436,7 @@ For detailed information, see **[LIFECYCLE_MANAGEMENT.md](LIFECYCLE_MANAGEMENT.m
 ### **Debug Commands:**
 ```bash
 # Test Fleet Manager API connectivity
-curl -H "Authorization: Bearer your-api-key" https://api.scalecomputing.com/api/v2/clusters
+curl -H "api-key: $SC_FM_APIKEY" https://api.scalecomputing.com/api/v2/clusters
 
 # Validate manifests locally
 python scripts/validate-manifests.py
@@ -535,12 +536,12 @@ Notes:
 
 ### **Environment-Specific Deployments:**
 Create different branches for different environments:
-- `main` → Production
+- `<default-branch>` (usually `master` or `main`) → Production
 - `develop` → Development
 - `staging` → Staging
 
 ### **Conditional Deployments:**
-Modify `.github/workflows/deploy.yml` to add conditions:
+Modify `.github/workflows/production-deployment.yml` to add conditions:
 ```yaml
 if: github.ref == 'refs/heads/main'
 ```

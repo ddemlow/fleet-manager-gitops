@@ -7,21 +7,17 @@ A complete GitOps workflow that automatically deploys Fleet Manager applications
 ## 🗂️ **File Structure**
 
 ```
-gitops/
+fleet-manager-gitops/
 ├── .github/workflows/
-│   └── deploy.yml                 # GitHub Actions workflow
-├── manifests/                     # Application manifests
-│   ├── example-vm.yaml           # Simple VM example
-│   └── nginx-deployment.yaml     # Nginx web server
-├── scripts/
-│   ├── deploy.py                 # Main deployment script
-│   └── validate-manifests.py     # Manifest validation
-├── .gitignore                    # Git ignore file
-├── requirements.txt              # Python dependencies
-├── README.md                     # Main documentation
-├── SETUP.md                      # Detailed setup guide
-├── QUICKSTART.md                 # 5-minute quick start
-└── DEPLOYMENT_SUMMARY.md         # This file
+│   ├── validate-manifests.yml        # PR manifest validation
+│   ├── test-deployment.yml           # PR test deployment
+│   ├── production-deployment.yml     # Push-to-default-branch production deployment
+│   ├── security-scan.yml             # PR security scan (Trivy + Trufflehog)
+│   └── notify-deployment.yml         # Example notification hook
+├── manifests/                        # Application manifests
+├── scripts/                          # Deployment/validation utilities
+├── requirements.txt                  # Python dependencies
+└── README.md                         # Main documentation
 ```
 
 ## 🚀 **How It Works**
@@ -53,7 +49,7 @@ gitops/
 # Create new GitHub repository
 git clone https://github.com/yourusername/your-repo.git
 cd your-repo
-# Copy gitops/ contents to your repo
+# Copy this repository contents (or fork/template it in GitHub)
 ```
 
 ### **Step 2: Configure Secrets**
@@ -68,7 +64,7 @@ In GitHub: **Settings** → **Secrets and variables** → **Actions**
 echo "# Test" >> manifests/example-vm.yaml
 git add .
 git commit -m "Test deployment"
-git push origin main
+git push origin <default-branch>  # usually master or main
 ```
 
 ### **Step 4: Verify Results**
@@ -151,7 +147,7 @@ on:
 Edit `scripts/validate-manifests.py` to add custom validation logic.
 
 ### **Conditional Deployments**
-Modify `.github/workflows/deploy.yml` to add conditions:
+Modify the workflow triggers (for example in `.github/workflows/production-deployment.yml`) to add conditions:
 ```yaml
 if: github.ref == 'refs/heads/main'
 ```

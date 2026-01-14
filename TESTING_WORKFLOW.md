@@ -11,7 +11,7 @@ graph TD
     C --> D{Tests Pass?}
     D -->|Yes| E[Approve PR]
     D -->|No| F[Request Changes]
-    E --> G[Merge to Master]
+    E --> G[Merge to Default Branch]
     F --> H[Fix Issues]
     H --> B
     G --> I[Production Deployment]
@@ -39,7 +39,7 @@ graph TD
 - ❌ **Request Changes**: If tests fail or issues are found
 
 ### 5. **Production Deployment**
-- Once PR is merged to `master`, production deployment happens automatically
+- Once the PR is merged to the default branch (`master` or `main`), production deployment happens automatically
 - Changes are deployed to all production cluster groups
 
 ## 🎯 Test Cluster Group

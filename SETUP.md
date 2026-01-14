@@ -20,18 +20,12 @@ This guide walks you through setting up a complete GitOps workflow for Fleet Man
 ### **Step 2: Clone and Setup Repository**
 
 ```bash
-# Clone your new repository
+# Recommended: fork (or template) this repository and clone it.
 git clone https://github.com/yourusername/fleet-manager-gitops.git
 cd fleet-manager-gitops
 
-# Create the directory structure
-mkdir -p .github/workflows
-mkdir -p manifests
-mkdir -p applications
-mkdir -p scripts
-
-# Copy the files from this gitops/ directory to your repo
-# (You'll need to copy the files manually)
+# If you are building your own repo from scratch, copy the contents of this
+# repository into it (workflows, scripts, manifests, and docs).
 ```
 
 ### **Step 3: Configure GitHub Secrets**
@@ -65,7 +59,7 @@ mkdir -p scripts
    ```bash
    git add .
    git commit -m "Test GitOps deployment"
-   git push origin main
+   git push origin <default-branch>  # usually master or main
    ```
 
 3. **Check GitHub Actions**:
@@ -101,12 +95,12 @@ If you're using a custom Fleet Manager instance:
 
 ### **Custom Deployment Triggers**
 
-Modify `.github/workflows/deploy.yml` to change when deployments happen:
+Modify the workflow triggers to change when deployments happen:
 
 ```yaml
 on:
   push:
-    branches: [ main, develop ]  # Deploy on these branches
+    branches: [ master, main, develop ]  # Deploy on these branches
     paths:
       - 'manifests/**'           # Only when manifests change
       # paths under manifests trigger the workflow
@@ -155,7 +149,7 @@ on:
    ```bash
    git add manifests/test-app.yaml
    git commit -m "Add test application"
-   git push origin main
+   git push origin <default-branch>  # usually master or main
    ```
 
 3. **Check the results**:
@@ -174,7 +168,7 @@ on:
    ```bash
    git add manifests/test-app.yaml
    git commit -m "Update test application"
-   git push origin main
+   git push origin <default-branch>  # usually master or main
    ```
 
 3. **Verify the update**:
@@ -194,7 +188,7 @@ on:
    ```bash
    git add manifests/invalid-app.yaml
    git commit -m "Add invalid manifest"
-   git push origin main
+   git push origin <default-branch>  # usually master or main
    ```
 
 3. **Check the error handling**:

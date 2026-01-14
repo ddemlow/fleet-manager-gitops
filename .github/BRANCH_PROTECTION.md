@@ -2,9 +2,9 @@
 
 ## **Recommended GitHub Repository Settings**
 
-### **Master Branch Protection**
+### **Default Branch Protection (master/main)**
 1. Go to **Settings** → **Branches** → **Add rule**
-2. **Branch name pattern**: `master`
+2. **Branch name pattern**: `master` (or `main`, depending on your default branch)
 3. **Protect matching branches**: ✅
 
 #### **Required Settings:**
@@ -42,7 +42,7 @@
 ## **Benefits of Branch Protection**
 
 ### **Safety**
-- **Prevents direct pushes** to master branch
+- **Prevents direct pushes** to the default branch
 - **Requires code review** before merging
 - **Ensures tests pass** before deployment
 - **Prevents force pushes** that could break history
@@ -64,7 +64,7 @@
 1. **Navigate to repository settings**
 2. **Go to Branches section**
 3. **Add protection rules** as described above
-4. **Test the protection** by trying to push directly to master
+4. **Test the protection** by trying to push directly to the default branch
 5. **Verify PR workflow** requires checks to pass
 
 ## **Team Workflow**
