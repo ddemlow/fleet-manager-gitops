@@ -1,2 +1,5 @@
 manifests/_compiled/
 
+# Local/CI artifacts
+action.log
+
