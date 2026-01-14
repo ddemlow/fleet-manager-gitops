@@ -8,16 +8,10 @@ import os
 import sys
 import yaml
 import glob
-from pathlib import Path
 from typing import Dict, List, Any
 
 class ManifestValidator:
     def __init__(self):
-        self.required_fields = {
-            'metadata': ['name'],
-            'spec': ['assets']
-        }
-        
         self.valid_asset_types = [
             'virtual_disk',
             'virtual_machine',
@@ -112,8 +106,7 @@ class ManifestValidator:
         
         # Find all manifest files
         manifest_files = []
-        for pattern in ['manifests/**/*.yaml', 'manifests/**/*.yml', 
-                       'applications/**/*.yaml', 'applications/**/*.yml']:
+        for pattern in ['manifests/**/*.yaml', 'manifests/**/*.yml']:
             manifest_files.extend(glob.glob(pattern, recursive=True))
         
         if not manifest_files:

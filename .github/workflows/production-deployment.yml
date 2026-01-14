@@ -2,7 +2,7 @@ name: Production Deployment
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, main ]
     paths:
       - 'manifests/**'
 
@@ -48,7 +48,7 @@ jobs:
       id: changed-files
       run: |
         # Get list of changed manifest files from the push
-        CHANGED_FILES=$(git diff --name-only HEAD~1...HEAD -- 'manifests/**' | grep -E '\.(yaml|yml)$' || true)
+        CHANGED_FILES=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- 'manifests/**' | grep -E '\.(yaml|yml)$' || true)
         echo "changed_files<<EOF" >> $GITHUB_OUTPUT
         echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT

@@ -937,8 +937,6 @@ class FleetManagerGitOps:
                 all_ok = all_ok and released
 
         return all_ok
-        
-        return False
 
     def run(self):
         """Main deployment process with enhanced controls"""

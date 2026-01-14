@@ -4,26 +4,19 @@ Get your Fleet Manager GitOps workflow running in 5 minutes!
 
 ## ⚡ **5-Minute Setup**
 
-### **1. Create GitHub Repository**
+### **1. Create (or fork) a GitHub repository**
 ```bash
-# Create a new repository on GitHub
-# Clone it locally
-git clone https://github.com/yourusername/your-repo.git
-cd your-repo
+# Option A: use this repo as a template / fork it in GitHub, then clone
+git clone https://github.com/yourusername/fleet-manager-gitops.git
+cd fleet-manager-gitops
 ```
 
-### **2. Copy GitOps Files**
-```bash
-# Copy all files from the gitops/ directory to your repo
-# (You'll need to copy manually from this repository)
-```
-
-### **3. Set GitHub Secrets**
+### **2. Set GitHub Secrets**
 Go to **Settings** → **Secrets and variables** → **Actions** and add:
 
 - **`SC_FM_APIKEY`**: Your Fleet Manager API key
 
-### **4. Test Deployment**
+### **3. Test a deployment**
 ```bash
 # Make a small change to a manifest
 echo "# Test comment" >> manifests/example-vm.yaml
@@ -31,10 +24,10 @@ echo "# Test comment" >> manifests/example-vm.yaml
 # Commit and push
 git add .
 git commit -m "Test GitOps deployment"
-git push origin main
+git push origin <default-branch>  # usually master or main
 ```
 
-### **5. Check Results**
+### **4. Check Results**
 - Go to **Actions** tab in GitHub
 - Check Fleet Manager for new applications
 - 🎉 **You're done!**
@@ -42,13 +35,15 @@ git push origin main
 ## 📁 **Repository Structure**
 
 ```
-your-repo/
-├── .github/workflows/deploy.yml    # GitHub Actions workflow
-├── manifests/                      # Your application manifests
+fleet-manager-gitops/
+├── .github/workflows/
+│   ├── validate-manifests.yml      # PR manifest validation
+│   ├── test-deployment.yml         # PR test deployment
+│   ├── production-deployment.yml   # Push-to-default-branch production deployment
+│   └── security-scan.yml           # PR security scan (Trivy + Trufflehog)
+├── manifests/                      # Application manifests
 │   ├── example-vm.yaml
 │   └── nginx-deployment.yaml
-├── manifests/                      # Application definitions (YAML)
-│   └── k3s-cluster.yaml
 ├── scripts/                        # Deployment scripts
 │   ├── deploy.py
 │   └── validate-manifests.py
@@ -85,7 +80,7 @@ your-repo/
    ```bash
    git add manifests/my-app.yaml
    git commit -m "Add my first application"
-   git push origin main
+   git push origin <default-branch>  # usually master or main
    ```
 
 3. **Watch it deploy** in GitHub Actions!

@@ -169,7 +169,7 @@ export TEST_MODE=false
 - **Undeploy**: Cleans up test deployments
 - **Destructive Changes**: Warnings only
 
-### **Production Deployment (Master)**
+### **Production Deployment (Default Branch)**
 - **Draft**: Skipped
 - **Testonly**: Skipped
 - **Production**: Deployed to production
