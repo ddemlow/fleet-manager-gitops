@@ -3,3 +3,7 @@ manifests/_compiled/
 # Local/CI artifacts
 action.log
 
+# Python bytecode
+__pycache__/
+*.pyc
+
