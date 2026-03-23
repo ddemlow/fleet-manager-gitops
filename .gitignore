@@ -1,2 +1,22 @@
+# Compiled manifests
 manifests/_compiled/
 
+# Logs
+*.log
+
+# Secrets and credentials
+*.pem
+*.key
+*.p12
+.env
+.env.*
+secrets/
+credentials/
+
+# OS files
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
