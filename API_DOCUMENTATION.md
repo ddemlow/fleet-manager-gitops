@@ -231,15 +231,15 @@ headers = {
 ### Debug Commands
 ```bash
 # Test API connectivity
-curl -H "Authorization: Bearer $SC_FM_APIKEY" \
+curl -H "api-key: $SC_FM_APIKEY" \
      https://api.scalecomputing.com/api/v2/clusters
 
 # List applications
-curl -H "Authorization: Bearer $SC_FM_APIKEY" \
+curl -H "api-key: $SC_FM_APIKEY" \
      https://api.scalecomputing.com/api/v2/deployment-applications
 
 # Get specific application
-curl -H "Authorization: Bearer $SC_FM_APIKEY" \
+curl -H "api-key: $SC_FM_APIKEY" \
      https://api.scalecomputing.com/api/v2/deployment-applications/{id}
 ```
 
