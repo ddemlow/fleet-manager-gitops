@@ -87,7 +87,7 @@ jobs:
             continue
           fi
           echo "🧪 Deploying $manifest in test mode..."
-          python scripts/test-deploy.py "$manifest"
+          python scripts/deploy.py --test --create-test-manifests --test-cluster-group dd_szt15b "$manifest"
         done
     
     - name: Create test deployment summary
