@@ -435,7 +435,7 @@ For detailed information, see **[LIFECYCLE_MANAGEMENT.md](LIFECYCLE_MANAGEMENT.m
 ### **Debug Commands:**
 ```bash
 # Test Fleet Manager API connectivity
-curl -H "Authorization: Bearer your-api-key" https://api.scalecomputing.com/api/v2/clusters
+curl -H "api-key: your-api-key" https://api.scalecomputing.com/api/v2/clusters
 
 # Validate manifests locally
 python scripts/validate-manifests.py

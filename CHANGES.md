@@ -76,7 +76,7 @@ headers = {
 
 ### **1. Test API Connectivity:**
 ```bash
-curl -H "Authorization: Bearer your-api-key" https://api.scalecomputing.com/api/v2/clusters
+curl -H "api-key: your-api-key" https://api.scalecomputing.com/api/v2/clusters
 ```
 
 ### **2. Test Deployment Locally:**
@@ -120,7 +120,7 @@ If you were using an older version:
 ### **Debug Commands:**
 ```bash
 # Test Fleet Manager API
-curl -H "Authorization: Bearer your-api-key" https://api.scalecomputing.com/api/v2/clusters
+curl -H "api-key: your-api-key" https://api.scalecomputing.com/api/v2/clusters
 
 # Test deployment locally
 export SC_FM_APIKEY="your-fleet-manager-api-key"

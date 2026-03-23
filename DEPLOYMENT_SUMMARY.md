@@ -178,7 +178,7 @@ if: github.ref == 'refs/heads/main'
 ### **Debug Commands:**
 ```bash
 # Test API connectivity
-curl -H "Authorization: Bearer your-api-key" https://api.scalecomputing.com/api/v2/health
+curl -H "api-key: your-api-key" https://api.scalecomputing.com/api/v2/health
 
 # Validate manifests locally
 python scripts/validate-manifests.py
