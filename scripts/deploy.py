@@ -6,6 +6,7 @@ Automatically deploys manifests from GitHub to Fleet Manager via direct API call
 
 import os
 import sys
+import subprocess
 import yaml
 import json
 import requests
@@ -66,36 +67,33 @@ class FleetManagerGitOps:
         
         # Repository information
         try:
-            import subprocess
-            result = subprocess.run(['git', 'remote', 'get-url', 'origin'], 
+            result = subprocess.run(['git', 'remote', 'get-url', 'origin'],
                                   capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
                 repo_url = result.stdout.strip()
                 description_parts.append(f"🔗 Repository: {repo_url}")
-        except:
+        except (OSError, subprocess.SubprocessError):
             description_parts.append("🔗 Repository: fleet-manager-gitops")
-        
+
         # Git commit information
         try:
-            import subprocess
-            result = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], 
+            result = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
                                   capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
                 commit_sha = result.stdout.strip()
                 description_parts.append(f"📝 Commit: {commit_sha}")
-        except:
+        except (OSError, subprocess.SubprocessError):
             pass
-        
+
         # Branch information
         try:
-            import subprocess
-            result = subprocess.run(['git', 'branch', '--show-current'], 
+            result = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
                                   capture_output=True, text=True, timeout=5)
             if result.returncode == 0:
                 branch = result.stdout.strip()
                 if branch:
                     description_parts.append(f"🌿 Branch: {branch}")
-        except:
+        except (OSError, subprocess.SubprocessError):
             pass
         
         # Test mode indicator
@@ -319,7 +317,6 @@ class FleetManagerGitOps:
 
         # Prefer using git to detect changes
         try:
-            import subprocess
             # Ensure we are in a git repo and HEAD exists
             in_repo = subprocess.run(
                 ['git', 'rev-parse', '--is-inside-work-tree'], capture_output=True, text=True
@@ -937,8 +934,6 @@ class FleetManagerGitOps:
                 all_ok = all_ok and released
 
         return all_ok
-        
-        return False
 
     def run(self):
         """Main deployment process with enhanced controls"""
