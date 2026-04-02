@@ -31,8 +31,17 @@ class FleetManagerGitOps:
         # Filter out empty strings
         self.target_applications = [app.strip() for app in self.target_applications if app.strip()]
         
+        # Test manifest creation settings
+        self.create_test_manifests = os.getenv('CREATE_TEST_MANIFESTS', '').lower() in ('1', 'true', 'yes')
+        self.test_cluster_group = os.getenv('TEST_CLUSTER_GROUP', 'dd_szt15b')
+
+        # Optional: deploy a single manifest file (set via CLI positional arg)
+        self.single_manifest = os.getenv('SINGLE_MANIFEST', '')
+
         # Track deployments for monitoring
         self.created_deployments = []
+        # Track test manifests for cleanup
+        self._test_manifest_paths = []
         
         if not self.fm_api_key:
             raise ValueError("SC_FM_APIKEY environment variable is required")
@@ -102,6 +111,71 @@ class FleetManagerGitOps:
         
         # Join with newlines for better readability in UI
         return " | ".join(description_parts)
+
+    def create_test_manifest(self, manifest_path: str) -> str:
+        """Create a test version of a manifest with -test suffix and test cluster group.
+
+        Returns the path to the temporary test manifest file.
+        The caller is responsible for cleanup (or use self._test_manifest_paths tracking).
+        """
+        from datetime import datetime
+
+        with open(manifest_path, 'r') as f:
+            manifest = yaml.safe_load(f)
+
+        test_manifest = manifest.copy()
+
+        if 'metadata' in test_manifest:
+            # Allow manifest to override test cluster group
+            test_group = test_manifest['metadata'].get('testClusterGroup', self.test_cluster_group)
+            print(f"📋 Using test cluster group: {test_group}")
+
+            test_manifest['metadata']['clusterGroups'] = [test_group]
+
+            # Add -test suffix to application name
+            original_name = test_manifest['metadata'].get('name', '')
+            test_manifest['metadata']['name'] = f"{original_name}-test"
+
+            # Build descriptive test description
+            original_desc = test_manifest['metadata'].get('description', '')
+            desc_parts = [
+                "🧪 TEST DEPLOYMENT",
+                f"📦 Original: {original_desc}",
+                f"🎯 Test Cluster: {test_group}",
+                f"🕐 Created: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC",
+                "🤖 GitOps Automated Test"
+            ]
+
+            try:
+                import subprocess
+                result = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
+                                      capture_output=True, text=True, timeout=5)
+                if result.returncode == 0:
+                    desc_parts.append(f"📝 Commit: {result.stdout.strip()}")
+            except Exception:
+                pass
+
+            test_manifest['metadata']['description'] = " | ".join(desc_parts)
+
+        # Write test manifest alongside original
+        test_manifest_path = manifest_path.replace('.yaml', '-test.yaml')
+        with open(test_manifest_path, 'w') as f:
+            yaml.dump(test_manifest, f, default_flow_style=False)
+
+        self._test_manifest_paths.append(test_manifest_path)
+        print(f"📄 Test manifest created: {test_manifest_path}")
+        return test_manifest_path
+
+    def _cleanup_test_manifests(self):
+        """Remove temporary test manifest files."""
+        for path in self._test_manifest_paths:
+            try:
+                if os.path.exists(path):
+                    os.remove(path)
+                    print(f"🧹 Cleaned up test manifest: {path}")
+            except OSError as e:
+                print(f"⚠️  Could not remove {path}: {e}")
+        self._test_manifest_paths.clear()
 
     def get_manifest_lifecycle_state(self, manifest: dict) -> str:
         """Get the lifecycle state of a manifest"""
@@ -943,6 +1017,8 @@ class FleetManagerGitOps:
         # Print control flags
         if self.test_mode:
             print("🧪 TEST_MODE: Deploying to test cluster group only")
+        if self.create_test_manifests:
+            print(f"🧪 CREATE_TEST_MANIFESTS: Will create -test copies targeting cluster group '{self.test_cluster_group}'")
         if self.only_compile:
             print("🔧 ONLY_COMPILE mode: Will only compile manifests, not deploy")
         if self.skip_deployment_trigger:
@@ -951,6 +1027,8 @@ class FleetManagerGitOps:
             print("🔍 DIAGNOSTIC_MODE: Enhanced error checking and conflict detection enabled")
         if self.target_applications:
             print(f"🎯 TARGET_APPLICATIONS mode: Will only process {self.target_applications}")
+        if self.single_manifest:
+            print(f"📄 SINGLE_MANIFEST mode: Will only process {self.single_manifest}")
         
         # If only compiling, skip Fleet Manager API connection
         if self.only_compile:
@@ -973,8 +1051,14 @@ class FleetManagerGitOps:
             print(f"❌ Fleet Manager API connection error: {e}")
             return False
         
-        # Get changed files
-        changed_files = self.get_changed_files()
+        # Get changed files (or use single manifest if specified)
+        if self.single_manifest:
+            if not os.path.exists(self.single_manifest):
+                print(f"❌ Manifest file not found: {self.single_manifest}")
+                return False
+            changed_files = [self.single_manifest]
+        else:
+            changed_files = self.get_changed_files()
         # Skip files that were deleted (can appear in event payload)
         existing_changed_files = [f for f in changed_files if os.path.exists(f)]
         missing_files = [f for f in changed_files if not os.path.exists(f)]
@@ -1055,17 +1139,33 @@ class FleetManagerGitOps:
             except Exception:
                 application_files.append(cf)
 
+        # If --create-test-manifests, transform each manifest into a -test copy
+        if self.create_test_manifests:
+            test_files = []
+            for file_path in application_files:
+                try:
+                    test_path = self.create_test_manifest(file_path)
+                    test_files.append(test_path)
+                except Exception as e:
+                    print(f"⚠️  Failed to create test manifest for {file_path}: {e}")
+            application_files = test_files
+
         # Process each Application file
         success_count = 0
-        for file_path in application_files:
-            if self.process_manifest(file_path):
-                success_count += 1
-        
+        try:
+            for file_path in application_files:
+                if self.process_manifest(file_path):
+                    success_count += 1
+        finally:
+            # Always clean up test manifests even on failure
+            if self.create_test_manifests:
+                self._cleanup_test_manifests()
+
         print(f"\n📊 Deployment Summary:")
         print(f"✅ Successful: {success_count}")
         print(f"⏭️  Skipped: {skipped_count}")
         print(f"❌ Failed: {len(application_files) - success_count}")
-        
+
         # Monitor deployments if requested
         if self.monitor_deployments and self.created_deployments:
             print(f"\n🔍 Monitoring {len(self.created_deployments)} deployments...")
@@ -1090,16 +1190,26 @@ class FleetManagerGitOps:
 if __name__ == "__main__":
     import argparse
     
-    parser = argparse.ArgumentParser(description='Enhanced Fleet Manager GitOps deployment')
+    parser = argparse.ArgumentParser(description='Fleet Manager GitOps deployment')
+    parser.add_argument('manifest', nargs='?', default=None,
+                        help='Optional: deploy a single manifest file instead of detecting changes')
     parser.add_argument('--target-apps', help='Comma-separated list of applications to target')
     parser.add_argument('--only-compile', action='store_true', help='Only compile manifests, do not deploy')
     parser.add_argument('--skip-deployment-trigger', action='store_true', help='Update applications but do not trigger deployments')
     parser.add_argument('--diagnostic', action='store_true', help='Enable enhanced error checking and conflict detection')
     parser.add_argument('--dry-run', action='store_true', help='Show what would be deployed without making changes')
-    
+    parser.add_argument('--test', action='store_true',
+                        help='Enable test mode (deploy testonly manifests, add test mode indicators)')
+    parser.add_argument('--test-cluster-group', default='dd_szt15b',
+                        help='Cluster group for test deployments (default: dd_szt15b)')
+    parser.add_argument('--create-test-manifests', action='store_true',
+                        help='Create -test copies of manifests with modified names and cluster groups')
+
     args = parser.parse_args()
-    
+
     # Set environment variables from command line args
+    if args.manifest:
+        os.environ['SINGLE_MANIFEST'] = args.manifest
     if args.target_apps:
         os.environ['TARGET_APPLICATIONS'] = args.target_apps
     if args.only_compile:
@@ -1108,7 +1218,13 @@ if __name__ == "__main__":
         os.environ['SKIP_DEPLOYMENT_TRIGGER'] = 'true'
     if args.diagnostic:
         os.environ['DIAGNOSTIC_MODE'] = 'true'
-    
+    if args.test:
+        os.environ['TEST_MODE'] = 'true'
+    if args.test_cluster_group:
+        os.environ['TEST_CLUSTER_GROUP'] = args.test_cluster_group
+    if args.create_test_manifests:
+        os.environ['CREATE_TEST_MANIFESTS'] = 'true'
+
     try:
         deployer = FleetManagerGitOps()
         success = deployer.run()
